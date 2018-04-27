@@ -22,3 +22,4 @@
 #import "UIDevice+Hardware.h"
 #import "UIViewController+AutoDismiss.h"
 #import "Wallet.h"
+#import "ModuleXMLHttpRequest.h"
