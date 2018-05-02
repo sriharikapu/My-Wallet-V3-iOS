@@ -2132,3 +2132,108 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "ซื้อและขาย bitcoin โดยตรงจากของคุณ Blockchain กระเป๋าคุมข้อมูลนะ เริ่มด้วยการสร้างบัญชีในการซื้อ-ขา&ขายแท็บอก";
+
+/* (No Commment) */
+"All Wallets" = "ทั้งกระเป๋าคุมข้อมูลต่างๆ";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "เก็บของคุณ xPub นเรื่องส่วนตัว ใครบางคนใช้งานของคุณ xPub สามารถมองเห็นทั้งหมดของคุณเงินทุนและการทำธุรกรรมจำน";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "ของคุณ xPub เป็นขั้นสูงคุณสมบัติที่มีทั้งหมดของคุณสาธารณะที่อยู่นะ";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "เกี่ยวกับธุรกรรมเกิดขึ้นตอนที่คุณส่งและการร้องขอ bitcoin เงินสด";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "เอา Bitcoin เงินสด";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "การร้องขอ Bitcoin เงินสด";
+
+/* (No Commment) */
+"Price" = "ราคา";
+
+/* (No Commment) */
+"See charts" = "เห็นชาร์ท";
+
+/* (No Commment) */
+"Price charts" = "คาชาร์ท";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Bitcoin เงินสด";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Bitcoin เงินราคา";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "ป้อน Bitcoin เงินที่อยู่หรือเลือก";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "คัดลอกมันได้รับที่อยู่ไปยังคลิปบอร์ด? ถ้าอย่างนั้นจะได้รับคำแนะนำอีกคนโปรแกรมอาจจะสามารถดูข้อมูลนี้นะ";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "โปรดส่ง BCH ที่ Bitcoin เงินสดที่อยู่\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "การต่อรองค่าธรรมเนียมกระทบว่ามันเร็วแค่ไหนที่ตื่นเครือข่ายจะยืนยันของคุณเกี่ยวกับธุรกรรม,และขึ้นอยู่กับปัจจุบันบนเครือข่ายเงื่อนไข";
+
+/* (No Commment) */
+"Trade Refunded" = "แลกเปลี่ Refunded";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "เราตื่นเต้นมากเลยที่จะประกาศว่าคุณ Blockchain กระเป๋าคุมข้อมูลจะอนุญาตให้คุณ seamlessly องส่งได้รับและการแลกเปลี่ยน Bitcoin เงินสด!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "คุณแน่ใจนะว่านี่เป็น bitcoin เงินสดที่อยู่ของเธอไหม?";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "ส่งเงินทุนที่จะเป็น bitcoin ที่อยู่โดยบังเอิญจะส่งผลให้สูญเสียของเงิน.";
+
+/* (No Commment) */
+"All Wallets" = "กระเป๋าเงินทั้งหมด";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "เก็บ xPub ของคุณให้เป็นส่วนตัว ผู้ที่มีการเข้าถึง xPub จะสามารถเห็นเงินและธุรกรรมทั้งหมดของคุณได้";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "xPub ของคุณเป็นคุณสมบัติขั้นสูงที่มีที่อยู่สาธารณะของคุณทั้งหมด";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "ธุรกรรมจะเกิดขึ้นเมื่อคุณส่งหรือรับ bitcoin cash";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "รับ Bitcoin Cash";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "ร้องขอ Bitcoin Cash";
+
+/* (No Commment) */
+"Price" = "ราคา";
+
+/* (No Commment) */
+"See charts" = "ชมแผนภูมิ";
+
+/* (No Commment) */
+"Price charts" = "แผนภูมิราคา";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Bitcoin Cash";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "ราคา Bitcoin Cash";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "กรอกที่อยู่ Bitcoin Cash หรือเลือก";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "คัดลอกที่อยู่การรับไปยังคลิปบอร์ด? หากทำเช่นนั้น โปรดทราบว่าแอปพลิเคชันอื่นอาจสามารถมองเห็นข้อมูลนี้ได้";
+
+/* (No Commment) */
+"Start trading" = "เริ่มทำการเทรด";
+
+/* (No Commment) */
+"Trade bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "เทรด bitcoin โดยตรงจากกระเป๋าเงิน Blockchain ของคุณ เริ่มโดยการสร้างบัญชีในแถบ ซื้อ & ขาย";
+
+/* (No Commment) */
+"The wait is over" = "การรอคอยสิ้นสุดลงแล้ว";

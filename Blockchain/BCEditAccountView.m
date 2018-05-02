@@ -12,13 +12,14 @@
 
 @implementation BCEditAccountView
 
--(id)init
+-(id)initWithAssetType:(AssetType)assetType
 {
     UIWindow *window = app.window;
     
     self = [super initWithFrame:CGRectMake(0, DEFAULT_HEADER_HEIGHT, window.frame.size.width, window.frame.size.height - DEFAULT_HEADER_HEIGHT)];
     
     if (self) {
+        self.assetType = assetType;
         self.backgroundColor = [UIColor whiteColor];
         
         UILabel *labelLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 55, window.frame.size.width - 40, 25)];
@@ -78,7 +79,9 @@
     
     [self.labelTextField resignFirstResponder];
     
-    [app showBusyViewWithLoadingText:BC_STRING_LOADING_SYNCING_WALLET];
+    if (self.assetType == AssetTypeBitcoin) {
+        [app showBusyViewWithLoadingText:BC_STRING_LOADING_SYNCING_WALLET];
+    }
     
     [app closeModalWithTransition:kCATransitionFade];
     
@@ -87,9 +90,8 @@
 
 - (void)changeAccountName:(NSString *)name
 {
-    [app.wallet setLabelForAccount:self.accountIdx label:name];
+    [app.wallet setLabelForAccount:self.accountIdx label:name assetType:self.assetType];
 }
-
 
 #pragma mark - Textfield Delegates
 

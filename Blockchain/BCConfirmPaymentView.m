@@ -13,13 +13,8 @@
 #import "BCTotalAmountView.h"
 #import "BCConfirmPaymentViewModel.h"
 
-#define CELL_HEIGHT 60
-
-const int cellRowFrom = 0;
-const int cellRowTo = 1;
-const int cellRowDescription = 2;
-const int cellRowAmount = 3;
-const int cellRowFee = 4;
+#define CELL_HEIGHT_DEFAULT 60
+#define CELL_HEIGHT_SMALL 44
 
 @interface BCConfirmPaymentView () <UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate>
 @property (nonatomic) BCSecureTextField *descriptionField;
@@ -30,7 +25,7 @@ const int cellRowFee = 4;
 @end
 @implementation BCConfirmPaymentView
 
-- (id)initWithWindow:(UIView *)window viewModel:(BCConfirmPaymentViewModel *)viewModel
+- (id)initWithWindow:(UIView *)window viewModel:(BCConfirmPaymentViewModel *)viewModel sendButtonFrame:(CGRect)sendButtonFrame
 {
     self = [super initWithFrame:CGRectMake(0, DEFAULT_HEADER_HEIGHT, window.frame.size.width, window.frame.size.height - DEFAULT_HEADER_HEIGHT)];
     
@@ -48,7 +43,7 @@ const int cellRowFee = 4;
         
         [self setupRows];
         
-        CGFloat tableViewHeight = CELL_HEIGHT * [self.rows count];
+        CGFloat tableViewHeight = [self getCellHeight] * [self.rows count];
         
         self.backgroundColor = [UIColor whiteColor];
         
@@ -76,8 +71,6 @@ const int cellRowFee = 4;
         
         self.tableView = summaryTableView;
         
-        CGFloat buttonHeight = 40;
-        CGRect buttonFrame = CGRectMake(0, app.window.frame.size.height - DEFAULT_HEADER_HEIGHT - buttonHeight, app.window.frame.size.width, buttonHeight);;
         NSString *buttonTitle;
         
         if (self.contactTransaction) {
@@ -86,8 +79,10 @@ const int cellRowFee = 4;
             buttonTitle = BC_STRING_SEND;
         }
         
-        self.reallyDoPaymentButton = [[UIButton alloc] initWithFrame:CGRectZero];
-        self.reallyDoPaymentButton.frame = buttonFrame;
+        self.reallyDoPaymentButton = [[UIButton alloc] initWithFrame:sendButtonFrame];
+        self.reallyDoPaymentButton.layer.cornerRadius = CORNER_RADIUS_BUTTON;
+        [self.reallyDoPaymentButton changeYPosition:self.bounds.size.height - 12 - sendButtonFrame.size.height];
+        
         [self.reallyDoPaymentButton setTitle:buttonTitle forState:UIControlStateNormal];
         self.reallyDoPaymentButton.backgroundColor = COLOR_BLOCKCHAIN_LIGHT_BLUE;
         self.reallyDoPaymentButton.titleLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:17.0];
@@ -96,6 +91,20 @@ const int cellRowFee = 4;
         
         [self addSubview:self.reallyDoPaymentButton];
         
+        if (viewModel.warningText) {
+            UITextView *warning = [[UITextView alloc] initWithFrame:self.reallyDoPaymentButton.frame];
+            warning.textContainerInset = UIEdgeInsetsMake(8, 8, 8, 8);
+            warning.editable = NO;
+            warning.scrollEnabled = NO;
+            warning.selectable = NO;
+            warning.backgroundColor = COLOR_BLOCKCHAIN_YELLOW;
+            [self addSubview:warning];
+            warning.attributedText = viewModel.warningText;
+            CGSize fittedSize = [warning sizeThatFits:CGSizeMake(self.reallyDoPaymentButton.frame.size.width, CGFLOAT_MAX)];
+            [warning changeWidth:self.reallyDoPaymentButton.frame.size.width];
+            [warning changeHeight:fittedSize.height];
+            [warning changeYPosition:self.reallyDoPaymentButton.frame.origin.y - warning.frame.size.height - 12];
+        }
     }
     return self;
 }
@@ -105,7 +114,7 @@ const int cellRowFee = 4;
     self.rows = [NSMutableArray new];
     if (self.viewModel.from) [self.rows addObject:@[BC_STRING_FROM, self.viewModel.from]];
     if (self.viewModel.to) [self.rows addObject:@[BC_STRING_TO, self.viewModel.to]];
-    [self.rows addObject:@[BC_STRING_DESCRIPTION, self.viewModel.noteText ? : @""]];
+    if (self.viewModel.showDescription) [self.rows addObject:@[BC_STRING_DESCRIPTION, self.viewModel.noteText ? : @""]];
     if (self.viewModel.btcWithFiatAmountText) [self.rows addObject:@[BC_STRING_AMOUNT, self.viewModel.btcWithFiatAmountText]];
     if (self.viewModel.btcWithFiatFeeText) [self.rows addObject:@[BC_STRING_FEE, self.viewModel.btcWithFiatFeeText]];
 }
@@ -120,6 +129,13 @@ const int cellRowFee = 4;
 - (void)feeInformationButtonClicked
 {
     [self.confirmDelegate feeInformationButtonClicked];
+}
+
+#pragma mark - Helpers
+
+- (CGFloat)getCellHeight
+{
+    return IS_USING_SCREEN_SIZE_4S && (self.viewModel.warningText || self.rows.count > 4) ? CELL_HEIGHT_SMALL : CELL_HEIGHT_DEFAULT;
 }
 
 #pragma mark - Text Field Delegate
@@ -137,7 +153,7 @@ const int cellRowFee = 4;
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return self.isEditingDescription ? self.descriptionCellHeight : CELL_HEIGHT;
+    return self.isEditingDescription ? self.descriptionCellHeight : [self getCellHeight];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -147,6 +163,8 @@ const int cellRowFee = 4;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    CGFloat cellHeight = [self getCellHeight];
+    
     UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
     
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -176,7 +194,7 @@ const int cellRowFee = 4;
             [testLabel sizeToFit];
             
             CGFloat feeInformationButtonWidth = 19;
-            self.feeInformationButton = [[UIButton alloc] initWithFrame:CGRectMake(15 + testLabel.frame.size.width + 8, CELL_HEIGHT/2 - feeInformationButtonWidth/2, feeInformationButtonWidth, feeInformationButtonWidth)];
+            self.feeInformationButton = [[UIButton alloc] initWithFrame:CGRectMake(15 + testLabel.frame.size.width + 8, cellHeight/2 - feeInformationButtonWidth/2, feeInformationButtonWidth, feeInformationButtonWidth)];
             [self.feeInformationButton setImage:[[UIImage imageNamed:@"help"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
             self.feeInformationButton.tintColor = COLOR_BLOCKCHAIN_LIGHT_BLUE;
             [self.feeInformationButton addTarget:self action:@selector(feeInformationButtonClicked) forControlEvents:UIControlEventTouchUpInside];
@@ -189,7 +207,7 @@ const int cellRowFee = 4;
             CGFloat leftMargin = IS_USING_6_OR_7_PLUS_SCREEN_SIZE ? 20 : 15;
             CGFloat labelHeight = 16;
             
-            UILabel *descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(leftMargin, CELL_HEIGHT/2 - labelHeight/2, self.frame.size.width/2 - 8 - leftMargin, labelHeight)];
+            UILabel *descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(leftMargin, cellHeight/2 - labelHeight/2, self.frame.size.width/2 - 8 - leftMargin, labelHeight)];
             descriptionLabel.text = BC_STRING_DESCRIPTION;
             descriptionLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:FONT_SIZE_SMALL];
             descriptionLabel.textColor = COLOR_TEXT_DARK_GRAY;
@@ -197,7 +215,7 @@ const int cellRowFee = 4;
             [cell.contentView addSubview:descriptionLabel];
             
             CGFloat descriptionFieldHeight = 20;
-            self.descriptionField = [[BCSecureTextField alloc] initWithFrame:CGRectMake(self.frame.size.width/2 + 16, CELL_HEIGHT/2 - descriptionFieldHeight/2, self.frame.size.width/2 - 16 - 15, descriptionFieldHeight)];
+            self.descriptionField = [[BCSecureTextField alloc] initWithFrame:CGRectMake(self.frame.size.width/2 + 16, cellHeight/2 - descriptionFieldHeight/2, self.frame.size.width/2 - 16 - 15, descriptionFieldHeight)];
             self.descriptionField.font = [UIFont fontWithName:FONT_MONTSERRAT_LIGHT size:FONT_SIZE_SMALL];
             self.descriptionField.textColor = COLOR_TEXT_DARK_GRAY;
             self.descriptionField.textAlignment = NSTextAlignmentRight;

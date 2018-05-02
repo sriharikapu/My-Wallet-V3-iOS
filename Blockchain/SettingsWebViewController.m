@@ -35,7 +35,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-#ifdef ENABLE_DEBUG_MENU
+#ifdef DEBUG
     self.longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     self.longPressGesture.minimumPressDuration = DURATION_LONG_PRESS_GESTURE_DEBUG;
     self.debugButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 15, 80, 51)];

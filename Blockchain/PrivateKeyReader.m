@@ -8,23 +8,21 @@
 
 #import "PrivateKeyReader.h"
 #import "RootService.h"
-
 @interface PrivateKeyReader()
 @property (nonatomic, copy) void (^onClose)();
+@property (nonatomic) AVCaptureVideoPreviewLayer *videoPreviewLayer;
+@property (nonatomic) AVCaptureSession *captureSession;
+@property (nonatomic) AssetType assetType;
 @end
 @implementation PrivateKeyReader
 
-AVCaptureSession *captureSession;
-AVCaptureVideoPreviewLayer *videoPreviewLayer;
-BOOL isReadingQRCode;
-
-- (id)initWithSuccess:(void (^)(NSString*))__success error:(void (^)(NSString*))__error acceptPublicKeys:(BOOL)acceptPublicKeys busyViewText:(NSString *)text
+- (id)initWithAssetType:(AssetType)assetType success:(void (^)(NSString*))__success error:(void (^)(NSString*))__error acceptPublicKeys:(BOOL)acceptPublicKeys busyViewText:(NSString *)text
 {
     self = [super init];
     
     if (self) {
         self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-        
+        self.assetType = assetType;
         self.success = __success;
         self.error = __error;
         self.acceptsPublicKeys = acceptPublicKeys;
@@ -82,35 +80,35 @@ BOOL isReadingQRCode;
         return;
     }
     
-    captureSession = [[AVCaptureSession alloc] init];
-    [captureSession addInput:input];
+    _captureSession = [[AVCaptureSession alloc] init];
+    [_captureSession addInput:input];
     
     AVCaptureMetadataOutput *captureMetadataOutput = [[AVCaptureMetadataOutput alloc] init];
-    [captureSession addOutput:captureMetadataOutput];
+    [_captureSession addOutput:captureMetadataOutput];
     
     dispatch_queue_t dispatchQueue;
     dispatchQueue = dispatch_queue_create("myQueue", NULL);
     [captureMetadataOutput setMetadataObjectsDelegate:self queue:dispatchQueue];
     [captureMetadataOutput setMetadataObjectTypes:[NSArray arrayWithObject:AVMetadataObjectTypeQRCode]];
     
-    videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:captureSession];
-    [videoPreviewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
+    _videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_captureSession];
+    [_videoPreviewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
     
     CGRect frame = CGRectMake(0, DEFAULT_HEADER_HEIGHT, app.window.frame.size.width, app.window.frame.size.height - DEFAULT_HEADER_HEIGHT);
     
-    [videoPreviewLayer setFrame:frame];
+    [_videoPreviewLayer setFrame:frame];
     
-    [self.view.layer addSublayer:videoPreviewLayer];
+    [self.view.layer addSublayer:_videoPreviewLayer];
     
-    [captureSession startRunning];
+    [_captureSession startRunning];
 }
 
 - (void)stopReadingQRCode
 {
-    [captureSession stopRunning];
-    captureSession = nil;
+    [_captureSession stopRunning];
+    _captureSession = nil;
     
-    [videoPreviewLayer removeFromSuperlayer];
+    [_videoPreviewLayer removeFromSuperlayer];
     
     [self dismissViewControllerAnimated:YES completion:^{
         if (self.onClose) {
@@ -153,7 +151,7 @@ BOOL isReadingQRCode;
                     [app hideBusyView];
                     
                     if (self.acceptsPublicKeys) {
-                        if ([app.wallet isBitcoinAddress:scannedString]) {
+                        if ([app.wallet isValidAddress:scannedString assetType:self.assetType]) {
                             [app askUserToAddWatchOnlyAddress:scannedString success:self.success];
                         } else {
                             self.onClose = ^(){

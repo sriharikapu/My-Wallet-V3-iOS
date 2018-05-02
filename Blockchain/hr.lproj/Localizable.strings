@@ -2092,3 +2092,60 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Kupovati i prodavati биткойны izravno iz svog novčanika blockchain. Počnite sa stvaranjem računa u odjeljku za Kupiti i prodati.";
+
+/* (No Commment) */
+"All Wallets" = "Sve Torbice";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Neka vaša Privatna xPub. Netko ima pristup vašem xPub moći vidjeti sva svoja sredstva i rad.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Vaš xPub-to je dodatna funkcija koja sadrži sve svoje javne nastupe.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Zaključak bavi se događa kada ste poslali i upit биткоин gotovinu.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Dobiti Bitcoin Cash";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Zahtjev Биткоин Gotovinu";
+
+/* (No Commment) */
+"Price" = "Cijena";
+
+/* (No Commment) */
+"See charts" = "Pogledajte grafiku";
+
+/* (No Commment) */
+"Price charts" = "Cijena karata";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Биткоин Gotovinom";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Cijena Bitcoin Cash";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Unesite Биткоин gotovinu adrese ili izbor";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Kopija toga, dobiti adresu u međuspremnik? Ako je to tako, da druge aplikacije mogu vidjeti te podatke.";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "Molimo, pošaljite ВСН na Биткоин novac adrese\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "Naknade utjecaja posao kako brzo izvlači mrežu će se potvrditi svoj posao i zavisi od trenutnog stanja mreže.";
+
+/* (No Commment) */
+"Trade Refunded" = "Klađenje Se Vraća";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "Mi smo zadovoljstvom, da vaš blockchain novčanik će vam omogućiti da lako slanje, primanje i dijeljenje Биткоина Gotovinu!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "Sigurni ste da je to биткоин gotovinu adrese?";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "Slanje novca u биткоин adresu slučajno dovesti do gubitka sredstava.";

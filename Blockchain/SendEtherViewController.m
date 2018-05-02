@@ -53,12 +53,7 @@
 {
     [super viewDidLoad];
     
-    CGFloat statusBarAdjustment = [[UIApplication sharedApplication] statusBarFrame].size.height > DEFAULT_STATUS_BAR_HEIGHT ? DEFAULT_STATUS_BAR_HEIGHT : 0;
-
-    self.view.frame = CGRectMake(0,
-                                 TAB_HEADER_HEIGHT_DEFAULT - TAB_HEADER_HEIGHT_SMALL_OFFSET - DEFAULT_HEADER_HEIGHT,
-                                 [UIScreen mainScreen].bounds.size.width,
-                                 [UIScreen mainScreen].bounds.size.height - (TAB_HEADER_HEIGHT_DEFAULT - TAB_HEADER_HEIGHT_SMALL_OFFSET) - DEFAULT_FOOTER_HEIGHT - statusBarAdjustment);
+    [self resetFrame];
     
     UILabel *fromLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 12, 40, 21)];
     fromLabel.adjustsFontSizeToFitWidth = YES;
@@ -158,7 +153,19 @@
 {
     [super viewWillAppear:animated];
     
+    [self resetFrame];
+    
     [self getHistory];
+}
+
+- (void)resetFrame
+{
+    CGFloat statusBarAdjustment = [[UIApplication sharedApplication] statusBarFrame].size.height > DEFAULT_STATUS_BAR_HEIGHT ? DEFAULT_STATUS_BAR_HEIGHT : 0;
+    
+    self.view.frame = CGRectMake(0,
+                                 DEFAULT_HEADER_HEIGHT_OFFSET,
+                                 [UIScreen mainScreen].bounds.size.width,
+                                 [UIScreen mainScreen].bounds.size.height - DEFAULT_HEADER_HEIGHT - DEFAULT_HEADER_HEIGHT_OFFSET - DEFAULT_FOOTER_HEIGHT - statusBarAdjustment);
 }
 
 - (void)keepCurrentPayment
@@ -186,7 +193,7 @@
         self.amountInputView.userInteractionEnabled = YES;
     }
 
-    [app.wallet createNewEtherPayment];
+    [app.wallet createNewPayment:AssetTypeEther];
 
     if (self.addressToSet) {
         [self selectToAddress:self.addressToSet];
@@ -238,7 +245,7 @@
 {
     [super doCurrencyConversion];
     
-    [app.wallet changeEtherPaymentAmount:self.ethAmount];
+    [app.wallet changePaymentAmount:self.ethAmount assetType:AssetTypeEther];
 }
 
 - (void)didUpdatePayment:(NSDictionary *)payment;
@@ -351,7 +358,7 @@
     
     [self checkIfEtherContractAddress:self.toAddress successHandler:^(NSString *nonContractAddress) {
         
-        [app.wallet changeEtherPaymentTo:nonContractAddress];
+        [app.wallet changePaymentToAddress:nonContractAddress assetType:AssetTypeEther];
 
         NSDecimalNumber *totalDecimalNumber = [self.ethAmount decimalNumberByAdding:self.ethFee];
         
@@ -364,7 +371,7 @@
                                                               fiatFee:[NSNumberFormatter formatEthToFiatWithSymbol:[self.ethFee stringValue] exchangeRate:self.latestExchangeRate]
                                                               fiatTotal:[NSNumberFormatter formatEthToFiatWithSymbol:[NSString stringWithFormat:@"%@", totalDecimalNumber] exchangeRate:self.latestExchangeRate]];
         
-        self.confirmPaymentView = [[BCConfirmPaymentView alloc] initWithWindow:self.view.window viewModel:confirmPaymentViewModel];
+        self.confirmPaymentView = [[BCConfirmPaymentView alloc] initWithWindow:self.view.window viewModel:confirmPaymentViewModel sendButtonFrame:self.continuePaymentButton.frame];
         self.confirmPaymentView.confirmDelegate = self;
         
         [self.confirmPaymentView.reallyDoPaymentButton addTarget:self action:@selector(reallyDoPayment) forControlEvents:UIControlEventTouchUpInside];
@@ -468,7 +475,7 @@
 
 - (BOOL)isEtherAddress:(NSString *)address
 {
-    return [app.wallet isEthAddress:address];
+    return [app.wallet isValidAddress:address assetType:AssetTypeEther];
 }
 
 - (void)selectToAddress:(NSString *)address

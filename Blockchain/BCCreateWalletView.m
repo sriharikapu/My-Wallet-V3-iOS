@@ -10,6 +10,7 @@
 
 #import "RootService.h"
 #import "BuyBitcoinViewController.h"
+#import "Blockchain-Swift.h"
 
 @implementation BCCreateWalletView
 
@@ -183,7 +184,7 @@
 
 - (IBAction)termsOfServiceClicked:(id)sender
 {
-    [app pushWebViewController:[URL_SERVER stringByAppendingString:URL_SUFFIX_TERMS_OF_SERVICE] title:BC_STRING_TERMS_OF_SERVICE];
+    [app pushWebViewController:[[NSBundle walletUrl] stringByAppendingString:URL_SUFFIX_TERMS_OF_SERVICE] title:BC_STRING_TERMS_OF_SERVICE];
     [emailTextField becomeFirstResponder];
 }
 

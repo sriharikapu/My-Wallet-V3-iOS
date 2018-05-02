@@ -15,7 +15,7 @@
 @property (nonatomic) UILabel *noTransactionsTitle;
 @property (nonatomic) UILabel *noTransactionsDescription;
 @property (nonatomic) UIButton *getBitcoinButton;
-
+@property (nonatomic) NSString *balance;
 @property (nonatomic) UIView *noTransactionsView;
 
 - (void)setupNoTransactionsViewInView:(UIView *)view assetType:(AssetType)assetType;
@@ -34,9 +34,9 @@
     [super viewDidLoad];
     
     self.view.frame = CGRectMake(0,
-                                 TAB_HEADER_HEIGHT_DEFAULT - DEFAULT_HEADER_HEIGHT,
-                                 app.window.frame.size.width,
-                                 app.window.frame.size.height - TAB_HEADER_HEIGHT_DEFAULT - DEFAULT_FOOTER_HEIGHT);
+                                 DEFAULT_HEADER_HEIGHT_OFFSET,
+                                 [UIScreen mainScreen].bounds.size.width,
+                                 [UIScreen mainScreen].bounds.size.height - DEFAULT_HEADER_HEIGHT - DEFAULT_HEADER_HEIGHT_OFFSET - DEFAULT_FOOTER_HEIGHT);
     
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
     self.tableView.delegate = self;
@@ -49,16 +49,36 @@
     
     [self setupNoTransactionsViewInView:self.tableView assetType:AssetTypeEther];
     
-    [self loadTransactions];
+    [self reload];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    self.balance = @"";
+    
+    [self reload];
 }
 
 - (void)reload
 {
     [self loadTransactions];
+    
+    [self updateBalance];
+}
+
+- (void)updateBalance
+{
+    NSString *balance = [app.wallet getEthBalanceTruncated];
+    
+    self.balance = app->symbolLocal ? [NSNumberFormatter formatEthToFiatWithSymbol:balance exchangeRate:app.tabControllerManager.latestEthExchangeRate] : [NSNumberFormatter formatEth:balance];
 }
 
 - (void)reloadSymbols
 {
+    [self updateBalance];
+    
     [self.tableView reloadData];
     
     [self.detailViewController reloadSymbols];

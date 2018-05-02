@@ -2107,3 +2107,60 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Nákup a predaj bitcoin priamo z vášho Blockchain peňaženky. Začnite vytvorením účtu v Buy & Sell tab.";
+
+/* (No Commment) */
+"All Wallets" = "Všetky Peňaženky";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Udržať vaše xPub súkromné. Niekto prístup k vašim xPub budú môcť vidieť všetky vaše finančné prostriedky a transakcií.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Vaše xPub je pokročilá funkcia, ktorá obsahuje všetky verejné adresy.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Transakcie sa vyskytujú pri odosielaní a žiadosť bitcoin hotovosti.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Dostať Bitcoin Hotovosti";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Žiadosť Bitcoin Hotovosti";
+
+/* (No Commment) */
+"Price" = "Cena";
+
+/* (No Commment) */
+"See charts" = "Pozri grafy";
+
+/* (No Commment) */
+"Price charts" = "Cena grafy";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Bitcoin Hotovosti";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Bitcoin Peňažné Ceny";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Zadajte Bitcoin Hotovosti alebo vyberte adresu";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Skopírujte tento príjem adresu do schránky? Ak áno, treba upozorniť, že iné aplikácie môže byť schopný pozrieť sa na tieto informácie.";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "Pošlite BCH na Bitcoin Peňažné adresu\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "Transakčné poplatky vplyv, ako rýchlo banských siete potvrdí vaše transakcie, a závisí od aktuálnych podmienok v sieti.";
+
+/* (No Commment) */
+"Trade Refunded" = "Obchod Vrátené";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "Sme radi, oznamujeme, že vaše Blockchain peňaženky vám umožní bez problémov posielať, prijímať a výmena Bitcoin v Hotovosti!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "Ste si istý, že toto je bitcoin peňažné adresu?";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "Poslanie peňazí na bitcoin adresu náhodou bude mať za následok stratu finančných prostriedkov.";

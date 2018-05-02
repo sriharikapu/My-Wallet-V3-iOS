@@ -10,7 +10,7 @@
 #define BC_STRING_BITCOIN NSLocalizedString(@"Bitcoin", nil)
 #define BC_STRING_ETHER NSLocalizedString(@"Ether", nil)
 
-#define BC_STRING_BITCOIN_BALANCES NSLocalizedString(@"Bitcoin Balances", nil)
+#define BC_STRING_ALL_WALLETS NSLocalizedString(@"All Wallets", nil)
 #define BC_STRING_WALLETS NSLocalizedString(@"Wallets", nil)
 
 #define BC_STRING_ANY_ADDRESS NSLocalizedString(@"Any address", nil)
@@ -222,6 +222,7 @@
 #define BC_STRING_TRY_AGAIN NSLocalizedString(@"Try again", nil)
 
 #define BC_STRING_PAYMENT_REQUEST_BITCOIN_ARGUMENT_ARGUMENT NSLocalizedString(@"Please send %@ to bitcoin address.\n%@", nil)
+#define BC_STRING_PAYMENT_REQUEST_BITCOIN_CASH_ARGUMENT NSLocalizedString(@"Please send BCH to the Bitcoin Cash address\n%@", nil)
 #define BC_STRING_PAYMENT_REQUEST_ETHER_ARGUMENT NSLocalizedString(@"Please send ether to %@.", nil)
 #define BC_STRING_AMOUNT NSLocalizedString(@"Amount", nil)
 #define BC_STRING_PAYMENT_REQUEST_HTML NSLocalizedString(@"Please send payment to bitcoin address (<a href=\"https://blockchain.info/wallet/bitcoin-faq\">help?</a>): %@", nil)
@@ -267,12 +268,6 @@
 #define BC_STRING_LOADING_CREATING_INVITATION NSLocalizedString(@"Creating invitation", nil)
 #define BC_STRING_IDENTIFIER NSLocalizedString(@"Identifier", nil)
 
-#define BC_STRING_BITCOIN_MERCHANT_MAP NSLocalizedString(@"Bitcoin Merchant Map", nil)
-#define BC_STRING_MERCHANT NSLocalizedString(@"Merchant", nil)
-#define BC_STRING_MERCHANT_MAP_ASK_TO_ENABLE_LOCATION_SERVICES_ALERTVIEW_TITLE NSLocalizedString(@"Enable Location Services", nil)
-#define BC_STRING_MERCHANT_MAP_ASK_TO_ENABLE_LOCATION_SERVICES_ALERTVIEW_MESSAGE NSLocalizedString(@"Blockchain needs Location Services enabled in order to access your location.", nil)
-#define BC_STRING_MERCHANT_MAP_ASK_TO_ENABLE_LOCATION_SERVICES_ALERTVIEW_MESSAGE_GLOBALLY_IOS_8_AND_ABOVE NSLocalizedString(@"Blockchain needs Location Services enabled in order to access your location. You can enable access in Settings->Privacy->Location Services", nil)
-#define BC_STRING_MERCHANT_MAP_ASK_TO_ENABLE_LOCATION_SERVICES_ALERTVIEW_MESSAGE_GLOBALLY_IOS_7 NSLocalizedString(@"Blockchain needs Location Services enabled in order to access your location. You can enable access in Settings->Privacy->Location->Location Services", nil)
 #define BC_STRING_GO_TO_SETTINGS NSLocalizedString(@"Go to Settings", nil)
 
 #define BC_STRING_SUPPORT NSLocalizedString(@"Support", nil)
@@ -581,7 +576,6 @@
 #define BC_STRING_LOADING_RECOVERY_CREATING_WALLET NSLocalizedString(@"Creating Wallet", nil)
 #define BC_STRING_INVALID_RECOVERY_PHRASE NSLocalizedString(@"Invalid recovery phrase. Please try again", nil)
 
-#define BC_STRING_MERCHANT_DIRECTORY_UNAVAILABLE NSLocalizedString(@"Merchant Directory is currently unavailable. Please try again later.", nil)
 #define BC_STRING_SEND_ERROR_NO_INTERNET_CONNECTION NSLocalizedString(@"No internet connection available. Please check your network settings.", nil)
 #define BC_STRING_SEND_ERROR_FEE_TOO_LOW NSLocalizedString(@"The fee you have specified is too low.", nil)
 #define BC_STRING_HIGH_FEE_WARNING_TITLE NSLocalizedString(@"Large Transaction", nil)
@@ -612,13 +606,12 @@
 #define BC_STRING_ARCHIVE_FOOTER_TITLE NSLocalizedString(@"Archive this if you do NOT want to use it anymore. Your funds will remain safe, and you can unarchive it at any time.", nil)
 #define BC_STRING_ARCHIVED_FOOTER_TITLE NSLocalizedString(@"This is archived. Though you cannot send funds from here, any and all funds will remain safe. Simply unarchive to start using it again.", nil)
 #define BC_STRING_TRANSFER_FOOTER_TITLE NSLocalizedString(@"For your safety, we recommend you to transfer any balances in your imported addresses into your Blockchain wallet.", nil)
-#define BC_STRING_EXTENDED_PUBLIC_KEY_FOOTER_TITLE_ONE NSLocalizedString(@"If you are a merchant, view your extended public key (xPub) and use the Blockchain Merchant app to receive funds.", nil)
-#define BC_STRING_EXTENDED_PUBLIC_KEY_FOOTER_TITLE_TWO NSLocalizedString(@"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions.", nil)
+#define BC_STRING_EXTENDED_PUBLIC_KEY_FOOTER_TITLE NSLocalizedString(@"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions.", nil)
 #define BC_STRING_EXTENDED_PUBLIC_KEY_WARNING NSLocalizedString(@"Sharing your xPub authorizes others to track your transaction history. As authorized persons may be able to disrupt you from accessing your wallet, only share your xPub with people you trust.", nil)
 #define BC_STRING_WATCH_ONLY_FOOTER_TITLE NSLocalizedString(@"This is a watch-only address. To spend your funds from this wallet, please scan your private key.", nil)
 #define BC_STRING_SET_DEFAULT_ACCOUNT NSLocalizedString(@"Set as Default?", nil)
 #define BC_STRING_AT_LEAST_ONE_ADDRESS_REQUIRED NSLocalizedString(@"You must have at least one active address", nil)
-#define BC_STRING_EXTENDED_PUBLIC_KEY_DETAIL_HEADER_TITLE NSLocalizedString(@"Scan or copy this code into your Blockchain Merchant app to securely receive Bitcoin.", nil)
+#define BC_STRING_EXTENDED_PUBLIC_KEY_DETAIL_HEADER_TITLE NSLocalizedString(@"Your xPub is an advanced feature that contains all of your public addresses.", nil)
 #define BC_STRING_COPY_XPUB NSLocalizedString(@"Copy xPub", nil)
 #define BC_STRING_ADDRESS_NOT_PRESENT_IN_WALLET NSLocalizedString(@"Your wallet does not contain this address.", nil)
 #define BC_STRING_ADDRESS_NOT_WATCH_ONLY NSLocalizedString(@"This address is not watch-only.", nil)
@@ -661,7 +654,7 @@
 #define BC_STRING_SURGE_OCCURRING_TITLE NSLocalizedString(@"Surge Occurring", nil)
 #define BC_STRING_SURGE_OCCURRING_MESSAGE NSLocalizedString(@"The Bitcoin mining network is currently experiencing a high volume of activity, resulting in recommended fees that are higher than usual.", nil)
 #define BC_STRING_FEE_INFORMATION_TITLE NSLocalizedString(@"Transaction Fees", nil)
-#define BC_STRING_FEE_INFORMATION_MESSAGE NSLocalizedString(@"Transaction fees impact how quickly the Bitcoin mining network will confirm your transactions, and depend on the current network conditions.", nil)
+#define BC_STRING_FEE_INFORMATION_MESSAGE NSLocalizedString(@"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions.", nil)
 #define BC_STRING_FEE_INFORMATION_MESSAGE_APPEND_REGULAR_SEND NSLocalizedString (@" We recommend the fee shown for the transaction at this time.", nil)
 #define BC_STRING_FEE_INFORMATION_DUST NSLocalizedString(@"This transaction requires a higher fee for dust consumption due to the small amount of change to be returned.", nil)
 
@@ -734,6 +727,7 @@
 #define BC_STRING_NO_TRANSACTIONS_TITLE NSLocalizedString(@"No Transactions", nil)
 #define BC_STRING_NO_TRANSACTIONS_TEXT_BITCOIN NSLocalizedString(@"Transactions occur when you send and request bitcoin.", nil)
 #define BC_STRING_NO_TRANSACTIONS_TEXT_ETHER NSLocalizedString(@"Transactions occur when you send and request ether.", nil)
+#define BC_STRING_NO_TRANSACTIONS_TEXT_BITCOIN_CASH NSLocalizedString(@"Transactions occur when you send and request bitcoin cash.", nil)
 
 #define BC_STRING_YOUR_TRANSACTIONS NSLocalizedString(@"Your Transactions", nil)
 
@@ -777,6 +771,8 @@
 #define BC_STRING_GET_BITCOIN NSLocalizedString(@"Get Bitcoin", nil)
 #define BC_STRING_GET_ETHER NSLocalizedString(@"Get Ether", nil)
 #define BC_STRING_REQUEST_ETHER NSLocalizedString(@"Request Ether", nil)
+#define BC_STRING_GET_BITCOIN_CASH NSLocalizedString(@"Get Bitcoin Cash", nil)
+#define BC_STRING_REQUEST_BITCOIN_CASH NSLocalizedString(@"Request Bitcoin Cash", nil)
 #define BC_STRING_OVERVIEW NSLocalizedString(@"Overview", nil)
 #define BC_STRING_DASHBOARD NSLocalizedString(@"Dashboard", nil)
 
@@ -838,7 +834,7 @@
 #define BC_STRING_EXCHANGE_DESCRIPTION_IN_PROGRESS NSLocalizedString(@"Exchanges can take up to two hours, you can keep track of your exchange progress in the Order History. Once the trade is complete, your ether will arrive in your wallet.", nil)
 #define BC_STRING_EXCHANGE_DESCRIPTION_CANCELED NSLocalizedString(@"Your trade has been canceled. Please return to the exchange tab to start your trade again.", nil)
 #define BC_STRING_FAILED NSLocalizedString(@"Failed", nil)
-#define BC_STRING_EXCHANGE_TITLE_FAILED NSLocalizedString(@"Exchange Failed", nil)
+#define BC_STRING_EXCHANGE_TITLE_REFUNDED NSLocalizedString(@"Trade Refunded", nil)
 #define BC_STRING_EXCHANGE_DESCRIPTION_FAILED NSLocalizedString(@"This trade has failed. Any funds sent from your wallet will be returned minus the transaction fee. Please return to the exchange tab to start a new trade.", nil)
 #define BC_STRING_EXCHANGE_DESCRIPTION_EXPIRED NSLocalizedString(@"Your trade has expired. Please return to the exchange tab to start a new trade.", nil)
 #define BC_STRING_EXCHANGE_CARD_DESCRIPTION NSLocalizedString(@"You can now exchange your bitcoin for ether and vice versa directly from your Blockchain wallet!", nil)
@@ -885,5 +881,22 @@
 #define BC_STRING_FAILED_TO_LOAD_EXCHANGE_DATA NSLocalizedString(@"Failed to load exchange data", nil)
 
 #define BC_STRING_BUY_SELL_CARD_TITLE NSLocalizedString(@"The wait is over", nil)
+
+#define BC_STRING_PRICE NSLocalizedString(@"Price", nil)
+#define BC_STRING_SEE_CHARTS NSLocalizedString(@"See charts", nil)
+#define BC_STRING_PRICE_CHARTS NSLocalizedString(@"Price charts", nil)
+
+#define BC_STRING_BITCOIN_CASH NSLocalizedString(@"Bitcoin Cash", nil)
+#define BC_STRING_BITCOIN_CASH_PRICE NSLocalizedString(@"Bitcoin Cash Price", nil)
+#define BC_STRING_ENTER_BITCOIN_CASH_ADDRESS_OR_SELECT NSLocalizedString(@"Enter Bitcoin Cash address or select", nil)
 #define BC_STRING_BUY_SELL_CARD_DESCRIPTION NSLocalizedString(@"Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab.", nil)
 #define BC_STRING_BUY_SELL_CARD_ACTION_TITLE BC_STRING_GET_STARTED
+
+#define BC_STRING_BITCOIN_CASH_CARD_TITLE BC_STRING_BITCOIN_CASH
+#define BC_STRING_BITCOIN_CASH_CARD_DESCRIPTION NSLocalizedString(@"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!", nil)
+#define BC_STRING_BITCOIN_CASH_CARD_ACTION_TITLE BC_STRING_GET_STARTED
+
+#define BC_STRING_BITCOIN_CASH_WARNING_CONFIRM_VALID_ADDRESS_ONE NSLocalizedString(@"Are you sure this is a bitcoin cash address?", nil)
+#define BC_STRING_BITCOIN_CASH_WARNING_CONFIRM_VALID_ADDRESS_TWO NSLocalizedString(@"Sending funds to a bitcoin address by accident will result in loss of funds.", nil)
+
+#define BC_STRING_COPY_WARNING_TEXT NSLocalizedString(@"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information.", nil)

@@ -2207,3 +2207,108 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Kupować i sprzedawać bitcoiny bezpośrednio ze swojego portfela blockchain. Zacznij od utworzenia konta w dziale Kupić i sprzedać.";
+
+/* (No Commment) */
+"All Wallets" = "Wszystkie Portfele";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Zachowaj swoje Prywatne xPub. Ktoś ma dostęp do twojego xPub możesz zobaczyć wszystkie swoje środki i operacje.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Twój xPub-jest to dodatkowa funkcja, która zawiera wszystkie swoje publiczne występy.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Zawarcie transakcji następuje, gdy wysyłasz i żądanie btc gotówkę.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Zobacz Bitcoin Gotówki";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Zapytanie Btc Gotówka";
+
+/* (No Commment) */
+"Price" = "Cena";
+
+/* (No Commment) */
+"See charts" = "Zobacz grafikę";
+
+/* (No Commment) */
+"Price charts" = "Wykresy cen";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Btc Kasę";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Cena Bitcoin Gotówki";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Wprowadź Btc gotówka adres lub wybrać";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Kopia tego uzyskaj adres do schowka? Jeśli to jest tak, że inne aplikacje mogą zobaczyć te informacje.";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "Proszę, prześlij ВСН na Btc gotówki adresy\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "Opłaty wpływu transakcji jak szybko górniczego sieć będzie potwierdzić swoje transakcje, i zależy od aktualnego stanu sieci.";
+
+/* (No Commment) */
+"Trade Refunded" = "Licytacja";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "Mamy przyjemność poinformować, że twój portfel blockchain pozwoli ci łatwo wysyłać, odbierać i wymiana Биткоина Gotówkę!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "Jesteś pewien, że to btc gotówka adresy?";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "Wysyłanie środków w btc-adres przypadkowo spowoduje utratę środków.";
+
+/* (No Commment) */
+"All Wallets" = "Wszystkie Portfele";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Chroń prywatność swojego xPub. Osoba posiadająca dostęp do Twojego xPub będzie mogła przeglądać Twoje konto oraz transakcje.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "xPub to zaawansowana funkcja zawierająca wszystkie Twoje publiczne adresy.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Transakcje odbywają się, gdy wysyłasz lub prosisz o wysłanie bitcoin cash.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Odbierz Bitcoin Cash";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Poproś o Bitcoin Cash";
+
+/* (No Commment) */
+"Price" = "Cena";
+
+/* (No Commment) */
+"See charts" = "Zobacz tabele";
+
+/* (No Commment) */
+"Price charts" = "Tabele cen";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Bitcoin Cash";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Cena Bitcoin Cash";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Wprowadź lub wybierz adres Bitcoin Cash";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Skopiować ten adres odbioru do schowka? Jeśli tak, pamiętaj, że inne aplikacje mogą uzyskać podgląd skopiowanych danych.";
+
+/* (No Commment) */
+"Start trading" = "Zacznij handlować";
+
+/* (No Commment) */
+"Trade bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Handluj walutą bitcoin bezpośrednio ze swojego portfela Blockchain. Rozpocznij od utworzenia konta w zakładce Kup i Sprzedaj.";
+
+/* (No Commment) */
+"The wait is over" = "Nie trzeba dłużej czekać";

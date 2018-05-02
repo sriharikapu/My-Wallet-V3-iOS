@@ -157,7 +157,7 @@
             rowDescription = 2;
         }
         
-        NSString *accountOrAddressString = [self.accountOrAddress isKindOfClass:[NSString class]] ? self.accountOrAddress : [app.wallet getLabelForAccount:[self.accountOrAddress intValue]];
+        NSString *accountOrAddressString = [self.accountOrAddress isKindOfClass:[NSString class]] ? self.accountOrAddress : [app.wallet getLabelForAccount:[self.accountOrAddress intValue] assetType:AssetTypeBitcoin];
         
         if (indexPath.row == rowTo) {
             cell.textLabel.text = BC_STRING_TO;

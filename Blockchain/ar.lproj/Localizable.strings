@@ -2107,3 +2107,60 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "بيع و شراء بيتكوين الخاص بك مباشرة من Blockchain المحفظة. تبدأ عن طريق إنشاء حساب في شراء وبيع علامة التبويب.";
+
+/* (No Commment) */
+"All Wallets" = "كل محافظ";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "الحفاظ على الخاص بك xPub خاصة. شخص ما مع الوصول إلى xPub سوف تكون قادرا على رؤية كل من الأموال والمعاملات.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "الخاص بك xPub هو ميزة متقدمة يحتوي على جميع العناوين العامة.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "المعاملات تحدث عند إرسال طلب بيتكوين النقدية.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "الحصول على بيتكوين النقدية";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "طلب بيتكوين النقدية";
+
+/* (No Commment) */
+"Price" = "السعر";
+
+/* (No Commment) */
+"See charts" = "انظر الرسوم البيانية";
+
+/* (No Commment) */
+"Price charts" = "سعر الرسوم البيانية";
+
+/* (No Commment) */
+"Bitcoin Cash" = "بيتكوين النقدية";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "بيتكوين السعر النقدي";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "أدخل بيتكوين النقدية العنوان أو تحديد";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "نسخ هذا تتلقى عنوان الورقه ؟ إذا العلم أن تطبيقات أخرى قد تكون قادرة على النظر في هذه المعلومات.";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "يرجى ارسال تبادل معلومات السلامة الأحيائية إلى بيتكوين النقدية عنوان\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "رسوم المعاملات تؤثر على كيفية بسرعة التعدين شبكة تأكيد المعاملات الخاصة بك ، وتعتمد على الشبكة الحالية الظروف.";
+
+/* (No Commment) */
+"Trade Refunded" = "التجارة ردها";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "نحن سعداء أن نعلن أن Blockchain محفظة يسمح لك بسهولة إرسال واستقبال وتبادل بيتكوين النقدية!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "هل أنت متأكد أن هذا هو بيتكوين النقدية العنوان ؟";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "إرسال الأموال إلى عنوان بيتكوين عن طريق الصدفة سوف يؤدي إلى خسارة الأموال.";

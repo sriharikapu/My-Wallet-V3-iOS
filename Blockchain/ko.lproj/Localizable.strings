@@ -2132,3 +2132,108 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "구매 및 판매하는 비트코인에서 직접 Blockchain 지갑니다. 시작으로 계정을 만들에서 구매 및 판매하는 탭입니다.";
+
+/* (No Commment) */
+"All Wallets" = "모든 지갑";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "유 xPub 개인합니다. 누군가에 대한 액세스를 xPub 을 볼 수있을 것이의 모든 당신의 자금을 그 거래합니다.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "귀하의 xPub 은 고급 기능 포함하는 모든 공공 장소입니다.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "트랜잭션이 발생할 경우를 보내고 요청 비트코인 현금습니다.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "을 얻을 비금";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "요청을 비금";
+
+/* (No Commment) */
+"Price" = "가격";
+
+/* (No Commment) */
+"See charts" = "차트를 참조하십시오";
+
+/* (No Commment) */
+"Price charts" = "가격 차트";
+
+/* (No Commment) */
+"Bitcoin Cash" = "비트 코인의 현금";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "비트 코인은 현금 가격";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "입력 비트코인 현금 주소 또는 선택";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "복사이 받 주소를 클립보드에까? 그렇다면,권고는 다른 응용 프로그램을 수 있습을 볼 수 있습니다.";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "보내 주시기 바랍 BCH 비트 코인 현금 주소\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "거래 수수료하는 방법에 영향을 빠르게 마이닝 네트워크의 거래를 확인합,그에 따라 달라지는 현재 있습니다.";
+
+/* (No Commment) */
+"Trade Refunded" = "무역 환불";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "를 발표하게 된 것을 기쁘게 생각하는 안전한 방법은 당신을 완벽하게 보내고,받고,환 비트코인 현금!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "당신은 확실 이것은 비트코인 현금 주소까?";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "보내는 자금 비트 코인의 주소에 의해 사고가 발생한 손실의 기금입니다.";
+
+/* (No Commment) */
+"All Wallets" = "모든 지갑들";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "xPub은 자기만 알고 있으세요. 귀하 xPub을 아는 사람은 귀하 돈과 거래를 모두 볼 수 있습니다.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "xPub은 모든 공개 주소들이 들어 있는 고급 기능입니다.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "비트코인 캐시를 보내고 요청할 때 거래가 발생합니다.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "비트코인 캐시 받기";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "비트코인 캐시 요청하기";
+
+/* (No Commment) */
+"Price" = "가격";
+
+/* (No Commment) */
+"See charts" = "차트 보기";
+
+/* (No Commment) */
+"Price charts" = "가격 차트";
+
+/* (No Commment) */
+"Bitcoin Cash" = "비트코인 캐시";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "비트코인 캐시 가격";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "비트코인 캐시 주소를 입력 또는 선택";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "이 받는 주소를 클립보드에 복사하겠습니까? 그렇게 하면, 다른 앱이 이 정보를 볼 수 있습니다.";
+
+/* (No Commment) */
+"Start trading" = "거래 시작";
+
+/* (No Commment) */
+"Trade bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "비트코인을 귀하 블록체인 지갑에서 직접 거래하세요. 사기 & 팔기 탭에서 계정을 만들어서 시작하세요.";
+
+/* (No Commment) */
+"The wait is over" = "기다림은 끝났습니다";

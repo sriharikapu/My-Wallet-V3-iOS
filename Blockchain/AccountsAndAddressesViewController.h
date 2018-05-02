@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "Assets.h"
 @interface AccountsAndAddressesViewController : UIViewController
 @property (nonatomic) UITableView *tableView;
 @property (nonatomic, strong) NSArray *allKeys;
-
+@property (nonatomic) UIView *containerView;
+@property (nonatomic) AssetType assetType;
 - (void)didGenerateNewAddress;
 @end

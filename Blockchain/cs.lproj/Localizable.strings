@@ -2443,3 +2443,108 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Koupit a prodat bitcoin přímo z vašeho Blockchain peněženky. Začněte tím, že vytvoří účet na Nákup A Prodej tab.";
+
+/* (No Commment) */
+"All Wallets" = "Všechny Peněženky";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Udržujte své xPub soukromé. Někdo s přístupem k vašemu xPub bude mít možnost vidět všechny své finanční prostředky a transakce.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Vaše xPub je pokročilá funkce, která obsahuje všechny své veřejné adresy.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Transakce se vyskytují, když jsi odesílat a požádat o bitcoin hotovosti.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Získat Bitcoin Hotovosti";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Žádost Bitcoin Hotovosti";
+
+/* (No Commment) */
+"Price" = "Cena";
+
+/* (No Commment) */
+"See charts" = "Viz grafy";
+
+/* (No Commment) */
+"Price charts" = "Cenové grafy";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Bitcoin Hotovosti";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Bitcoin Cena V Hotovosti";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Zadejte Bitcoin adresu nebo vyberte Hotovosti";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Zkopírujte tento obdrží adresu do schránky? Pokud ano, na vědomí, že další aplikace mohou být schopni podívat se na tyto informace.";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "Prosím, pošlete BCH na Bitcoin adresu Hotovosti\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "Poplatky za transakce dopad, jak rychle důlní sítě potvrdí vaše transakce, a závisí na aktuální podmínky v síti.";
+
+/* (No Commment) */
+"Trade Refunded" = "Obchodní Vrácena";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "Jsme rádi, oznámit, že vaše Blockchain peněženka vám umožní bez problémů posílat, přijímat, a výměna Bitcoin Hotovosti!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "Jsi si jistý, že to je bitcoin hotovosti adresa?";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "Zaslání finančních prostředků na bitcoin adresu, náhodou bude mít za následek ztrátu finančních prostředků.";
+
+/* (No Commment) */
+"All Wallets" = "Všechny peněženky";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Uchovejte svůj xPub soukromý. Kdokoliv s přístupem k vašemu xPub bude moct vidět všechny vaše prostředky a transakce.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Váš xPub má pokročilou funkci, která obsahuje všechny vaše veřejné adresy.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Transakce nastanou, když odešlete a požádáte o bitcoin cash.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Získat Bitcoin Cash";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Požádat o Bitcoin Cash";
+
+/* (No Commment) */
+"Price" = "Cena";
+
+/* (No Commment) */
+"See charts" = "Zobrazit grafy";
+
+/* (No Commment) */
+"Price charts" = "Cenové grafy";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Bitcoin Cash";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Cena Bitcoin Cash";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Zadejte adresu Bitcoin Cash nebo vyberte";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Zkopírovat tuto adresy do schránky? Pokud ano, vezměte na vědomí, že tyto informace mohou vidět ostatní aplikace.";
+
+/* (No Commment) */
+"Start trading" = "Začít obchodovat";
+
+/* (No Commment) */
+"Trade bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Obchodujte bitcoin přímo ze své peněženky Blockchain. Začněte tak, že si na kartě Koupit a prodat založíte svůj účet.";
+
+/* (No Commment) */
+"The wait is over" = "Čekání je u konce";

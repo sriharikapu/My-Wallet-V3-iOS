@@ -24,8 +24,6 @@
 
 #import "PEViewController.h"
 
-#define USER_DEFAULTS_KEY_SWIPE_ASSET @"preferredSwipeAsset"
-
 @interface PEViewController ()
 
 - (void)setPin:(int)pin enabled:(BOOL)yes;
@@ -75,9 +73,8 @@
 	pins[3] = pin3;
 	self.pin = @"";
     
-    CGFloat scrollViewHeight;
-    CGFloat screenHeight = [[UIScreen mainScreen] bounds].size.height;
-
+    CGFloat containerViewHeight;
+    
     if (IS_USING_SCREEN_SIZE_4S) {
         CGFloat offsetY = 60;
         pin0.frame = CGRectOffset(pin0.frame, 0, offsetY);
@@ -85,9 +82,8 @@
         pin2.frame = CGRectOffset(pin2.frame, 0, offsetY);
         pin3.frame = CGRectOffset(pin3.frame, 0, offsetY);
         promptLabel.frame = CGRectOffset(promptLabel.frame, 0, offsetY);
-        scrollViewHeight = 380;
-    } else {
-        
+        containerViewHeight = 380;
+    } else {        
         if (IS_USING_SCREEN_SIZE_LARGER_THAN_5S) {
             CGFloat offsetY = IS_USING_6_OR_7_PLUS_SCREEN_SIZE ? -80 : -60;
             pin0.frame = CGRectOffset(pin0.frame, 0, offsetY);
@@ -96,15 +92,15 @@
             pin3.frame = CGRectOffset(pin3.frame, 0, offsetY);
             promptLabel.frame = CGRectOffset(promptLabel.frame, 0, offsetY);
         }
-        
-        scrollViewHeight = screenHeight/HEIGHT_IPHONE_5S * 380;
+        containerViewHeight = [[UIScreen mainScreen] bounds].size.height/HEIGHT_IPHONE_5S * 380;
     }
     
     promptLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:FONT_SIZE_LARGE];
     self.versionLabel.textColor = COLOR_BLOCKCHAIN_BLUE;
     self.versionLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:FONT_SIZE_EXTRA_SMALL];
     
-    self.scrollView.frame = CGRectMake(0, 480 - scrollViewHeight, WINDOW_WIDTH, scrollViewHeight);
+    CGFloat windowWidth = WINDOW_WIDTH;
+    containerView.frame = CGRectMake(0, 480 - containerViewHeight, windowWidth, containerViewHeight);
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.scrollView.showsHorizontalScrollIndicator = NO;
     
@@ -114,25 +110,6 @@
     self.swipeLabelImageView.transform = CGAffineTransformMakeRotation(-M_PI_2);
     self.swipeLabelImageView.image = [self.swipeLabelImageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     [self.swipeLabelImageView setTintColor:COLOR_BLOCKCHAIN_BLUE];
-    
-    self.assetSegmentedControl = [[UISegmentedControl alloc] initWithItems:@[BC_STRING_BITCOIN, BC_STRING_ETHER]];
-    [self.assetSegmentedControl setTitleTextAttributes:@{NSFontAttributeName : [UIFont fontWithName:FONT_MONTSERRAT_LIGHT size:FONT_SIZE_SMALL]} forState:UIControlStateNormal];
-    [self.assetSegmentedControl addTarget:self action:@selector(assetSegmentedControlChanged) forControlEvents:UIControlEventValueChanged];
-    self.assetSegmentedControl.tintColor = COLOR_BLOCKCHAIN_BLUE;
-    self.assetSegmentedControl.frame = CGRectMake(0, 60 - 29 - 16, 304, 29);
-    CGFloat width = WINDOW_WIDTH;
-    self.assetSegmentedControl.center = CGPointMake(width * 1.5, self.assetSegmentedControl.center.y);
-    
-    id selectedAsset = [[NSUserDefaults standardUserDefaults] objectForKey:USER_DEFAULTS_KEY_SWIPE_ASSET];
-    
-    if (!selectedAsset) {
-        self.assetSegmentedControl.selectedSegmentIndex = AssetTypeBitcoin;
-        [self assetSegmentedControlChanged];
-    } else {
-        self.assetSegmentedControl.selectedSegmentIndex = [selectedAsset integerValue];
-    }
-    
-    [self.scrollView addSubview:self.assetSegmentedControl];
     
     [self setupTapActionForSwipeQR];
 }
@@ -205,9 +182,10 @@
     UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showSwipeQR)];
     tapGestureRecognizer.numberOfTapsRequired = 1;
     
+    CGFloat windowWidth = WINDOW_WIDTH;
     CGFloat actionViewOriginX = self.swipeLabelImageView.frame.origin.x - self.swipeLabel.intrinsicContentSize.width - 8;
-    UIView *actionView = [[UIView alloc] initWithFrame:CGRectMake(actionViewOriginX, self.swipeLabel.frame.origin.y, self.view.frame.size.width - actionViewOriginX, self.swipeLabel.frame.size.height)];
-    [self.scrollView addSubview:actionView];
+    UIView *actionView = [[UIView alloc] initWithFrame:CGRectMake(actionViewOriginX, self.swipeLabel.frame.origin.y, windowWidth - actionViewOriginX, self.swipeLabel.frame.size.height)];
+    [containerView addSubview:actionView];
     [actionView addGestureRecognizer:tapGestureRecognizer];
     actionView.userInteractionEnabled = YES;
 }
@@ -217,12 +195,6 @@
     if (!self.swipeLabel.hidden) {
         [self.scrollView setContentOffset:CGPointMake(self.scrollView.frame.size.width, self.scrollView.contentOffset.y) animated:YES];
     }
-}
-
-- (void)assetSegmentedControlChanged
-{
-    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:self.assetSegmentedControl.selectedSegmentIndex] forKey:USER_DEFAULTS_KEY_SWIPE_ASSET];
-    [self.delegate didSelectAsset];
 }
 
 @end

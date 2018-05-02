@@ -49,8 +49,8 @@
     // Rendering Logic
     NSString *depositCurrencySymbol = [[trade depositCurrency] uppercaseString];
     NSString *withdrawalCurrencySymbol = [[trade withdrawalCurrency] uppercaseString];
-    NSString *depositCurrency = [depositCurrencySymbol isEqual: CURRENCY_SYMBOL_BTC] ? BC_STRING_BITCOIN : BC_STRING_ETHER;
-    NSString *receiveCurrency = [depositCurrencySymbol isEqual:CURRENCY_SYMBOL_BTC] ? BC_STRING_ETHER : BC_STRING_BITCOIN;
+    NSString *depositCurrency = [ExchangeDetailView stringFromSymbol:depositCurrencySymbol];
+    NSString *receiveCurrency = [ExchangeDetailView stringFromSymbol:withdrawalCurrencySymbol];
     NSString *depositAmount = [NSString stringWithFormat:@"%@ %@", [NSNumberFormatter localFormattedString:[trade.depositAmount stringValue]], depositCurrencySymbol];
     NSString *withdrawAmount = [NSString stringWithFormat:@"%@ %@", [NSNumberFormatter localFormattedString:[trade.withdrawalAmount stringValue]], withdrawalCurrencySymbol];
     NSString *minerFee = [NSString stringWithFormat:@"%@ %@", [NSNumberFormatter localFormattedString:[trade.minerFee stringValue]], withdrawalCurrencySymbol];
@@ -87,8 +87,8 @@
     // Rendering Logic
     NSString *depositCurrencySymbol = [[trade depositCurrency] uppercaseString];
     NSString *withdrawalCurrencySymbol = [[trade withdrawalCurrency] uppercaseString];
-    NSString *depositCurrency = [depositCurrencySymbol isEqual: CURRENCY_SYMBOL_BTC] ? BC_STRING_BITCOIN : BC_STRING_ETHER;
-    NSString *receiveCurrency = [depositCurrencySymbol isEqual:CURRENCY_SYMBOL_BTC] ? BC_STRING_ETHER : BC_STRING_BITCOIN;
+    NSString *depositCurrency = [ExchangeDetailView stringFromSymbol:depositCurrencySymbol];
+    NSString *receiveCurrency = [ExchangeDetailView stringFromSymbol:withdrawalCurrencySymbol];
     NSString *depositAmount = [NSString stringWithFormat:@"%@ %@",  [NSNumberFormatter localFormattedString:[trade.depositAmount stringValue]], depositCurrencySymbol];
     NSString *withdrawAmount = [NSString stringWithFormat:@"%@ %@", [NSNumberFormatter localFormattedString:[trade.withdrawalAmount stringValue]], withdrawalCurrencySymbol];
     NSString *transactionFee = [NSString stringWithFormat:@"%@ %@", [NSNumberFormatter localFormattedString:[trade.transactionFee stringValue]], depositCurrencySymbol];
@@ -186,6 +186,19 @@
     if (self.orderID) {
         [self.delegate orderIDTapped:self.orderID];
     }
+}
+
++ (NSString *)stringFromSymbol:(NSString *)symbol
+{
+    if ([symbol isEqualToString:CURRENCY_SYMBOL_BTC]) {
+        return BC_STRING_BITCOIN;
+    } else if ([symbol isEqualToString:CURRENCY_SYMBOL_ETH]) {
+        return BC_STRING_ETHER;
+    } else if ([symbol isEqualToString:CURRENCY_SYMBOL_BCH]) {
+        return BC_STRING_BITCOIN_CASH;
+    }
+    DLog(@"ExchangeDetailView: unsupported symbol!");
+    return nil;
 }
 
 @end

@@ -27,7 +27,7 @@
     symbol.symbol = [dict objectForKey:DICTIONARY_KEY_SYMBOL];
     NSNumber *last = [dict objectForKey:DICTIONARY_KEY_LAST];
     
-#ifdef ENABLE_DEBUG_MENU
+#ifdef DEBUG
     if ([[NSUserDefaults standardUserDefaults] boolForKey:USER_DEFAULTS_KEY_DEBUG_SIMULATE_ZERO_TICKER]) last = 0;
 #endif
     if (!last || [last isEqualToNumber:@0]) {
@@ -45,14 +45,12 @@
 +(CurrencySymbol*)btcSymbolFromCode:(NSString *)code
 {
     NSDictionary *btc = @{DICTIONARY_KEY_SYMBOL: CURRENCY_SYMBOL_BTC, DICTIONARY_KEY_CONVERSION: CURRENCY_CONVERSION_BTC, DICTIONARY_KEY_NAME: CURRENCY_NAME_BTC};
-    NSDictionary *mBtc = @{DICTIONARY_KEY_SYMBOL: CURRENCY_SYMBOL_MBC, DICTIONARY_KEY_CONVERSION: CURRENCY_CONVERSION_MBC, DICTIONARY_KEY_NAME: CURRENCY_NAME_MBC};
-    NSDictionary *bits = @{DICTIONARY_KEY_SYMBOL: CURRENCY_SYMBOL_UBC, DICTIONARY_KEY_CONVERSION: CURRENCY_CONVERSION_UBC, DICTIONARY_KEY_NAME: CURRENCY_NAME_UBC};
     
-    NSDictionary *btcCurrencies = @{CURRENCY_CODE_BTC: btc, CURRENCY_CODE_MBC: mBtc, CURRENCY_CODE_UBC: bits};
+    NSDictionary *btcCurrencies = @{CURRENCY_CODE_BTC: btc};
     
     CurrencySymbol * symbol = [[CurrencySymbol alloc] init];
-    symbol.code = code;
-    NSDictionary * currency = [btcCurrencies objectForKey:code];
+    symbol.code = CURRENCY_CODE_BTC;
+    NSDictionary * currency = [btcCurrencies objectForKey:CURRENCY_CODE_BTC];
     symbol.symbol = [currency objectForKey:DICTIONARY_KEY_SYMBOL];
     symbol.conversion = [[currency objectForKey:DICTIONARY_KEY_CONVERSION] longLongValue];
     symbol.name = [currency objectForKey:DICTIONARY_KEY_NAME];

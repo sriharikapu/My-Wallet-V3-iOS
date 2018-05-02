@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "BCFadeView.h"
+#import "AssetSelectorView.h"
 
 @interface AccountsAndAddressesNavigationController : UINavigationController <TopViewController>
 @property (nonatomic) UILabel *headerLabel;
@@ -15,6 +16,7 @@
 @property (nonatomic) UIButton *warningButton;
 @property (nonatomic) BCFadeView *busyView;
 @property (nonatomic) UILabel *busyLabel;
+@property (nonatomic, readonly) AssetSelectorView *assetSelectorView;
 
 - (void)didGenerateNewAddress;
 - (void)reload;

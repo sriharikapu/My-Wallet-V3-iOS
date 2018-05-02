@@ -2150,3 +2150,53 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Comprar y vender bitcoin directamente desde su monedero de Blockchain. Comience por crear una cuenta en la Compra Y venta de la ficha.";
+
+
+/* (No Commment) */
+"All Wallets" = "Todas las billeteras";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Conserve la privacidad de su xPub. Cualquier persona que tenga acceso a su xPub podrá ver todos su saldos y transacciones.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Su xPub es una función avanzada que contiene todas sus direcciones públicas.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Las transacciones ocurren cuando envía y pide Bitcoin Cash.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Obtener Bitcoin Cash.";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Pedir Bitcoin Cash";
+
+/* (No Commment) */
+"Price" = "Precio";
+
+/* (No Commment) */
+"See charts" = "Ver cuadros";
+
+/* (No Commment) */
+"Price charts" = "Cuadros de precios";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Bitcoin Cash";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Precio del Bitcoin Cash";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Escriba una dirección de Bitcoin Cash o elíjala";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "¿Copiar esta dirección de recepción al portapapeles? Si acepta, tenga en cuenta que otras aplicaciones podrían ver esta información.";
+
+/* (No Commment) */
+"Start trading" = "Comenzar a intercambiar";
+
+/* (No Commment) */
+"Trade bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Intercambie Bitcoin directamente desde su billetera de Blockchain. Comience creando una cuenta en la pestaña Comprar y vender.";
+
+/* (No Commment) */
+"The wait is over" = "La espera terminó";
+

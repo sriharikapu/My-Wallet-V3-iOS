@@ -74,7 +74,7 @@ Boolean shouldShowAnimation;
         [self addSubview:self.recoverWalletButton];
         self.recoverWalletButton.enabled = NO;
         self.recoverWalletButton.alpha = 0.0;
-#ifdef ENABLE_DEBUG_MENU
+#ifdef DEBUG
         UIButton *debugButton = [[UIButton alloc] initWithFrame:CGRectMake(self.frame.size.width - 80, 0, 80, 51)];
         debugButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
         debugButton.titleLabel.adjustsFontSizeToFitWidth = YES;

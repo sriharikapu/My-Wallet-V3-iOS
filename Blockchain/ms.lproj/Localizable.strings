@@ -2107,3 +2107,60 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Membeli dan menjual kripto langsung dari anda Menerima dompet. Mulailah dengan membuat akaun di Jual Beli tab.";
+
+/* (No Commment) */
+"All Wallets" = "Semua Dompet";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Pastikan anda xPub swasta. Seseorang dengan akses untuk anda xPub akan dapat melihat semua dana anda dan transaksi.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Anda xPub adalah maju ciri yang mengandungi semua awam anda alamat.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Transaksi berlaku apabila anda menghantar dan meminta kripto tunai.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Dapatkan Kripto Tunai";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Permintaan Kripto Tunai";
+
+/* (No Commment) */
+"Price" = "Harga";
+
+/* (No Commment) */
+"See charts" = "Lihat carta";
+
+/* (No Commment) */
+"Price charts" = "Harga carta";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Kripto Tunai";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Kripto Tunai Harga";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Masukkan Kripto Tunai alamat atau pilih";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Salinan ini menerima alamat untuk clipboard? Jika begitu, dinasihatkan yang lain aplikasi mungkin dapat melihat maklumat ini.";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "Sila hantar BKKHI dengan Kripto Tunai alamat\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "Transaksi yuran kesan bagaimana dengan cepat perlombongan rangkaian akan mengesahkan transaksi anda, dan bergantung pada rangkaian semasa syarat.";
+
+/* (No Commment) */
+"Trade Refunded" = "Perdagangan Dikembalikan";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "Kami senang untuk mengumumkan bahwa anda Menerima dompet akan membenarkan anda untuk lancar menghantar, menerima, dan pertukaran Kripto Tunai!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "Adakah anda pasti ini adalah kripto tunai alamat?";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "Menghantar dana untuk kripto alamat oleh kecelakaan akan menyebabkan kehilangan dana.";

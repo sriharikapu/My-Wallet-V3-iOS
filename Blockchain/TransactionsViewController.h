@@ -9,4 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface TransactionsViewController : UIViewController
+@property (nonatomic) NSInteger filterIndex;
+- (void)changeFilterLabel:(NSString *)newText;
 @end

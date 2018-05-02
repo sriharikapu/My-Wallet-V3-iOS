@@ -14,7 +14,7 @@
 - (id)init
 {
     if (self == [super init]) {
-        self.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 50);
+        self.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, AMOUNT_INPUT_VIEW_HEIGHT);
         
         CGFloat labelWidth = IS_USING_SCREEN_SIZE_LARGER_THAN_5S ? 48 : 42;
         self.btcLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 15, labelWidth, 21)];

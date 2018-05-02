@@ -2045,3 +2045,59 @@
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "购买和出售特币直接从你的块链的钱包。 开始通过创建一个帐户在购买和出售标签。";
 
+/* (No Commment) */
+"All Wallets" = "所有的钱包";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "保持你的xPub私人的。 有人问到你的xPub将能够看到所有的基金和交易。";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "你xPub是一个先进的功能，它包含所有的公共地址。";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "交易发生时你发送的和请求币的现金。";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "获得现金币";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "请求币现金";
+
+/* (No Commment) */
+"Price" = "价格";
+
+/* (No Commment) */
+"See charts" = "请参阅图表";
+
+/* (No Commment) */
+"Price charts" = "价格表";
+
+/* (No Commment) */
+"Bitcoin Cash" = "特币现金";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "特币的现金价格";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "该币的现金或者选择的地址";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "复制此接收地址的剪贴板吗？ 如果是这样，可以建议其他应用程序可能可以看看这个信息。";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "请给生物安全信息交换所的特币现金的地址\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "交易费用的影响如何快速的采矿网络将确认的交易，以及取决于当前的网络条件。";
+
+/* (No Commment) */
+"Trade Refunded" = "贸易退";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "我们很高兴地宣布，你块链的钱包会让你无缝地发送、接收和交换币现金！";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "你确定这是一个特币现金的地址吗?";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "发送资金的一个特币地址的意外事故会导致损失的资金。";

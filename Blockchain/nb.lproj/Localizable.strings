@@ -2032,3 +2032,60 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Kjøpe og selge bitcoin direkte fra din Blockchain lommebok. Start med å opprette en konto i Kjøpe & Selge kategorien.";
+
+/* (No Commment) */
+"All Wallets" = "Alle Lommebøker";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Holde xPub privat. Noen med tilgang til din xPub vil være i stand til å se alle dine penger og transaksjoner.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Din xPub er en avansert funksjon som inneholder alle offentlige adresser.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Transaksjoner oppstå når du sender og be om bitcoin kontanter.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Få Bitcoin Kontanter";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Be Om Bitcoin Kontanter";
+
+/* (No Commment) */
+"Price" = "Pris";
+
+/* (No Commment) */
+"See charts" = "Se kart";
+
+/* (No Commment) */
+"Price charts" = "Pris diagrammer";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Bitcoin Kontanter";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Bitcoin Kontanter Pris";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Skriv inn Bitcoin Kontanter adresse eller velg";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Kopier denne får adressen til utklippstavlen? Hvis så, være oppmerksom på at andre programmer kan være i stand til å se på denne informasjonen.";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "Vennligst send BCH til Bitcoin Kontanter adresse\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "Transaksjonsgebyrer påvirke hvor raskt gruvedrift nettverk vil bekrefte dine transaksjoner, og er avhengig av den aktuelle nettverket forhold.";
+
+/* (No Commment) */
+"Trade Refunded" = "Handel Refundert";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "Vi er glade for å kunngjøre at Blockchain wallet vil tillate deg å sømløst sende, motta og utveksle Bitcoin Penger!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "Er du sikker på at dette er en bitcoin kontanter adresse?";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "Sende penger til en bitcoin adresse ved et uhell, vil resultere i tap av midler.";

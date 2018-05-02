@@ -7,11 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Assets.h"
 @class BCSecureTextField;
 
 @interface BCEditAccountView : UIView <UITextFieldDelegate>
 
 @property int accountIdx;
+@property (nonatomic) AssetType assetType;
 @property (nonatomic, strong) BCSecureTextField *labelTextField;
-
+- (id)initWithAssetType:(AssetType)assetType;
 @end

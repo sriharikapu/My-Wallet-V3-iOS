@@ -7,11 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "Assets.h"
 @interface AccountTableCell : UITableViewCell
 
 @property int accountIdx;
-
+@property AssetType assetType;
 @property (strong, atomic) UIImageView *iconImage;
 @property (strong, atomic) UIButton *editButton;
 @property (strong, atomic) UILabel *amountLabel;

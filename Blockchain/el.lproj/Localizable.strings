@@ -2107,3 +2107,60 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Αγοράζουν και να πωλούν bitcoin απευθείας από το Blockchain πορτοφόλι. Ξεκινήστε δημιουργώντας ένα λογαριασμό στο Buy & sell στην καρτέλα.";
+
+/* (No Commment) */
+"All Wallets" = "Όλα Τα Πορτοφόλια";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Κρατήστε το xPub ιδιωτικό. Κάποιος με πρόσβαση στο xPub θα είναι σε θέση να δείτε όλα τα κεφάλαια και συναλλαγές.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Το xPub είναι ένα προηγμένο χαρακτηριστικό που περιέχει όλο το δημόσιο διευθύνσεις.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Συναλλαγές προκύψουν κατά την αποστολή και να ζητήσει bitcoin σε μετρητά.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Πάρτε Το Bitcoin Σε Μετρητά";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Αίτημα Bitcoin Σε Μετρητά";
+
+/* (No Commment) */
+"Price" = "Τιμή";
+
+/* (No Commment) */
+"See charts" = "Δείτε γραφήματα";
+
+/* (No Commment) */
+"Price charts" = "Διαγράμματα των τιμών";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Το Bitcoin Σε Μετρητά";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Το Bitcoin Τιμή Μετρητοίς";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Εισάγετε το Bitcoin σε Μετρητά διεύθυνση ή επιλέξτε";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Αντιγράψτε αυτό το λάβετε διεύθυνση στο πρόχειρο; Αν ναι, σας ενημερώνω ότι άλλες εφαρμογές μπορεί να είναι σε θέση να δει τις πληροφορίες.";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "Παρακαλούμε να στείλετε BCH να το Bitcoin σε Μετρητά διεύθυνση\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "Τέλη συναλλαγής αντίκτυπο πόσο γρήγορα η εξόρυξη του δικτύου θα επιβεβαιώσει τις συναλλαγές σας, και εξαρτάται από τις τρέχουσες συνθήκες του δικτύου.";
+
+/* (No Commment) */
+"Trade Refunded" = "Εμπόριο Επιστρέφεται";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "Είμαστε ενθουσιασμένοι για να ανακοινώσει ότι η Blockchain πορτοφόλι θα σας επιτρέψει να απρόσκοπτα να στείλετε, να λάβετε, και την ανταλλαγή Bitcoin σε Μετρητά!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "Είσαι σίγουρος ότι αυτό είναι το bitcoin σε μετρητά διεύθυνση;";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "Αποστολή χρημάτων σε μια διεύθυνση bitcoin από ατύχημα θα οδηγήσει σε απώλεια πόρων.";

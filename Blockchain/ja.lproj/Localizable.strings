@@ -2132,3 +2132,108 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "売買ビットコインから直接Blockchain財布です。 開始によるアカウントを作成したり、の販売す。";
+
+/* (No Commment) */
+"All Wallets" = "すべての財布";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "おxPubます。 人へのアクセスxPubできるすべての資金取引です。";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "おxPubは高度な機能を含む全ての公開アドレスです。";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "お取引きが送信する場合は、請求ビットコインのキャッシュします。";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "くビットコインのキャッシュ";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "請求ビットコインのキャッシュ";
+
+/* (No Commment) */
+"Price" = "価格";
+
+/* (No Commment) */
+"See charts" = "参照図";
+
+/* (No Commment) */
+"Price charts" = "価格表";
+
+/* (No Commment) */
+"Bitcoin Cash" = "ビットコインのキャッシュ";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "ビットコインのキャッシュ価格";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "入力ビットコインのキャッシュアドレスを選択し";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "コピーこの受信アドレスのクリップボードか。 その場合、することがありますのでご了承他のアプリケーションを眺めることができこれらの情報です。";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "ご送付くださいBCHのビットコインのキャッシュアドレス\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "取引手数料の影響などの鉱業ネットワークの確認、お取引の流ネットワーク条件です。";
+
+/* (No Commment) */
+"Trade Refunded" = "貿易の返";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "その一つとして、今るBlockchain財布を可能にするシームレスに送信、受信、交換ビットコインのキャッシュに！";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "ご確認くださいこれはビットコインのキャッシュアドレスのか？";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "送金資金をビットコインアドレスにおける事故による損失資金です。";
+
+/* (No Commment) */
+"All Wallets" = "すべてのウォレット";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "xPubを公開しない。xPubにアクセスできる人は全員すべての資金と取引を見ることができます。";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "xPubはすべての公開アドレスを含む高度な機能です。";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "取引はビットコインキャッシュを送信してリクエストする際に発生します。";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "ビットコインキャッシュを取得";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "ビットコインキャッシュをリクエスト";
+
+/* (No Commment) */
+"Price" = "価格";
+
+/* (No Commment) */
+"See charts" = "チャートを表示";
+
+/* (No Commment) */
+"Price charts" = "価格チャート";
+
+/* (No Commment) */
+"Bitcoin Cash" = "ビットコインキャッシュ";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "ビットコインキャッシュの価格";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "ビットコインキャッシュアドレスを入力して選択";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "この受信アドレスをクリップボードにコピーしますか？その場合は他のアプリケーションがこの情報を参照できることがあります。ご注意ください。";
+
+/* (No Commment) */
+"Start trading" = "取引を開始";
+
+/* (No Commment) */
+"Trade bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "ブロックチェーンウォレットから直接ビットコインを取引。［売買］タブからまずアカウントを作成してください。";
+
+/* (No Commment) */
+"The wait is over" = "待機時間は終了しました";

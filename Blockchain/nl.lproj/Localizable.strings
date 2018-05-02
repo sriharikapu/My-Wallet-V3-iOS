@@ -2393,3 +2393,108 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Kopen en verkopen van bitcoin direct van uw Blockchain portemonnee. Begin met het aanmaken van een account in het Kopen & Verkopen tabblad.";
+
+/* (No Commment) */
+"All Wallets" = "Alle Portefeuilles";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Houd uw xPub privé. Iemand met toegang tot uw xPub in staat zal zijn om al uw fondsen en transacties.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Uw xPub is een geavanceerde functie die bevat al uw openbare adressen.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Transacties zich voordoen wanneer u verzenden en verzoek bitcoin geld.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Bitcoin Krijgen Geld";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Verzoek Bitcoin Geld";
+
+/* (No Commment) */
+"Price" = "Prijs";
+
+/* (No Commment) */
+"See charts" = "Zie grafieken";
+
+/* (No Commment) */
+"Price charts" = "Prijs grafieken";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Bitcoin-Geld";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Bitcoin-Koers";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Voer Bitcoin Cash adres of selecteer";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Kopieer deze ontvangen mailadres naar het klembord te kopiëren? Als dat zo is, worden geadviseerd dat andere programma ' s kunnen kijken op deze informatie.";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "Stuur BCH naar de Bitcoin Cash adres\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "Transactiekosten van invloed op hoe snel de mijnbouw netwerk bevestig uw transacties, en zijn afhankelijk van de huidige netwerk-voorwaarden.";
+
+/* (No Commment) */
+"Trade Refunded" = "Handel Terugbetaald";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "We zijn verheugd om aan te kondigen dat je Blockchain portemonnee zal u toelaten om naadloos te verzenden, ontvangen en uitwisselen van Bitcoin Geld!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "Weet je zeker dat dit is een bitcoin cash adres?";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "Het verzenden van geld aan een bitcoin adres door ongeval zal resulteren in verlies van fondsen.";
+
+/* (No Commment) */
+"All Wallets" = "Alle portefeuilles";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Houd je xPub privé. Iemand met toegang tot je xPub zal al je gelden en transacties kunnen zien.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Je xPub is een geavanceerde functie die al je openbare adressen bevat.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Er vinden transacties plaats wanneer je bitcoin-contanten verstuurt en aanvraagt.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Haal Bitcoin-contanten";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Verzoek Bitcoin-contanten";
+
+/* (No Commment) */
+"Price" = "Prijs";
+
+/* (No Commment) */
+"See charts" = "Zie tabellen";
+
+/* (No Commment) */
+"Price charts" = "Prijstabellen";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Bitcoin-contanten";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Prijs van Bitcoin-contanten";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Voer adres voor Bitcoin-contanten in of selecteer";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Dit ontvangstadres naar het klembord kopiëren? Zo ja, houd er dan rekening mee dat andere apps deze informatie kunnen bekijken.";
+
+/* (No Commment) */
+"Start trading" = "Begin met handelen";
+
+/* (No Commment) */
+"Trade bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Verhandel bitcoin direct vanuit je Blockchain-portefeuille. Begin met het aanmaken van een account in het tabblad Kopen en Verkopen.";
+
+/* (No Commment) */
+"The wait is over" = "Het wachten is voorbij";

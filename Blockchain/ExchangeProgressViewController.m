@@ -131,7 +131,7 @@
     } else if ([trade.status isEqualToString:TRADE_STATUS_RECEIVED] || [trade.status isEqualToString:TRADE_STATUS_NO_DEPOSITS]) {
         return BC_STRING_EXCHANGE_IN_PROGRESS;
     } else if ([trade.status isEqualToString:TRADE_STATUS_RESOLVED] || [trade.status isEqualToString:TRADE_STATUS_FAILED]) {
-        return BC_STRING_EXCHANGE_TITLE_FAILED;
+        return BC_STRING_EXCHANGE_TITLE_REFUNDED;
     }
     
     return nil;

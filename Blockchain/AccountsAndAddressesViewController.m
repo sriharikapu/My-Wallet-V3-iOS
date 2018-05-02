@@ -33,9 +33,17 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.tableView = [[UITableView alloc] initWithFrame:app.window.frame style:UITableViewStyleGrouped];
+    
+    self.view.frame = app.window.frame;
+    
+    UIView *containerView = [[UIView alloc] initWithFrame:CGRectOffset(app.window.frame, 0, DEFAULT_HEADER_HEIGHT + ASSET_SELECTOR_ROW_HEIGHT + 8)];
+    [self.view addSubview:containerView];
+    self.containerView = containerView;
+    
+    self.tableView = [[UITableView alloc] initWithFrame:self.view.frame style:UITableViewStyleGrouped];
+    [self.tableView changeHeight:self.view.frame.size.height - CELL_HEIGHT_DEFAULT*2];
     self.tableView.backgroundColor = COLOR_TABLE_VIEW_BACKGROUND_LIGHT_GRAY;
-    [self.view addSubview:self.tableView];
+    [self.containerView addSubview:self.tableView];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:NOTIFICATION_KEY_RELOAD_ACCOUNTS_AND_ADDRESSES object:nil];
@@ -46,7 +54,7 @@
 {
     [super viewWillAppear:animated];
     AccountsAndAddressesNavigationController *navigationController = (AccountsAndAddressesNavigationController *)self.navigationController;
-    navigationController.headerLabel.text = BC_STRING_BITCOIN_ADDRESSES;
+    navigationController.headerLabel.text = BC_STRING_ADDRESSES;
     
     if (IS_USING_SCREEN_SIZE_4S) {
         self.edgesForExtendedLayout = UIRectEdgeNone;
@@ -69,7 +77,7 @@
 
 - (void)reload
 {
-    allKeys = [app.wallet allLegacyAddresses];
+    allKeys = [app.wallet allLegacyAddresses:self.assetType];
     [self.tableView reloadData];
     
     [self displayTransferFundsWarningIfAppropriate];
@@ -81,6 +89,7 @@
 {
     if ([segue.identifier isEqualToString:SEGUE_IDENTIFIER_ACCOUNTS_AND_ADDRESSES_DETAIL]) {
         AccountsAndAddressesDetailViewController *detailViewController = segue.destinationViewController;
+        detailViewController.assetType = self.assetType;
         if (self.clickedAddress) {
             detailViewController.address = self.clickedAddress;
             detailViewController.account = -1;
@@ -92,6 +101,13 @@
 }
 
 #pragma mark - Actions
+
+- (void)setAssetType:(AssetType)assetType
+{
+    _assetType = assetType;
+    
+    [self reload];
+}
 
 - (void)didSelectAddress:(NSString *)address
 {
@@ -187,7 +203,7 @@
         return;
     }
     
-    PrivateKeyReader *reader = [[PrivateKeyReader alloc] initWithSuccess:^(NSString* keyString) {
+    PrivateKeyReader *reader = [[PrivateKeyReader alloc] initWithAssetType:self.assetType success:^(NSString* keyString) {
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(promptForLabelAfterScan)
                                                      name:NOTIFICATION_KEY_BACKUP_SUCCESS object:nil];
@@ -213,7 +229,7 @@
 {
     AccountsAndAddressesNavigationController *navigationController = (AccountsAndAddressesNavigationController *)self.navigationController;
     
-    if ([app.wallet didUpgradeToHd] && [app.wallet getTotalBalanceForSpendableActiveLegacyAddresses] >= [app.wallet dust] && navigationController.visibleViewController == self) {
+    if (self.assetType == AssetTypeBitcoin && [app.wallet didUpgradeToHd] && [app.wallet getTotalBalanceForSpendableActiveLegacyAddresses] >= [app.wallet dust] && navigationController.visibleViewController == self) {
         navigationController.warningButton.hidden = NO;
     } else {
         navigationController.warningButton.hidden = YES;
@@ -271,19 +287,23 @@
     
     if (section == 0) {
         labelString = BC_STRING_WALLETS;
-        UIButton *addButton = [[UIButton alloc] initWithFrame:CGRectMake(self.view.frame.size.width - 20 - 30, 4, 50, 40)];
-        [addButton setImage:[[UIImage imageNamed:@"new"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-        addButton.imageView.tintColor = COLOR_BLOCKCHAIN_BLUE;
-        [addButton addTarget:self action:@selector(newAccountClicked:) forControlEvents:UIControlEventTouchUpInside];
-        [view addSubview:addButton];
+        if (self.assetType == AssetTypeBitcoin) {
+            UIButton *addButton = [[UIButton alloc] initWithFrame:CGRectMake(self.view.frame.size.width - 20 - 30, 4, 50, 40)];
+            [addButton setImage:[[UIImage imageNamed:@"new"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+            addButton.imageView.tintColor = COLOR_BLOCKCHAIN_BLUE;
+            [addButton addTarget:self action:@selector(newAccountClicked:) forControlEvents:UIControlEventTouchUpInside];
+            [view addSubview:addButton];
+        }
     }
     else if (section == 1) {
         labelString = BC_STRING_IMPORTED_ADDRESSES;
-        UIButton *addButton = [[UIButton alloc] initWithFrame:CGRectMake(self.view.frame.size.width - 20 - 30, 4, 50, 40)];
-        [addButton setImage:[[UIImage imageNamed:@"new"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-        addButton.imageView.tintColor = COLOR_BLOCKCHAIN_BLUE;
-        [addButton addTarget:self action:@selector(newAddressClicked:) forControlEvents:UIControlEventTouchUpInside];
-        [view addSubview:addButton];
+        if (self.assetType == AssetTypeBitcoin) {
+            UIButton *addButton = [[UIButton alloc] initWithFrame:CGRectMake(self.view.frame.size.width - 20 - 30, 4, 50, 40)];
+            [addButton setImage:[[UIImage imageNamed:@"new"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+            addButton.imageView.tintColor = COLOR_BLOCKCHAIN_BLUE;
+            [addButton addTarget:self action:@selector(newAddressClicked:) forControlEvents:UIControlEventTouchUpInside];
+            [view addSubview:addButton];
+        }
     } else
         @throw @"Unknown Section";
     
@@ -295,15 +315,24 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if (section == 0)
-        return [app.wallet getAllAccountsCount];
-    else if (section == 1)
-        return [allKeys count];
+        return [app.wallet getAllAccountsCount:self.assetType];
+    else if (section == 1) {
+        if (self.assetType == AssetTypeBitcoin) {
+            return [allKeys count];
+        } else {
+            return [allKeys count] > 0 ? 1 : 0;
+        }
+    }
     return 0;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 2;
+    if (self.assetType == AssetTypeBitcoin) {
+        return 2;
+    } else {
+        return [app.wallet hasLegacyAddresses:self.assetType] ? 2 : 1;
+    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -312,7 +341,7 @@
     if (indexPath.section == 0) {
         [self didSelectAccount:(int)indexPath.row];
     } else if (indexPath.section == 1) {
-        [self didSelectAddress:allKeys[indexPath.row]];
+        if (self.assetType == AssetTypeBitcoin) [self didSelectAddress:allKeys[indexPath.row]];
     }
 }
 
@@ -320,7 +349,7 @@
 {
     if (indexPath.section == 0) {
         int accountIndex = (int) indexPath.row;
-        NSString *accountLabelString = [app.wallet getLabelForAccount:accountIndex];
+        NSString *accountLabelString = [app.wallet getLabelForAccount:accountIndex assetType:self.assetType];
         
         ReceiveTableCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"receiveAccount"];
         
@@ -329,7 +358,7 @@
             cell.backgroundColor = [UIColor whiteColor];
             cell.balanceLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_LIGHT size:FONT_SIZE_EXTRA_SMALL];
 
-            if ([app.wallet getDefaultAccountIndex] == accountIndex) {
+            if ([app.wallet getDefaultAccountIndexForAssetType:self.assetType] == accountIndex) {
                 
                 cell.labelLabel.autoresizingMask = UIViewAutoresizingNone;
                 cell.balanceLabel.autoresizingMask = UIViewAutoresizingNone;
@@ -380,18 +409,18 @@
         cell.labelLabel.text = accountLabelString;
         cell.addressLabel.text = @"";
         
-        uint64_t balance = [app.wallet getBalanceForAccount:accountIndex];
+        uint64_t balance = [[app.wallet getBalanceForAccount:accountIndex assetType:self.assetType] longLongValue];
         
         // Selected cell color
         UIView *v = [[UIView alloc] initWithFrame:CGRectMake(0,0,cell.frame.size.width,cell.frame.size.height)];
         [v setBackgroundColor:COLOR_BLOCKCHAIN_BLUE];
         [cell setSelectedBackgroundView:v];
         
-        if ([app.wallet isAccountArchived:accountIndex]) {
+        if ([app.wallet isAccountArchived:accountIndex assetType:self.assetType]) {
             cell.balanceLabel.text = BC_STRING_ARCHIVED;
             cell.balanceLabel.textColor = COLOR_BUTTON_BLUE;
         } else {
-            cell.balanceLabel.text = [NSNumberFormatter formatMoney:balance];
+            cell.balanceLabel.text = self.assetType == AssetTypeBitcoin ? [NSNumberFormatter formatMoney:balance] : [NSNumberFormatter formatBchWithSymbol:balance];
             cell.balanceLabel.textColor = COLOR_BLOCKCHAIN_GREEN;
         }
         cell.balanceLabel.minimumScaleFactor = 0.75f;
@@ -401,6 +430,8 @@
         
         return cell;
     }
+
+    // Imported addresses
     
     NSString *addr = [allKeys objectAtIndex:[indexPath row]];
     
@@ -438,19 +469,26 @@
             cell.balanceButton.frame = UIEdgeInsetsInsetRect(cell.contentView.frame, contentInsets);
             
             [cell.watchLabel setHidden:TRUE];
+
+            // Disable cell highlighting for BCH imported addresses
+            if (self.assetType == AssetTypeBitcoinCash) {
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            } else {
+                cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+            }
         }
     }
     
-    NSString *label =  [app.wallet labelForLegacyAddress:addr];
+    NSString *label = self.assetType == AssetTypeBitcoin ? [app.wallet labelForLegacyAddress:addr assetType:self.assetType] : BC_STRING_IMPORTED_ADDRESSES;
     
     if (label)
         cell.labelLabel.text = label;
     else
         cell.labelLabel.text = BC_STRING_NO_LABEL;
     
-    cell.addressLabel.text = addr;
+    cell.addressLabel.text = self.assetType == AssetTypeBitcoin ? addr : nil;
     
-    uint64_t balance = [app.wallet getLegacyAddressBalance:addr];
+    uint64_t balance = self.assetType == AssetTypeBitcoin ? [[app.wallet getLegacyAddressBalance:addr assetType:self.assetType] longLongValue] : [app.wallet getTotalBalanceForActiveLegacyAddresses:self.assetType];
     
     // Selected cell color
     UIView *v = [[UIView alloc] initWithFrame:CGRectMake(0,0,cell.frame.size.width,cell.frame.size.height)];
@@ -461,7 +499,7 @@
         cell.balanceLabel.text = BC_STRING_ARCHIVED;
         cell.balanceLabel.textColor = COLOR_BUTTON_BLUE;
     } else {
-        cell.balanceLabel.text = [NSNumberFormatter formatMoney:balance];
+        cell.balanceLabel.text = self.assetType == AssetTypeBitcoin ? [NSNumberFormatter formatMoney:balance] : [NSNumberFormatter formatBchWithSymbol:balance];
         cell.balanceLabel.textColor = COLOR_LABEL_BALANCE_GREEN;
     }
     cell.balanceLabel.minimumScaleFactor = 0.75f;

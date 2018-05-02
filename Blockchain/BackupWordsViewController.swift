@@ -9,7 +9,6 @@
 import UIKit
 
 class BackupWordsViewController: UIViewController, SecondPasswordDelegate, UIScrollViewDelegate {
-    
     @IBOutlet weak var wordsScrollView: UIScrollView?
     @IBOutlet weak var wordsPageControl: UIPageControl!
     @IBOutlet weak var wordsProgressLabel: UILabel!
@@ -21,77 +20,87 @@ class BackupWordsViewController: UIViewController, SecondPasswordDelegate, UIScr
     var wallet: Wallet?
     var wordLabels: [UILabel]!
     var isVerifying = false
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         previousWordButton.setTitle(NSLocalizedString("PREVIOUS", comment: ""), for: .normal)
-
         nextWordButton.setTitle(NSLocalizedString("NEXT", comment: ""), for: .normal)
-        
+
         updatePreviousWordButton()
 
         setupInstructionLabel()
-        
+
         setupWordsProgressLabel()
-        
+
         wallet!.addObserver(self, forKeyPath: "recoveryPhrase", options: .new, context: nil)
-        
+
         self.navigationController?.navigationBar.tintColor = UIColor.white
-        
+
         wordLabel.text = ""
-        
+
         updateCurrentPageLabel(0)
-        
+
         wordsScrollView!.center = CGPoint(x: view.center.x, y: wordsScrollView!.center.y)
         wordsScrollView!.clipsToBounds = true
-        wordsScrollView!.contentSize = CGSize(width: CGFloat(Constants.Defaults.NumberOfRecoveryPhraseWords) * wordLabel.frame.width, height: wordLabel.frame.height)
+        let scrollViewWidth = CGFloat(Constants.Defaults.NumberOfRecoveryPhraseWords) * wordLabel.frame.width
+        let scrollViewHeight = wordLabel.frame.height
+        wordsScrollView!.contentSize = CGSize(width: scrollViewWidth, height: scrollViewHeight)
         wordsScrollView!.isUserInteractionEnabled = false
 
         wordLabels = [UILabel]()
         wordLabels.insert(wordLabel, at: 0)
-        for i in 1 ..< Constants.Defaults.NumberOfRecoveryPhraseWords {
-            let offset: CGFloat = CGFloat(i) * wordLabel.frame.width
-            let x: CGFloat = wordLabel.frame.origin.x + offset
-            let label = UILabel(frame: CGRect(x: x, y: wordLabel.frame.origin.y, width: wordLabel.frame.size.width, height: wordLabel.frame.size.height))
+        for idx in 1 ..< Constants.Defaults.NumberOfRecoveryPhraseWords {
+            let offset: CGFloat = CGFloat(idx) * wordLabel.frame.width
+            let posX = wordLabel.frame.origin.x + offset
+            let posY = wordLabel.frame.origin.y
+            let labelWidth = wordLabel.frame.size.width
+            let labelHeight = wordLabel.frame.size.height
+            let label = UILabel(frame: CGRect(x: posX, y: posY, width: labelWidth, height: labelHeight))
             label.adjustsFontSizeToFitWidth = true
             label.font = wordLabel.font
             label.textColor = wordLabel.textColor
             label.textAlignment = wordLabel.textAlignment
 
             wordLabel.superview?.addSubview(label)
-            
+
             wordLabels.append(label)
         }
-        
-        if wallet!.needsSecondPassword(){
+
+        if wallet!.needsSecondPassword() {
             self.performSegue(withIdentifier: "secondPasswordForBackup", sender: self)
         } else {
             wallet!.getRecoveryPhrase(nil)
         }
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        UIView .animate(withDuration: 0.3, animations: { () -> Void in
-            self.previousWordButton.frame = CGRect(x: 0,y: self.view.frame.size.height-self.previousWordButton.frame.size.height, width:self.view.frame.size.width/2 - 2, height: self.previousWordButton.frame.size.height);
-            self.nextWordButton.frame = CGRect(x: self.view.frame.size.width-self.previousWordButton.frame.size.width + 2, y: self.view.frame.size.height-self.previousWordButton.frame.size.height, width:self.view.frame.size.width/2 - 2, height: self.previousWordButton.frame.size.height);
+        UIView .animate(withDuration: 0.3, animations: {
+            var posX: CGFloat = 0
+            let posY: CGFloat = self.view.frame.size.height - self.previousWordButton.frame.size.height
+            let buttonWidth = (self.view.frame.size.width / 2) - 2
+            var buttonHeight = self.previousWordButton.frame.size.height
+            self.previousWordButton.frame = CGRect(x: 0, y: posY, width: buttonWidth, height: buttonHeight)
+            posX = self.view.frame.size.width - self.previousWordButton.frame.size.width + 2
+            buttonHeight = self.previousWordButton.frame.size.height
+            self.nextWordButton.frame = CGRect(x: posX, y: posY, width: buttonWidth, height: buttonHeight)
         })
     }
-    
+
     func setupInstructionLabel() {
         summaryLabel.font = UIFont(name: "GillSans", size: Constants.FontSizes.MediumLarge)
-        summaryLabel.text = NSLocalizedString("Write down the following 12 word Recovery Phrase exactly as they appear and in this order:", comment: "")
+        summaryLabel.text = NSLocalizedString(
+            "Write down the following 12 word Recovery Phrase exactly as they appear and in this order:",
+            comment: "")
         summaryLabel.center = CGPoint(x: view.center.x, y: summaryLabel.center.y)
     }
-    
+
     func setupWordsProgressLabel() {
         wordsProgressLabel.font = UIFont(name: "Montserrat-Regular", size: Constants.FontSizes.SmallMedium)
         wordsProgressLabel.center = CGPoint(x: view.center.x, y: wordsProgressLabel.center.y)
         wordsProgressLabel.adjustsFontSizeToFitWidth = true
     }
-    
+
     func updatePreviousWordButton() {
         if wordsPageControl.currentPage == 0 {
             previousWordButton.isEnabled = false
@@ -107,23 +116,28 @@ class BackupWordsViewController: UIViewController, SecondPasswordDelegate, UIScr
     @IBAction func previousWordButtonTapped(_ sender: UIButton) {
         if wordsPageControl.currentPage > 0 {
             let pagePosition = wordLabel.frame.width * CGFloat(wordsPageControl.currentPage-1)
-            wordsScrollView?.setContentOffset(CGPoint(x: pagePosition, y: wordsScrollView!.contentOffset.y), animated: true)
+            let posY = wordsScrollView!.contentOffset.y
+            wordsScrollView?.setContentOffset(CGPoint(x: pagePosition, y: posY), animated: true)
         }
     }
-    
+
     @IBAction func nextWordButtonTapped(_ sender: UIButton) {
         if let count = wordLabels?.count {
             if wordsPageControl.currentPage == count-1 {
                 performSegue(withIdentifier: "backupVerify", sender: nil)
             } else if wordsPageControl.currentPage < count-1 {
                 let pagePosition = wordLabel.frame.width * CGFloat(wordsPageControl.currentPage+1)
-                wordsScrollView?.setContentOffset(CGPoint(x: pagePosition, y: wordsScrollView!.contentOffset.y), animated: true)
+                wordsScrollView?.setContentOffset(
+                    CGPoint(x: pagePosition, y: wordsScrollView!.contentOffset.y),
+                    animated: true)
             }
         }
     }
-    
+
     func updateCurrentPageLabel(_ page: Int) {
-        wordsProgressLabel.text = NSLocalizedString(NSString(format: "Word %@ of %@", String(page + 1), String((Constants.Defaults.NumberOfRecoveryPhraseWords))) as String, comment: "")
+        let format = NSLocalizedString("Word %@ of %@", comment: "")
+        let progressLabelText = String.localizedStringWithFormat(format, String(page + 1), String(Constants.Defaults.NumberOfRecoveryPhraseWords))
+        wordsProgressLabel.text = progressLabelText
         if let count = wordLabels?.count {
             if wordsPageControl.currentPage == count-1 {
                 nextWordButton.backgroundColor = Constants.Colors.BlockchainBlue
@@ -134,27 +148,19 @@ class BackupWordsViewController: UIViewController, SecondPasswordDelegate, UIScr
                 nextWordButton.setTitleColor(UIColor.white, for: UIControlState())
                 nextWordButton.setTitle(NSLocalizedString("NEXT", comment: ""), for: UIControlState())
             }
-            
             updatePreviousWordButton()
         }
     }
-    
+
     // MARK: - Words Scrollview
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        // Determine page number:
         let pageWidth = scrollView.frame.size.width
         let fractionalPage = Float(scrollView.contentOffset.x / pageWidth)
-        let page: Int = lroundf(fractionalPage)
-        
+        let page = lroundf(fractionalPage)
         wordsPageControl.currentPage = page
-        
         updateCurrentPageLabel(page)
     }
 
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        
-    }
-    
     // MARK: - Navigation
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -168,24 +174,24 @@ class BackupWordsViewController: UIViewController, SecondPasswordDelegate, UIScr
             vc.isVerifying = false
         }
     }
-    
+
     func didGetSecondPassword(_ password: String) {
         wallet!.getRecoveryPhrase(password)
     }
-    
-    internal func returnToRootViewController(_ completionHandler: @escaping () -> Void ) {
+
+    internal func returnToRootViewController(_ completionHandler: @escaping () -> Void) {
         self.navigationController?.popToRootViewControllerWithHandler({ () -> () in
             completionHandler()
         })
     }
-    
+    // swiftlint:disable block_based_kvo
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
         let words = wallet!.recoveryPhrase.components(separatedBy: " ")
-        for i in 0 ..< Constants.Defaults.NumberOfRecoveryPhraseWords {
-            wordLabels[i].text = words[i]
+        for idx in 0 ..< Constants.Defaults.NumberOfRecoveryPhraseWords {
+            wordLabels[idx].text = words[idx]
         }
     }
-    
+
     deinit {
         wallet!.removeObserver(self, forKeyPath: "recoveryPhrase", context: nil)
     }

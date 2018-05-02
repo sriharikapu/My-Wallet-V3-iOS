@@ -36,22 +36,21 @@
     LatestBlock *latestBlock;
 }
 
+@property (nonatomic) AssetType assetType;
+
 @property(nonatomic, strong) MultiAddressResponse *data;
 @property(nonatomic, strong) LatestBlock *latestBlock;
 
-@property(nonatomic) NSInteger filterIndex;
 @property(nonatomic) BOOL loadedAllTransactions;
 @property(nonatomic) UIButton *moreButton;
 @property(nonatomic) BOOL clickedFetchMore;
 @property(nonatomic) TransactionDetailViewController *detailViewController;
 @property(nonatomic) NSString *messageIdentifier;
-@property(nonatomic) UIButton *filterAccountButton;
 - (void)reload;
 - (void)reloadSymbols;
 - (void)didReceiveTransactionMessage;
 - (void)setText;
 - (UITableView*)tableView;
-- (void)changeFilterLabel:(NSString *)newText;
 - (void)selectPayment:(NSString *)payment;
 - (void)updateData:(MultiAddressResponse *)newData;
 - (void)didGetMessages;

@@ -33,15 +33,6 @@
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="80"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xlp-Yi-lq2" userLabel="Filter Account Button">
-                                        <rect key="frame" x="20" y="48" width="280" height="27"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" name="Montserrat-Regular" family="Montserrat" pointSize="14"/>
-                                        <state key="normal" title="1.12345 BTC">
-                                            <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                            <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        </state>
-                                    </button>
                                     <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zSG-vv-ac3" userLabel="Balance Big Button">
                                         <rect key="frame" x="20" y="0.0" width="280" height="42"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -75,7 +66,6 @@
             <size key="freeformSize" width="320" height="480"/>
             <connections>
                 <outlet property="balanceBigButton" destination="zSG-vv-ac3" id="o3Q-W4-AY5"/>
-                <outlet property="filterAccountButton" destination="xlp-Yi-lq2" id="6aK-7Q-gHY"/>
                 <outlet property="headerView" destination="QNE-4f-2C5" id="hBb-au-Iog"/>
                 <outlet property="tableView" destination="5kW-Wd-IHm" id="EA7-au-eGQ"/>
             </connections>

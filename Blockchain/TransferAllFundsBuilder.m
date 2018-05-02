@@ -11,12 +11,14 @@
 
 @interface TransferAllFundsBuilder()
 @property (nonatomic) NSString *temporarySecondPassword;
+@property (nonatomic) AssetType assetType;
 @end
 @implementation TransferAllFundsBuilder
 
-- (id)initUsingSendScreen:(BOOL)usesSendScreen
+- (id)initWithAssetType:(AssetType)assetType usingSendScreen:(BOOL)usesSendScreen
 {
     if (self = [super init]) {
+        self.assetType = assetType;
         _usesSendScreen = usesSendScreen;
         [self getTransferAllInfo];
     }
@@ -35,7 +37,7 @@
 
 - (NSString *)getLabelForDestinationAccount
 {
-    return [app.wallet getLabelForAccount:self.destinationAccount];
+    return [app.wallet getLabelForAccount:self.destinationAccount assetType:self.assetType];
 }
 
 - (NSString *)formatMoney:(uint64_t)amount localCurrency:(BOOL)useLocalCurrency
@@ -56,7 +58,7 @@
     self.transferAllAddressesUnspendable = 0;
     
     // use default account, but can select new destination account by calling setupTransfersToAccount:
-    [self setupTransfersToAccount:[app.wallet getDefaultAccountIndex]];
+    [self setupTransfersToAccount:[app.wallet getDefaultAccountIndexForAssetType:self.assetType]];
 }
 
 - (void)setupTransfersToAccount:(int)account

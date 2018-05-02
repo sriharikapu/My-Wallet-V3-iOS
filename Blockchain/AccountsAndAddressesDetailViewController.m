@@ -88,7 +88,7 @@ typedef enum {
 - (void)resetHeader
 {
     AccountsAndAddressesNavigationController *navigationController = (AccountsAndAddressesNavigationController *)self.navigationController;
-    navigationController.headerLabel.text = self.address ? [app.wallet labelForLegacyAddress:self.address] : [app.wallet getLabelForAccount:self.account];
+    navigationController.headerLabel.text = self.address ? [app.wallet labelForLegacyAddress:self.address assetType:self.assetType] : [app.wallet getLabelForAccount:self.account assetType:self.assetType];
 }
 
 - (void)updateHeaderText:(NSString *)headerText
@@ -130,7 +130,7 @@ typedef enum {
     if (self.address) {
       return [app.wallet isAddressArchived:self.address];
     } else {
-      return [app.wallet isAccountArchived:self.account];
+      return [app.wallet isAccountArchived:self.account assetType:self.assetType];
     }
 }
 
@@ -138,7 +138,7 @@ typedef enum {
 {
 #ifdef ENABLE_TRANSFER_FUNDS
     if (self.address) {
-        return [app.wallet getLegacyAddressBalance:self.address] >= [app.wallet dust] && ![app.wallet isWatchOnlyLegacyAddress:self.address] && ![self isArchived] && [app.wallet didUpgradeToHd];
+        return [[app.wallet getLegacyAddressBalance:self.address assetType:self.assetType] longLongValue] >= [app.wallet dust] && ![app.wallet isWatchOnlyLegacyAddress:self.address] && ![self isArchived] && [app.wallet didUpgradeToHd];
     } else {
         return NO;
     }
@@ -188,15 +188,15 @@ typedef enum {
 
 - (void)setDefaultAccount:(int)account
 {
-    [self showBusyViewWithLoadingText:BC_STRING_LOADING_SYNCING_WALLET];
-    [app.wallet setDefaultAccount:account];
+    if (self.assetType == AssetTypeBitcoin) [self showBusyViewWithLoadingText:BC_STRING_LOADING_SYNCING_WALLET];
+    [app.wallet setDefaultAccount:account assetType:self.assetType];
 }
 
 - (void)toggleArchive
 {
     if (self.address) {
         
-        NSArray *activeLegacyAddresses = [app.wallet activeLegacyAddresses];
+        NSArray *activeLegacyAddresses = [app.wallet activeLegacyAddresses:self.assetType];
         
         if (![app.wallet didUpgradeToHd] && [activeLegacyAddresses count] == 1 && [[activeLegacyAddresses firstObject] isEqualToString:self.address]) {
             [app standardNotifyAutoDismissingController:BC_STRING_AT_LEAST_ONE_ADDRESS_REQUIRED];
@@ -205,7 +205,7 @@ typedef enum {
             [self performSelector:@selector(toggleArchiveLegacyAddress) withObject:nil afterDelay:ANIMATION_DURATION];
         }
     } else {
-        [self showBusyViewWithLoadingText:BC_STRING_LOADING_SYNCING_WALLET];
+        if (self.assetType == AssetTypeBitcoin) [self showBusyViewWithLoadingText:BC_STRING_LOADING_SYNCING_WALLET];
         [self performSelector:@selector(toggleArchiveAccount) withObject:nil afterDelay:ANIMATION_DURATION];
     }
 }
@@ -217,7 +217,7 @@ typedef enum {
 
 - (void)toggleArchiveAccount
 {
-    [app.wallet toggleArchiveAccount:self.account];
+    [app.wallet toggleArchiveAccount:self.account assetType:self.assetType];
 }
 
 #pragma mark - Navigation
@@ -236,7 +236,7 @@ typedef enum {
         if (detailType == DetailTypeEditAddressLabel) {
             
             BCEditAddressView *editAddressView = [[BCEditAddressView alloc] initWithAddress:self.address];
-            editAddressView.labelTextField.text = [app.wallet labelForLegacyAddress:self.address];
+            editAddressView.labelTextField.text = [app.wallet labelForLegacyAddress:self.address assetType:self.assetType];
             
             [self setupModalView:editAddressView inViewController:segue.destinationViewController];
             
@@ -245,8 +245,8 @@ typedef enum {
             
         } else if (detailType == DetailTypeEditAccountLabel) {
             
-            BCEditAccountView *editAccountView = [[BCEditAccountView alloc] init];
-            editAccountView.labelTextField.text = [app.wallet getLabelForAccount:self.account];
+            BCEditAccountView *editAccountView = [[BCEditAccountView alloc] initWithAssetType:self.assetType];
+            editAccountView.labelTextField.text = [app.wallet getLabelForAccount:self.account assetType:self.assetType];
             editAccountView.accountIdx = self.account;
             
             [self setupModalView:editAccountView inViewController:segue.destinationViewController];
@@ -257,7 +257,7 @@ typedef enum {
         } else if (detailType == DetailTypeShowExtendedPublicKey) {
             
             BCQRCodeView *qrCodeView = [[BCQRCodeView alloc] initWithFrame:self.view.frame qrHeaderText:BC_STRING_EXTENDED_PUBLIC_KEY_DETAIL_HEADER_TITLE addAddressPrefix:YES];
-            qrCodeView.address = [app.wallet getXpubForAccount:self.account];
+            qrCodeView.address = [app.wallet getXpubForAccount:self.account assetType:self.assetType];
             qrCodeView.doneButton.hidden = YES;
             
             [self setupModalView:qrCodeView inViewController:segue.destinationViewController];
@@ -341,7 +341,7 @@ typedef enum {
             if (self.address) {
                 return [app.wallet isWatchOnlyLegacyAddress:self.address] ? BC_STRING_WATCH_ONLY_FOOTER_TITLE : BC_STRING_ARCHIVE_FOOTER_TITLE;
             } else {
-                return [NSString stringWithFormat:@"%@\n\n%@", BC_STRING_EXTENDED_PUBLIC_KEY_FOOTER_TITLE_ONE, BC_STRING_EXTENDED_PUBLIC_KEY_FOOTER_TITLE_TWO];
+                return BC_STRING_EXTENDED_PUBLIC_KEY_FOOTER_TITLE;
             }
         }
     } else if (section == sectionArchived) {
@@ -364,7 +364,7 @@ typedef enum {
         }
         return [app.wallet isWatchOnlyLegacyAddress:self.address] ? numberOfSections + 1 : numberOfSections;
     } else {
-        return [app.wallet getDefaultAccountIndex] == self.account ? numberOfSectionsAccountUnarchived - 1 : numberOfSectionsAccountUnarchived;
+        return [app.wallet getDefaultAccountIndexForAssetType:self.assetType] == self.account ? numberOfSectionsAccountUnarchived - 1 : numberOfSectionsAccountUnarchived;
     }
 }
 
@@ -385,7 +385,7 @@ typedef enum {
             if (self.address) {
                 return numberOfRowsAddressUnarchived;
             } else {
-                return [app.wallet getDefaultAccountIndex] == self.account ? numberOfRowsAccountUnarchived - 1 : numberOfRowsAccountUnarchived;
+                return [app.wallet getDefaultAccountIndexForAssetType:self.assetType] == self.account ? numberOfRowsAccountUnarchived - 1 : numberOfRowsAccountUnarchived;
             }
         }
         
@@ -400,7 +400,7 @@ typedef enum {
                 if (self.address) {
                     return numberOfRowsAddressUnarchived;
                 } else {
-                    return [app.wallet getDefaultAccountIndex] == self.account ? numberOfRowsAccountUnarchived - 1 : numberOfRowsAccountUnarchived;
+                    return [app.wallet getDefaultAccountIndexForAssetType:self.assetType] == self.account ? numberOfRowsAccountUnarchived - 1 : numberOfRowsAccountUnarchived;
                 }
             }
         }
@@ -459,7 +459,7 @@ typedef enum {
                     if (self.address) {
                             [self showAddress:self.address];
                     } else {
-                        if ([app.wallet getDefaultAccountIndex] != self.account) {
+                        if ([app.wallet getDefaultAccountIndexForAssetType:self.assetType] != self.account) {
                             [self alertToConfirmSetDefaultAccount:self.account];
                         } else {
                             [self alertToShowAccountXPub];
@@ -532,7 +532,7 @@ typedef enum {
                 } else {
                     cell.textLabel.text = self.address? BC_STRING_LABEL : BC_STRING_NAME;
                     cell.textLabel.textColor = COLOR_TEXT_DARK_GRAY;
-                    cell.detailTextLabel.text = self.address ? [app.wallet labelForLegacyAddress:self.address] : [app.wallet getLabelForAccount:self.account];
+                    cell.detailTextLabel.text = self.address ? [app.wallet labelForLegacyAddress:self.address assetType:self.assetType] : [app.wallet getLabelForAccount:self.account assetType:self.assetType];
                     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
                 }
                 return cell;
@@ -544,7 +544,7 @@ typedef enum {
                     cell.textLabel.textColor = COLOR_TEXT_DARK_GRAY;
                     cell.detailTextLabel.text = self.address;
                 } else {
-                    if ([app.wallet getDefaultAccountIndex] != self.account) {
+                    if ([app.wallet getDefaultAccountIndexForAssetType:self.assetType] != self.account) {
                         cell.textLabel.text = BC_STRING_MAKE_DEFAULT;
                         cell.textLabel.textColor = COLOR_TABLE_VIEW_CELL_TEXT_BLUE;
                         cell.accessoryType = UITableViewCellAccessoryNone;

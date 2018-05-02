@@ -6,9 +6,7 @@
 //  Copyright © 2017 Blockchain Luxembourg S.A. All rights reserved.
 //
 
-#define USER_DEFAULTS_KEY_GRAPH_TIME_FRAME @"timeFrame"
 
-#define X_INSET_GRAPH_CONTAINER 16
 
 #import "DashboardViewController.h"
 #import "SessionManager.h"
@@ -17,6 +15,13 @@
 #import "RootService.h"
 #import "GraphTimeFrame.h"
 #import "Blockchain-Swift.h"
+#import "BCPriceChartView.h"
+#import "BCBalancesChartView.h"
+#import "BCPricePreviewView.h"
+#import "BCPriceChartContainerViewController.h"
+
+#define DASHBOARD_HORIZONTAL_PADDING 15
+#define PRICE_CHART_PADDING 20
 
 @import Charts;
 
@@ -25,25 +30,13 @@
 @property (nonatomic) UIView *contentView;
 @end
 
-@interface DashboardViewController () <IChartAxisValueFormatter, ChartViewDelegate>
-@property (nonatomic) LineChartView *chartView;
-@property (nonatomic) UIView *graphContainerView;
-@property (nonatomic) UILabel *titleLabel;
-
-@property (nonatomic) UIView *priceContainerView;
-@property (nonatomic) UILabel *priceLabel;
-@property (nonatomic) UILabel *percentageChangeLabel;
-@property (nonatomic) UIImageView *arrowImageView;
-
-@property (nonatomic) UIButton *allTimeButton;
-@property (nonatomic) UIButton *yearButton;
-@property (nonatomic) UIButton *monthButton;
-@property (nonatomic) UIButton *weekButton;
-@property (nonatomic) UIButton *dayButton;
-@property (nonatomic) NSString *lastEthExchangeRate;
-
-@property (nonatomic) NSArray *lastUpdatedValues;
-
+@interface DashboardViewController () <IChartAxisValueFormatter, BCPriceChartViewDelegate, BCBalancesChartViewDelegate>
+@property (nonatomic) BCBalancesChartView *balancesChartView;
+@property (nonatomic) BCPriceChartContainerViewController *chartContainerViewController;
+@property (nonatomic) BCPricePreviewView *bitcoinPricePreview;
+@property (nonatomic) BCPricePreviewView *etherPricePreview;
+@property (nonatomic) BCPricePreviewView *bitcoinCashPricePreview;
+@property (nonatomic) NSDecimalNumber *lastEthExchangeRate;
 @end
 
 @implementation DashboardViewController
@@ -51,115 +44,31 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(resetScrollView) name:@"applicationDidEnterBackground" object:nil];
     // This contentView can be any custom view - intended to be placed at the top of the scroll view, moved down when the cards view is present, and moved back up when the cards view is dismissed
-    self.contentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 320)];
+    self.contentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 0)];
     self.contentView.clipsToBounds = YES;
-    self.contentView.backgroundColor = [UIColor whiteColor];
+    self.contentView.backgroundColor = [UIColor clearColor];
+    self.view.backgroundColor = COLOR_BACKGROUND_LIGHT_GRAY;
     [self.scrollView addSubview:self.contentView];
     
-    UIView *titleContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 16, self.view.frame.size.width, 60)];
-    titleContainerView.backgroundColor = [UIColor clearColor];
-    titleContainerView.center = CGPointMake(self.contentView.center.x, titleContainerView.center.y);
+    [self setupPieChart];
     
-    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
-    titleLabel.textColor = COLOR_BLOCKCHAIN_BLUE;
-    titleLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_EXTRALIGHT size:FONT_SIZE_EXTRA_SMALL];
-    [titleContainerView addSubview:titleLabel];
-    self.titleLabel = titleLabel;
-    
-    self.priceContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 30)];
-    self.priceLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.priceLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:FONT_SIZE_EXTRA_LARGE];
-    self.priceLabel.textColor = COLOR_BLOCKCHAIN_BLUE;
-    [self.priceContainerView addSubview:self.priceLabel];
-    
-    self.percentageChangeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 30)];
-    self.percentageChangeLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:FONT_SIZE_EXTRA_SMALL];
-    self.percentageChangeLabel.textColor = COLOR_BLOCKCHAIN_BLUE;
-    [self.priceContainerView addSubview:self.percentageChangeLabel];
-    
-    self.arrowImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 20, 15)];
-    self.arrowImageView.contentMode = UIViewContentModeScaleAspectFit;
-    [self.priceContainerView addSubview:self.arrowImageView];
-    
-    [titleContainerView addSubview:self.priceContainerView];
-    
-    [self.contentView addSubview:titleContainerView];
-    
-    UIView *graphContainerView = [[UIView alloc] initWithFrame:CGRectInset(self.contentView.bounds, X_INSET_GRAPH_CONTAINER, titleContainerView.frame.origin.y + 60)];
-    [graphContainerView changeWidth:self.contentView.frame.size.width - graphContainerView.frame.origin.x - 30];
-    [graphContainerView changeHeight:self.contentView.frame.size.height - 120];
-    
-    CGFloat verticalSpacing = 0;
-    CGFloat horizontalSpacing = 0;
+    [self setupPriceCharts];
 
-    LineChartView *chartView = [[LineChartView alloc] initWithFrame:CGRectMake(horizontalSpacing, verticalSpacing, graphContainerView.bounds.size.width - horizontalSpacing*2, graphContainerView.bounds.size.height - verticalSpacing*2)];
-    chartView.delegate = self;
-    chartView.drawGridBackgroundEnabled = NO;
-    chartView.drawBordersEnabled = NO;
-    chartView.scaleXEnabled = NO;
-    chartView.scaleYEnabled = NO;
-    chartView.pinchZoomEnabled = NO;
-    chartView.doubleTapToZoomEnabled = NO;
-    chartView.chartDescription.enabled = NO;
-    chartView.legend.enabled = NO;
-    
-    BCChartMarkerView *marker = [[BCChartMarkerView alloc] initWithFrame:CGRectMake(0, 0, 12, 12)];
-    marker.chartView = chartView;
-    chartView.marker = marker;
+    CGFloat balancesChartHeight = _balancesChartView.frame.size.height;
+    CGFloat titleLabelHeight = 2 * (40 + 16);
+    CGFloat pricePreviewHeight = 3 * 140;
+    CGFloat privePreviewSpacing = 3 * 16;
+    CGFloat bottomPadding = 8;
+    CGFloat contentHeight = balancesChartHeight + titleLabelHeight + pricePreviewHeight + privePreviewSpacing + bottomPadding;
+    CGRect contentViewFrame = CGRectMake(0, 0, self.view.frame.size.width, contentHeight);
+    self.contentView.frame = contentViewFrame;
+}
 
-    chartView.leftAxis.drawGridLinesEnabled = NO;
-    chartView.leftAxis.labelTextColor = COLOR_TEXT_GRAY;
-    chartView.leftAxis.labelFont = [UIFont fontWithName:FONT_MONTSERRAT_LIGHT size:FONT_SIZE_EXTRA_EXTRA_EXTRA_SMALL];
-    chartView.leftAxis.labelCount = 4;
-    
-    chartView.rightAxis.enabled = NO;
-    
-    chartView.xAxis.labelFont = [UIFont fontWithName:FONT_MONTSERRAT_LIGHT size:FONT_SIZE_EXTRA_EXTRA_EXTRA_SMALL];
-    chartView.xAxis.drawGridLinesEnabled = NO;
-    chartView.xAxis.labelTextColor = COLOR_TEXT_GRAY;
-    chartView.xAxis.labelPosition = XAxisLabelPositionBottom;
-    chartView.xAxis.granularityEnabled = YES;
-    chartView.xAxis.labelCount = 4;
-    [chartView setExtraOffsetsWithLeft:8.0 top:0 right:0 bottom:10.0];
-    chartView.noDataFont = [UIFont fontWithName:FONT_MONTSERRAT_LIGHT size:FONT_SIZE_EXTRA_EXTRA_EXTRA_SMALL];
-    chartView.noDataTextColor = COLOR_TEXT_GRAY;
-    
-    chartView.xAxis.valueFormatter = self;
-    chartView.leftAxis.valueFormatter = self;
-
-    self.chartView = chartView;
-    [graphContainerView addSubview:self.chartView];
-    
-    [self.contentView addSubview:graphContainerView];
-    self.graphContainerView = graphContainerView;
-    
-    [self setupTimeSpanButtons];
-    
-    NSData *data = [[NSUserDefaults standardUserDefaults] objectForKey:USER_DEFAULTS_KEY_GRAPH_TIME_FRAME];
-    GraphTimeFrame *timeFrame = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    
-    UIButton *selectedButton;
-    
-    [self.weekButton setSelected:NO];
-    [self.monthButton setSelected:NO];
-    [self.yearButton setSelected:NO];
-    [self.allTimeButton setSelected:NO];
-    
-    if (!timeFrame || timeFrame.timeFrame == TimeFrameWeek) {
-        selectedButton = self.weekButton;
-    } else if (timeFrame.timeFrame == TimeFrameMonth) {
-        selectedButton = self.monthButton;
-    } else if (timeFrame.timeFrame == TimeFrameYear) {
-        selectedButton = self.yearButton;
-    } else if (timeFrame.timeFrame == TimeFrameAll) {
-        selectedButton = self.allTimeButton;
-    } else if (timeFrame.timeFrame == TimeFrameDay) {
-        selectedButton = self.dayButton;
-    }
-
-    [selectedButton setSelected:YES];
+- (void)resetScrollView
+{
+    [self.scrollView setContentOffset:CGPointZero animated:NO];
 }
 
 - (void)setAssetType:(AssetType)assetType
@@ -169,24 +78,106 @@
     [self reload];
 }
 
+- (void)setupPieChart
+{
+    CGFloat horizontalPadding = DASHBOARD_HORIZONTAL_PADDING;
+
+    UILabel *balancesLabel = [[UILabel alloc] initWithFrame:CGRectMake(horizontalPadding, 16, self.view.frame.size.width/2, 40)];
+    balancesLabel.textColor = COLOR_BLOCKCHAIN_BLUE;
+    balancesLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_LIGHT size:FONT_SIZE_LARGE];
+    balancesLabel.text = [BC_STRING_BALANCES uppercaseString];
+    [self.contentView addSubview:balancesLabel];
+    
+    self.balancesChartView = [[BCBalancesChartView alloc] initWithFrame:CGRectMake(horizontalPadding, balancesLabel.frame.origin.y + balancesLabel.frame.size.height, self.view.frame.size.width - horizontalPadding*2, 320)];
+    self.balancesChartView.delegate = self;
+    self.balancesChartView.layer.masksToBounds = NO;
+    self.balancesChartView.layer.cornerRadius = 2;
+    self.balancesChartView.layer.shadowOffset = CGSizeMake(0, 2);
+    self.balancesChartView.layer.shadowRadius = 3;
+    self.balancesChartView.layer.shadowOpacity = 0.25;
+    [self.contentView addSubview:self.balancesChartView];
+}
+
+- (void)setupPriceCharts
+{
+    CGFloat horizontalPadding = DASHBOARD_HORIZONTAL_PADDING;
+    
+    UILabel *balancesLabel = [[UILabel alloc] initWithFrame:CGRectMake(horizontalPadding, self.balancesChartView.frame.origin.y + self.balancesChartView.frame.size.height + 16, self.view.frame.size.width/2, 40)];
+    balancesLabel.textColor = COLOR_BLOCKCHAIN_BLUE;
+    balancesLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_LIGHT size:FONT_SIZE_LARGE];
+    balancesLabel.text = [BC_STRING_PRICE_CHARTS uppercaseString];
+    [self.contentView addSubview:balancesLabel];
+    
+    BCPricePreviewView *bitcoinPreviewView = [[BCPricePreviewView alloc] initWithFrame:CGRectMake(horizontalPadding, balancesLabel.frame.origin.y + balancesLabel.frame.size.height, self.view.frame.size.width - horizontalPadding*2, 140) assetName:BC_STRING_BITCOIN price:[NSNumberFormatter formatMoney:SATOSHI localCurrency:YES] assetImage:@"bitcoin_white"];
+    [self.contentView addSubview:bitcoinPreviewView];
+    self.bitcoinPricePreview = bitcoinPreviewView;
+    
+    UITapGestureRecognizer *bitcoinChartTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(bitcoinChartTapped)];
+    [bitcoinPreviewView addGestureRecognizer:bitcoinChartTapGesture];
+    
+    BCPricePreviewView *etherPreviewView = [[BCPricePreviewView alloc] initWithFrame:CGRectMake(horizontalPadding, bitcoinPreviewView.frame.origin.y + bitcoinPreviewView.frame.size.height + 16, self.view.frame.size.width - horizontalPadding*2, 140) assetName:BC_STRING_ETHER price:[self getEthPrice] assetImage:@"ether_white"];
+    [self.contentView addSubview:etherPreviewView];
+    self.etherPricePreview = etherPreviewView;
+    
+    UITapGestureRecognizer *etherChartTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(etherChartTapped)];
+    [etherPreviewView addGestureRecognizer:etherChartTapGesture];
+    
+    BCPricePreviewView *bitcoinCashPreviewView = [[BCPricePreviewView alloc] initWithFrame:CGRectMake(horizontalPadding, etherPreviewView.frame.origin.y + etherPreviewView.frame.size.height + 16, self.view.frame.size.width - horizontalPadding*2, 140) assetName:BC_STRING_BITCOIN_CASH price:[self getBchPrice] assetImage:@"bitcoin_cash_white"];
+    [self.contentView addSubview:bitcoinCashPreviewView];
+    self.bitcoinCashPricePreview = bitcoinCashPreviewView;
+    
+    UITapGestureRecognizer *bitcoinCashChartTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(bitcoinCashChartTapped)];
+    [bitcoinCashPreviewView addGestureRecognizer:bitcoinCashChartTapGesture];
+}
+
 - (void)reload
 {
-    [self reloadCards];
+    double btcBalance = [self getBtcBalance];
+    double ethBalance = [self getEthBalance];
+    double bchBalance = [self getBchBalance];
+    double totalFiatBalance = btcBalance + ethBalance + bchBalance;
+    if (app.wallet.isInitialized) {
+        [self.balancesChartView updateFiatSymbol:app.latestResponse.symbol_local.symbol];
+        // Fiat balances
+        [self.balancesChartView updateBitcoinFiatBalance:btcBalance];
+        [self.balancesChartView updateEtherFiatBalance:ethBalance];
+        [self.balancesChartView updateBitcoinCashFiatBalance:bchBalance];
+        [self.balancesChartView updateTotalFiatBalance:[NSNumberFormatter appendStringToFiatSymbol:[NSNumberFormatter fiatStringFromDouble:totalFiatBalance]]];
+        // Balances
+        [self.balancesChartView updateBitcoinBalance:[NSNumberFormatter formatAmount:[app.wallet getTotalActiveBalance] localCurrency:NO]];
+        [self.balancesChartView updateEtherBalance:[app.wallet getEthBalanceTruncated]];
+        [self.balancesChartView updateBitcoinCashBalance:[NSNumberFormatter formatAmount:[app.wallet bitcoinCashTotalBalance] localCurrency:NO]];
+    }
+
+    [self.balancesChartView updateChart];
     
+    [self reloadPricePreviews];
+
+    [self reloadCards];
+}
+
+- (void)fetchChartDataForAsset:(AssetType)assetType
+{
     NSData *data = [[NSUserDefaults standardUserDefaults] objectForKey:USER_DEFAULTS_KEY_GRAPH_TIME_FRAME];
     GraphTimeFrame *timeFrame = [NSKeyedUnarchiver unarchiveObjectWithData:data] ? : [GraphTimeFrame timeFrameWeek];
     NSInteger startDate;
+    NSInteger entryDate;
     NSString *scale = timeFrame.scale;
         
     NSString *base;
     
-    if (self.assetType == AssetTypeBitcoin) {
+    if (assetType == AssetTypeBitcoin) {
         base = [CURRENCY_SYMBOL_BTC lowercaseString];
-        startDate = timeFrame.timeFrame == TimeFrameAll ? [timeFrame startDateBitcoin] : timeFrame.startDate;
-    } else {
+        entryDate = [timeFrame startDateBitcoin];
+    } else if (assetType == AssetTypeEther) {
         base = [CURRENCY_SYMBOL_ETH lowercaseString];
-        startDate = timeFrame.timeFrame == TimeFrameAll ? [timeFrame startDateEther] : timeFrame.startDate;
+        entryDate = [timeFrame startDateEther];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        base = [CURRENCY_SYMBOL_BCH lowercaseString];
+        entryDate = [timeFrame startDateBitcoinCash];
     }
+    
+    startDate = timeFrame.timeFrame == TimeFrameAll || timeFrame.startDate < entryDate ? entryDate : timeFrame.startDate;
     
     NSString *quote = [NSNumberFormatter localCurrencyCode];
     
@@ -195,7 +186,7 @@
         return;
     }
     
-    NSURL *URL = [NSURL URLWithString:[URL_API stringByAppendingString:[NSString stringWithFormat:CHARTS_URL_SUFFIX_ARGUMENTS_BASE_QUOTE_START_SCALE, base, quote, [NSString stringWithFormat:@"%lu", startDate], scale]]];
+    NSURL *URL = [NSURL URLWithString:[[NSBundle apiUrl] stringByAppendingString:[NSString stringWithFormat:CHARTS_URL_SUFFIX_ARGUMENTS_BASE_QUOTE_START_SCALE, base, quote, [NSString stringWithFormat:@"%lu", startDate], scale]]];
     NSURLRequest *request = [NSURLRequest requestWithURL:URL];
     
     NSURLSessionDataTask *task = [[SessionManager sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
@@ -209,8 +200,12 @@
                 [self showError:BC_STRING_ERROR_CHARTS];
             } else {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [self updateTitleContainer:values];
-                    [self setChartValues:values];
+                    if ([values count] == 0) {
+                        [self.chartContainerViewController clearChart];
+                        [self showError:BC_STRING_ERROR_CHARTS];
+                    } else {
+                        [self.chartContainerViewController updateChartWithValues:values];
+                    }
                 });
             }
         }
@@ -219,198 +214,71 @@
     [task resume];
 }
 
-- (void)updateTitleContainer:(NSArray *)values
-{
-    self.lastUpdatedValues = values;
-    
-    self.titleLabel.text = self.assetType == AssetTypeBitcoin ? [BC_STRING_BITCOIN_PRICE uppercaseString] : [BC_STRING_ETHER_PRICE uppercaseString];
-    [self.titleLabel sizeToFit];
-    self.titleLabel.center = CGPointMake([self.titleLabel superview].frame.size.width/2, self.titleLabel.center.y);
-    
-    self.priceLabel.text = self.assetType == AssetTypeBitcoin ? [NSNumberFormatter formatMoney:SATOSHI localCurrency:YES] : self.lastEthExchangeRate;
-    [self.priceLabel sizeToFit];
-    
-    double firstPrice = [[[values firstObject] objectForKey:DICTIONARY_KEY_PRICE] doubleValue];
-    double lastPrice = [[[values lastObject] objectForKey:DICTIONARY_KEY_PRICE] doubleValue];
-    double difference = lastPrice - firstPrice;
-    double percentChange = (difference / firstPrice) * 100;
-    
-    self.arrowImageView.hidden = NO;
-    self.arrowImageView.tintColor = COLOR_BLOCKCHAIN_GREEN;
-    [self.arrowImageView changeXPosition:self.priceLabel.frame.size.width + 8];
-    [self.arrowImageView changeYPosition:self.priceLabel.frame.size.height - self.arrowImageView.frame.size.height - 3.5];
- 
-    UIImage *arrowImage = [UIImage imageNamed:@"down_triangle"];
-    
-    if (percentChange > 0) {
-        self.arrowImageView.image = [[UIImage imageWithCGImage:arrowImage.CGImage scale:1.0f orientation:UIImageOrientationDownMirrored] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-        self.arrowImageView.tintColor = COLOR_BLOCKCHAIN_GREEN;
-    } else {
-        self.arrowImageView.image = [arrowImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-        self.arrowImageView.tintColor = COLOR_BLOCKCHAIN_RED;
-    }
-    
-    self.percentageChangeLabel.hidden = NO;
-    
-    NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
-    [numberFormatter setMaximumFractionDigits:1];
-    [numberFormatter setMinimumFractionDigits:1];
-    [numberFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
-    
-    NSLocale *currentLocale = numberFormatter.locale;
-    numberFormatter.locale = [NSLocale localeWithLocaleIdentifier:LOCALE_IDENTIFIER_EN_US];
-    NSNumber *number = [numberFormatter numberFromString:[NSString stringWithFormat:@"%.1f", percentChange]];
-    numberFormatter.locale = currentLocale;
-    
-    self.percentageChangeLabel.text = [[numberFormatter stringFromNumber:number] stringByAppendingString:@"%"];
-    [self.percentageChangeLabel sizeToFit];
-    [self.percentageChangeLabel changeYPosition:self.priceLabel.frame.size.height - self.percentageChangeLabel.frame.size.height - 1.5];
-    [self.percentageChangeLabel changeXPosition:self.priceLabel.frame.origin.x + self.priceLabel.frame.size.width + 8 + self.arrowImageView.frame.size.width];
-    
-    self.priceContainerView.frame = CGRectMake(0, self.titleLabel.frame.origin.y + self.titleLabel.frame.size.height, self.priceLabel.frame.size.width + 8 + self.arrowImageView.frame.size.width + self.percentageChangeLabel.frame.size.width, 30);
-    self.priceContainerView.center = CGPointMake(self.contentView.center.x, self.priceContainerView.center.y);
-}
-
-- (void)updateTitleContainerWithChartDataEntry:(ChartDataEntry *)dataEntry
-{
-    NSDateFormatter *dateFormatter = [NSDateFormatter new];
-    dateFormatter.dateFormat = @"MMM d, yyyy";
-    NSString *dateString = [dateFormatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:dataEntry.x]];
-    dateFormatter.dateFormat = @"h:mm a";
-    NSString *timeString = [dateFormatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:dataEntry.x]];
-    
-    self.titleLabel.text = [NSString stringWithFormat:@"%@ %@ %@", dateString, BC_STRING_AT, timeString];
-    [self.titleLabel sizeToFit];
-    self.titleLabel.center = CGPointMake([self.titleLabel superview].frame.size.width/2, self.titleLabel.center.y);
-    
-    NSString *formattedString = [NSNumberFormatter localFormattedString:[NSString stringWithFormat:@"%.2f", dataEntry.y]];
-    self.priceLabel.text = [NSString stringWithFormat:@"%@%@", app.latestResponse.symbol_local.symbol, formattedString];
-    [self.priceLabel sizeToFit];
-    
-    self.percentageChangeLabel.hidden = YES;
-    self.arrowImageView.hidden = YES;
-
-    self.priceContainerView.frame = CGRectMake(0, self.titleLabel.frame.origin.y + self.titleLabel.frame.size.height, self.priceLabel.frame.size.width, 30);
-    self.priceContainerView.center = CGPointMake(self.contentView.center.x, self.priceContainerView.center.y);
-}
-
-- (void)setChartValues:(NSArray *)values
-{
-    if ([values count] == 0) {
-        [self.chartView clear];
-        [self showError:BC_STRING_ERROR_CHARTS];
-        return;
-    }
-    
-    NSMutableArray *finalValues = [NSMutableArray new];
-
-    for (NSDictionary *dict in values) {
-        double x = [[dict objectForKey:DICTIONARY_KEY_TIMESTAMP] doubleValue];
-        double y = [[dict objectForKey:DICTIONARY_KEY_PRICE] doubleValue];
-        ChartDataEntry *value = [[ChartDataEntry alloc] initWithX:x y:y];
-        [finalValues addObject:value];
-    }
-    
-    LineChartDataSet *dataSet = [[LineChartDataSet alloc] initWithValues:finalValues label:nil];
-    dataSet.lineWidth = 1.5f;
-    dataSet.colors = @[COLOR_BLOCKCHAIN_BLUE];
-    dataSet.mode = LineChartModeLinear;
-    dataSet.drawValuesEnabled = NO;
-    dataSet.circleRadius = 1.0f;
-    dataSet.drawCircleHoleEnabled = NO;
-    dataSet.circleColors = @[COLOR_BLOCKCHAIN_BLUE];
-    dataSet.drawFilledEnabled = NO;
-    dataSet.drawVerticalHighlightIndicatorEnabled = NO;
-    dataSet.drawHorizontalHighlightIndicatorEnabled = NO;
-    self.chartView.data = [[LineChartData alloc] initWithDataSet:dataSet];
-}
-
-- (void)setupTimeSpanButtons
-{
-    CGFloat buttonContainerViewWidth = 280;
-    UIView *buttonContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, self.graphContainerView.frame.origin.y + self.graphContainerView.frame.size.height + 16, buttonContainerViewWidth, 30)];
-    
-    CGFloat buttonWidth = buttonContainerViewWidth/5;
-    
-    self.allTimeButton = [self timeSpanButtonWithFrame:CGRectMake(0, 0, buttonWidth, 30) title:BC_STRING_ALL];
-    [buttonContainerView addSubview:self.allTimeButton];
-
-    self.yearButton = [self timeSpanButtonWithFrame:CGRectMake(self.allTimeButton.frame.origin.x + self.allTimeButton.frame.size.width, 0, buttonWidth, 30) title:BC_STRING_YEAR];
-    [buttonContainerView addSubview:self.yearButton];
-    
-    self.monthButton = [self timeSpanButtonWithFrame:CGRectMake(self.yearButton.frame.origin.x + self.yearButton.frame.size.width, 0, buttonWidth, 30) title:BC_STRING_MONTH];
-    [buttonContainerView addSubview:self.monthButton];
-    
-    self.weekButton = [self timeSpanButtonWithFrame:CGRectMake(self.monthButton.frame.origin.x + self.monthButton.frame.size.width, 0, buttonWidth, 30) title:BC_STRING_WEEK];
-    [buttonContainerView addSubview:self.weekButton];
-    
-    self.dayButton = [self timeSpanButtonWithFrame:CGRectMake(self.weekButton.frame.origin.x + self.weekButton.frame.size.width, 0, buttonWidth, 30) title:BC_STRING_DAY];
-    [buttonContainerView addSubview:self.dayButton];
-    
-    [self.contentView addSubview:buttonContainerView];
-    buttonContainerView.center = CGPointMake(self.graphContainerView.center.x + 20, buttonContainerView.center.y);
-}
-
-- (void)timeSpanButtonTapped:(UIButton *)button
-{
-    [self.weekButton setSelected:NO];
-    [self.monthButton setSelected:NO];
-    [self.yearButton setSelected:NO];
-    [self.dayButton setSelected:NO];
-    [self.allTimeButton setSelected:NO];
-
-    [button setSelected:YES];
-    
-    GraphTimeFrame *timeFrame;
-    
-    if (button == self.dayButton) {
-        timeFrame = [GraphTimeFrame timeFrameDay];
-    } else if (button == self.weekButton) {
-        timeFrame = [GraphTimeFrame timeFrameWeek];
-    } else if (button == self.monthButton) {
-        timeFrame = [GraphTimeFrame timeFrameMonth];
-    } else if (button == self.yearButton) {
-        timeFrame = [GraphTimeFrame timeFrameYear];
-    } else {
-        timeFrame = [GraphTimeFrame timeFrameAll:self.assetType];
-    }
-    
-    NSUserDefaults *currentDefaults = [NSUserDefaults standardUserDefaults];
-    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:timeFrame];
-    [currentDefaults setObject:data forKey:USER_DEFAULTS_KEY_GRAPH_TIME_FRAME];
-    
-    [self reload];
-}
-
 - (void)updateEthExchangeRate:(NSDecimalNumber *)rate
 {
-    self.lastEthExchangeRate = [NSNumberFormatter formatEthToFiatWithSymbol:@"1" exchangeRate:rate];
-    [self reload];
+    self.lastEthExchangeRate = rate;
+    [self reloadPricePreviews];
+}
+
+- (void)showChartContainerViewController
+{
+    if (!self.chartContainerViewController.view.window) {
+        self.chartContainerViewController = [[BCPriceChartContainerViewController alloc] init];
+        self.chartContainerViewController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+        self.chartContainerViewController.delegate = self;
+        [app.tabControllerManager.tabViewController presentViewController:self.chartContainerViewController animated:YES completion:nil];
+    }
+}
+
+- (void)bitcoinChartTapped
+{
+    [self showChartContainerViewController];
+    
+    CGFloat padding = PRICE_CHART_PADDING;
+    BCPriceChartView *priceChartView = [[BCPriceChartView alloc] initWithFrame:CGRectMake(padding, padding, self.view.frame.size.width - padding, self.view.frame.size.height*3/4 - padding) assetType:AssetTypeBitcoin dataPoints:nil delegate:self];
+    [self.chartContainerViewController addPriceChartView:priceChartView atIndex:0];
+    [self fetchChartDataForAsset:AssetTypeBitcoin];
+}
+
+- (void)etherChartTapped
+{
+    [self showChartContainerViewController];
+    
+    CGFloat padding = PRICE_CHART_PADDING;
+    BCPriceChartView *priceChartView = [[BCPriceChartView alloc] initWithFrame:CGRectMake(padding, padding, self.view.frame.size.width - padding, self.view.frame.size.height*3/4 - padding) assetType:AssetTypeEther dataPoints:nil delegate:self];
+    [self.chartContainerViewController addPriceChartView:priceChartView atIndex:1];
+    [self.chartContainerViewController updateEthExchangeRate:self.lastEthExchangeRate];
+    [self fetchChartDataForAsset:AssetTypeEther];
+}
+
+- (void)bitcoinCashChartTapped
+{
+    [self showChartContainerViewController];
+
+    CGFloat padding = PRICE_CHART_PADDING;
+    BCPriceChartView *priceChartView = [[BCPriceChartView alloc] initWithFrame:CGRectMake(padding, padding, self.view.frame.size.width - padding, self.view.frame.size.height*3/4 - padding) assetType:AssetTypeBitcoinCash dataPoints:nil delegate:self];
+    [self.chartContainerViewController addPriceChartView:priceChartView atIndex:2];
+    [self fetchChartDataForAsset:AssetTypeBitcoinCash];
+}
+
+#pragma mark - Balances Chart Delegate
+
+- (void)bitcoinLegendTapped
+{
+    [app.tabControllerManager showTransactionsBitcoin];
+}
+
+- (void)etherLegendTapped
+{
+    [app.tabControllerManager showTransactionsEther];
+}
+
+- (void)bitcoinCashLegendTapped
+{
+    [app.tabControllerManager showTransactionsBitcoinCash];
 }
 
 #pragma mark - View Helpers
-
-- (UIButton *)timeSpanButtonWithFrame:(CGRect)frame title:(NSString *)title
-{
-    UIFont *normalFont = [UIFont fontWithName:FONT_MONTSERRAT_LIGHT size:FONT_SIZE_EXTRA_SMALL];
-    UIFont *selectedFont = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:FONT_SIZE_EXTRA_SMALL];
-    
-    NSAttributedString *attrNormal = [[NSAttributedString alloc] initWithString:title attributes:@{NSFontAttributeName:normalFont, NSForegroundColorAttributeName:COLOR_BLOCKCHAIN_BLUE, NSUnderlineStyleAttributeName:[NSNumber numberWithInt:NSUnderlineStyleNone]}];
-    NSAttributedString *attrSelected = [[NSAttributedString alloc] initWithString:title attributes:@{NSFontAttributeName:selectedFont, NSForegroundColorAttributeName:COLOR_BLOCKCHAIN_BLUE, NSUnderlineStyleAttributeName:[NSNumber numberWithInt:NSUnderlineStyleSingle]}];
-    
-    UIButton *button = [[UIButton alloc] initWithFrame:frame];
-    [button setAttributedTitle:attrNormal forState:UIControlStateNormal];
-    [button setAttributedTitle:attrSelected forState:UIControlStateSelected];
-    [button addTarget:self action:@selector(timeSpanButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    
-    UIButton *testButton = [UIButton new];
-    [testButton setTitle:title forState:UIControlStateNormal];
-    [testButton sizeToFit];
-    
-    [button changeWidth:testButton.frame.size.width];
-    [button changeXPosition:frame.origin.x + 8];
-    return button;
-}
 
 - (void)showError:(NSString *)error
 {
@@ -431,9 +299,9 @@
 
 - (NSString *)stringForValue:(double)value axis:(ChartAxisBase *)axis
 {
-    if (axis == self.chartView.leftAxis) {
+    if (axis == [self.chartContainerViewController leftAxis]) {
         return [NSString stringWithFormat:@"%@%.f", app.latestResponse.symbol_local.symbol, value];
-    } else if (axis == self.chartView.xAxis) {
+    } else if (axis == [self.chartContainerViewController xAxis]) {
         return [self dateStringFromGraphValue:value];
     } else {
         DLog(@"Warning: no axis found!");
@@ -455,16 +323,69 @@
     return timeFrame.dateFormat;
 }
 
-#pragma mark - Chart View Delegate
-
-- (void)chartValueNothingSelected:(ChartViewBase *)chartView
+- (NSString *)getBtcPrice
 {
-    [self updateTitleContainer:self.lastUpdatedValues];
+    return app.wallet.isInitialized ? [NSNumberFormatter formatMoney:SATOSHI localCurrency:YES] : nil;
 }
 
-- (void)chartValueSelected:(ChartViewBase *)chartView entry:(ChartDataEntry *)entry highlight:(ChartHighlight *)highlight
+- (NSString *)getBchPrice
 {
-    [self updateTitleContainerWithChartDataEntry:entry];
+    return app.wallet.isInitialized ? [NSNumberFormatter formatBchWithSymbol:SATOSHI localCurrency:YES] : nil;
+}
+
+- (NSString *)getEthPrice
+{
+    if (!app.wallet.isInitialized || !self.lastEthExchangeRate) {
+        return nil;
+    }
+    return [NSNumberFormatter formatEthToFiatWithSymbol:@"1" exchangeRate:self.lastEthExchangeRate];
+}
+
+- (double)getBtcBalance
+{
+    return [self doubleFromString:[NSNumberFormatter formatAmount:[app.wallet getTotalActiveBalance] localCurrency:YES]];
+}
+
+- (double)getEthBalance
+{
+    app.localCurrencyFormatter.usesGroupingSeparator = NO;
+    double result = [self doubleFromString:[NSNumberFormatter formatEthToFiat:[app.wallet getEthBalance] exchangeRate:app.wallet.latestEthExchangeRate]];
+    app.localCurrencyFormatter.usesGroupingSeparator = YES;
+    return result;
+}
+
+- (double)getBchBalance
+{
+    return [self doubleFromString:[NSNumberFormatter formatBch:[app.wallet bitcoinCashTotalBalance] localCurrency:YES]];
+}
+
+- (double)doubleFromString:(NSString *)string
+{
+    NSNumberFormatter *numberFormatter = [NSNumberFormatter new];
+    return [[numberFormatter numberFromString:string] doubleValue];
+}
+
+- (void)reloadPricePreviews
+{
+    [self.bitcoinPricePreview updatePrice:[self getBtcPrice]];
+    [self.etherPricePreview updatePrice:[self getEthPrice]];
+    [self.bitcoinCashPricePreview updatePrice:[self getBchPrice]];
+}
+
+#pragma mark - BCPriceChartView Delegate
+
+- (void)addPriceChartView:(AssetType)assetType
+{
+    switch (assetType) {
+        case AssetTypeBitcoin: [self bitcoinChartTapped]; return;
+        case AssetTypeEther: [self etherChartTapped]; return;
+        case AssetTypeBitcoinCash: [self bitcoinCashChartTapped]; return;
+    }
+}
+
+- (void)reloadPriceChartView:(AssetType)assetType
+{
+    [self fetchChartDataForAsset:assetType];
 }
 
 @end

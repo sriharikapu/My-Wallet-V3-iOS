@@ -1,6 +1,6 @@
-.env
 *.der
-
+Cert
+Config
 DerivedData
 # Xcode
 .DS_Store
@@ -15,7 +15,8 @@ build/
 !default.perspectivev3
 *.xcworkspace
 !default.xcworkspace
-xcuserdata
+xcuserdata/
+*.xcuserdatad
 profile
 *.moved-aside
 .idea/

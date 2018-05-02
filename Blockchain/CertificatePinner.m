@@ -8,13 +8,14 @@
 #import <openssl/x509.h>
 #import "CertificatePinner.h"
 #import "SessionManager.h"
+#import "Blockchain-Swift.h"
 
 @implementation CertificatePinner
 
 - (void)pinCertificate
 {
     NSURLSession *session = [SessionManager sharedSession];
-    NSURL *url = [NSURL URLWithString:URL_SERVER];
+    NSURL *url = [NSURL URLWithString:[NSBundle walletUrl]];
     session.sessionDescription = url.host;
     NSURLSessionDataTask *task = [session dataTaskWithURL:url completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         // response management code
@@ -45,12 +46,11 @@
     
     // Get local and remote cert data
     NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
-    
-    NSString *pathToCert = [[NSBundle mainBundle] pathForResource:[self getCertificateName] ofType:CERTIFICATE_FILE_TYPE_DER];
+
+    NSString *pathToCert = [NSBundle localCertificatePath];
     NSData *localCertificate = [NSData dataWithContentsOfFile:pathToCert];
     
     // The pinnning check
-    
     NSString *remoteKeyString = [self getPublicKeyStringFromData:remoteCertificateData];
     NSString *localKeyString = [self getPublicKeyStringFromData:localCertificate];
     
@@ -80,17 +80,6 @@
     X509_free(certificateX509);
     
     return publicKeyString;
-}
-
-- (NSString *)getCertificateName
-{
-    NSDictionary *certNames = @{ENV_INDEX_DEV : CERTIFICATE_SERVER_NAME_DEV,
-                                ENV_INDEX_STAGING : CERTIFICATE_SERVER_NAME_STAGING,
-                                ENV_INDEX_PRODUCTION : CERTIFICATE_SERVER_NAME_PRODUCTION,
-                                ENV_INDEX_TESTNET : CERTIFICATE_SERVER_NAME_TESTNET};
-    
-    NSString *certName = [certNames objectForKey:[[NSUserDefaults standardUserDefaults] objectForKey:USER_DEFAULTS_KEY_ENV]];
-    return certName;
 }
 
 @end

@@ -24,10 +24,11 @@
 #import "BCLine.h"
 #import "FeeTypes.h"
 #import "QRCodeScannerSendViewController.h"
+#import "Assets.h"
 
 @class Wallet, ContactTransaction;
 
-@interface SendBitcoinViewController : QRCodeScannerSendViewController < AddressSelectionDelegate> {
+@interface SendBitcoinViewController : QRCodeScannerSendViewController <AddressSelectionDelegate> {
     IBOutlet UIView *containerView;
     
     IBOutlet UILabel *fromLabel;
@@ -74,6 +75,9 @@
     
     BOOL displayingLocalSymbol;
 }
+
+// Must be a Bitcoin fork
+@property (nonatomic) AssetType assetType;
 
 @property (strong, nonatomic) BCConfirmPaymentView *confirmPaymentView;
 

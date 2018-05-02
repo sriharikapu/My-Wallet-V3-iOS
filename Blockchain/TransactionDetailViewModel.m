@@ -13,6 +13,7 @@
 #import "NSNumberFormatter+Currencies.h"
 #import "RootService.h"
 #import "NSDateFormatter+VerboseString.h"
+#import "Blockchain-Swift.h"
 
 @interface TransactionDetailViewModel ()
 @property (nonatomic) NSString *amountString;
@@ -26,12 +27,20 @@
 {
     if (self == [super init]) {
         self.assetType = AssetTypeBitcoin;
-        self.fromString = [transaction.from objectForKey:DICTIONARY_KEY_LABEL];
+        
+        id fromLabel = [transaction.from objectForKey:DICTIONARY_KEY_LABEL];
+        id toLabel = [transaction.to.firstObject objectForKey:DICTIONARY_KEY_LABEL];
+        
+        NSString *fromLabelString = [fromLabel isKindOfClass:[NSNumber class]] ? [fromLabel stringValue] : fromLabel;
+        NSString *toLabelString = [toLabel isKindOfClass:[NSNumber class]] ? [toLabel stringValue] : toLabel;
+        
+        self.fromString = fromLabelString;
         self.fromAddress = [transaction.from objectForKey:DICTIONARY_KEY_ADDRESS];
-        self.hasFromLabel = [transaction.from objectForKey:DICTIONARY_KEY_ACCOUNT_INDEX] || ![[transaction.from objectForKey:DICTIONARY_KEY_LABEL] isEqualToString:self.fromAddress];
-        self.hasToLabel = [[transaction.to firstObject] objectForKey:DICTIONARY_KEY_ACCOUNT_INDEX] || ![[[transaction.to firstObject] objectForKey:DICTIONARY_KEY_LABEL] isEqualToString:[[transaction.to firstObject] objectForKey:DICTIONARY_KEY_ADDRESS]];
+        self.hasFromLabel = [transaction.from objectForKey:DICTIONARY_KEY_ACCOUNT_INDEX] || ![fromLabelString isEqualToString:self.fromAddress];
+        self.hasToLabel = [[transaction.to firstObject] objectForKey:DICTIONARY_KEY_ACCOUNT_INDEX] || ![toLabelString isEqualToString:[[transaction.to firstObject] objectForKey:DICTIONARY_KEY_ADDRESS]];
         self.to = transaction.to;
-        self.toString = [transaction.to.firstObject objectForKey:DICTIONARY_KEY_LABEL];
+        self.toString = toLabelString;
+        
         self.amountInSatoshi = ABS(transaction.amount);
         self.feeInSatoshi = transaction.fee;
         self.txType = transaction.txType;
@@ -49,7 +58,8 @@
         app.btcFormatter.locale = [NSLocale localeWithLocaleIdentifier:LOCALE_IDENTIFIER_EN_US];
         CurrencySymbol *currentSymbol = app.latestResponse.symbol_btc;
         app.latestResponse.symbol_btc = [CurrencySymbol btcSymbolFromCode:CURRENCY_CODE_BTC];
-        self.decimalAmount = [NSDecimalNumber decimalNumberWithString:[NSNumberFormatter formatAmount:imaxabs(self.amountInSatoshi) localCurrency:NO]];
+        NSString *decimalString = [NSNumberFormatter formatAmount:imaxabs(self.amountInSatoshi) localCurrency:NO] ? : @"0";
+        self.decimalAmount = [NSDecimalNumber decimalNumberWithString:decimalString];
         app.latestResponse.symbol_btc = currentSymbol;
         app.btcFormatter.locale = currentLocale;
         
@@ -60,7 +70,7 @@
         };
         self.contactName = transaction.contactName;
         self.detailButtonTitle = [[NSString stringWithFormat:@"%@ %@",BC_STRING_VIEW_ON_URL_ARGUMENT, HOST_NAME_WALLET_SERVER] uppercaseString];
-        self.detailButtonLink = [URL_SERVER stringByAppendingFormat:@"/tx/%@", self.myHash];
+        self.detailButtonLink = [[NSBundle walletUrl] stringByAppendingFormat:@"/tx/%@", self.myHash];
     }
     return self;
 }
@@ -92,13 +102,31 @@
     return self;
 }
 
+- (id)initWithBitcoinCashTransaction:(Transaction *)transaction
+{
+    TransactionDetailViewModel *model = [self initWithTransaction:transaction];
+    if ([app.wallet isValidAddress:model.fromString assetType:AssetTypeBitcoinCash]) {
+        model.fromString = [app.wallet toBitcoinCash:model.fromString includePrefix:NO];
+    }
+    NSString *convertedAddress = [app.wallet toBitcoinCash:model.toString includePrefix:NO];
+    model.toString = convertedAddress ? : model.toString;
+    model.assetType = AssetTypeBitcoinCash;
+    model.hideNote = YES;
+    model.detailButtonTitle = [[BC_STRING_VIEW_ON_URL_ARGUMENT stringByAppendingFormat:@" %@", URL_BLOCKCHAIR] uppercaseString];
+    model.detailButtonLink = [URL_PREFIX_VIEW_TRANSACTION_BITCOIN_CASH stringByAppendingString:model.myHash];
+    return model;
+}
+
 - (NSString *)getAmountString
 {
     if (self.assetType == AssetTypeBitcoin) {
         return [NSNumberFormatter formatMoneyWithLocalSymbol:ABS(self.amountInSatoshi)];
     } else if (self.assetType == AssetTypeEther) {
         return [NSNumberFormatter formatEthWithLocalSymbol:self.amountString exchangeRate:self.ethExchangeRate];
+    } else if (self.assetType == AssetTypeBitcoinCash) {
+        return [NSNumberFormatter formatBchWithSymbol:ABS(self.amountInSatoshi)];
     }
+    
     return nil;
 }
 
@@ -108,6 +136,8 @@
         return [self getBtcFeeString];
     } else if (self.assetType == AssetTypeEther) {
         return [self getEthFeeString];
+    } else if (self.assetType == AssetTypeBitcoinCash) {
+        return [self getBchFeeString];
     }
     return nil;
 }
@@ -120,6 +150,11 @@
 - (NSString *)getEthFeeString
 {
     return [NSNumberFormatter formatEthWithLocalSymbol:self.feeString exchangeRate:self.exchangeRate];
+}
+
+- (NSString *)getBchFeeString
+{
+    return [NSNumberFormatter formatBchWithSymbol:ABS(self.feeInSatoshi)];
 }
 
 @end

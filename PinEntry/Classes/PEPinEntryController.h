@@ -24,6 +24,8 @@
 
 #import <UIKit/UIKit.h>
 #import "PEViewController.h"
+#import "BCSwipeAddressView.h"
+#import "Assets.h"
 
 @class PEPinEntryController;
 
@@ -41,7 +43,7 @@
 @class PEViewController;
 
 
-@interface PEPinEntryController : UINavigationController <PEViewControllerDelegate, UIScrollViewDelegate>
+@interface PEPinEntryController : UINavigationController <PEViewControllerDelegate, UIScrollViewDelegate, SwipeAddressViewDelegate>
 {
 	BOOL verifyOnly;
     BOOL verifyOptional;
@@ -56,15 +58,15 @@
 @property (nonatomic, readwrite) BOOL inSettings;
 @property (nonatomic) UILongPressGestureRecognizer *longPressGesture;
 @property (nonatomic) UIButton *debugButton;
+@property (nonatomic) UIPageControl *scrollViewPageControl;
+@property (nonatomic) UIPageControl *backgroundViewPageControl;
 @property (nonatomic) BOOL didScrollToQRCode;
+@property (nonatomic) NSMutableDictionary *swipeViews;
 
 // Swipe-to-receive
-@property (nonatomic) UIImageView *qrCodeImageView;
-@property (nonatomic) UILabel *addressLabel;
 @property (nonatomic) UIAlertController *errorAlert;
-- (void)paymentReceived;
+- (void)paymentReceived:(AssetType)assetType;
 - (void)setupQRCode;
-
 - (void)reset;
 
 + (PEPinEntryController *)pinVerifyController;

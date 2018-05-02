@@ -33,7 +33,7 @@
 
 @protocol TopViewController;
 
-@class TransactionsBitcoinViewController, BCFadeView, ReceiveCoinsViewController, SendBitcoinViewController, BCCreateWalletView, BCManualPairView, MultiAddressResponse, PairingCodeParser, MerchantMapViewController, BCWebViewController, BackupNavigationViewController, ContactsViewController, ContactTransaction, BuyBitcoinViewController;
+@class TransactionsBitcoinViewController, BCFadeView, ReceiveCoinsViewController, SendBitcoinViewController, BCCreateWalletView, BCManualPairView, MultiAddressResponse, PairingCodeParser, BCWebViewController, BackupNavigationViewController, ContactsViewController, ContactTransaction, BuyBitcoinViewController;
 
 @interface RootService : NSObject <UIApplicationDelegate, WalletDelegate, PEPinEntryControllerDelegate, MFMailComposeViewControllerDelegate, CertificatePinnerDelegate, UNUserNotificationCenterDelegate, ReminderModalDelegate, SetupDelegate, TabControllerDelegate> {
 
@@ -79,7 +79,6 @@
 
 @property (strong, nonatomic) IBOutlet ECSlidingViewController *slidingViewController;
 @property (nonatomic) TabControllerManager *tabControllerManager;
-@property (strong, nonatomic) IBOutlet MerchantMapViewController *merchantViewController;
 @property (strong, nonatomic) IBOutlet BCWebViewController *bcWebViewController;
 @property (strong, nonatomic) IBOutlet BackupNavigationViewController *backupNavigationViewController;
 @property (strong, nonatomic) SettingsNavigationController *settingsNavigationController;
@@ -180,7 +179,7 @@
 - (void)logoutAndShowPasswordModal;
 
 - (NSInteger)filterIndex;
-- (void)filterTransactionsByAccount:(int)accountIndex;
+- (void)filterTransactionsByAccount:(int)accountIndex assetType:(AssetType)assetType;
 - (void)filterTransactionsByImportedAddresses;
 - (void)removeTransactionsFilter;
 
@@ -195,7 +194,6 @@
 - (void)showBackupReminder:(BOOL)firstReceive;
 
 - (IBAction)webLoginClicked:(id)sender;
-- (IBAction)merchantClicked:(UIButton *)sender;
 - (IBAction)forgetWalletClicked:(id)sender;
 - (IBAction)scanAccountQRCodeclicked:(id)sender;
 - (IBAction)secondPasswordClicked:(id)sender;
@@ -215,7 +213,7 @@
 - (void)setupPaymentRequest:(ContactTransaction *)transaction;
 - (void)setupSendToAddress:(NSString *)address;
 
-- (void)paymentReceived:(NSDecimalNumber *)amount showBackupReminder:(BOOL)showBackupReminder;
+- (void)paymentReceived:(uint64_t)amount showBackupReminder:(BOOL)showBackupReminder;
 - (void)checkIfPaymentRequestFulfilled:(Transaction *)transaction;
 
 - (void)clearPin;
@@ -244,7 +242,7 @@
 - (void)endBackgroundUpdateTask;
 
 - (NSString *)getVersionLabelString;
-- (void)checkForUnusedAddress:(NSString *)address success:(void (^)(NSString *, BOOL))successBlock error:(void (^)())errorBlock;
+- (void)checkForUnusedAddress:(NSString *)address success:(void (^)(NSString *, BOOL))successBlock error:(void (^)())errorBlock assetType:(AssetType)assetType;
 
 - (BOOL)checkIfWaitingOnEtherTransaction;
 

@@ -2,24 +2,26 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>API_URL</key>
+	<string>$(API_URL)</string>
+	<key>BUY_WEBVIEW_URL</key>
+	<string>$(BUY_WEBVIEW_URL)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>${PRODUCT_NAME}</string>
+	<string>$(APP_NAME)</string>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
-	<key>CFBundleIconFiles</key>
-	<array/>
 	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<string>com.rainydayapps.Blockchain$(BUNDLE_ID_SUFFIX)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>${PRODUCT_NAME}</string>
+	<string>$(APP_NAME)</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.4.8</string>
+	<string>2.4.9</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -36,11 +38,11 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>5</string>
+	<string>14</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
-		<string>FabricAPIKey</string>
+		<string>$(FABRIC_API_KEY)</string>
 		<key>Kits</key>
 		<array>
 			<dict>
@@ -51,10 +53,14 @@
 			</dict>
 		</array>
 	</dict>
+	<key>LOCAL_CERTIFICATE_FILE</key>
+	<string>$(LOCAL_CERTIFICATE_FILE)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>NSCameraUsageDescription</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Enabling Face ID allows you to securely access your wallet.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Blockchain needs access to your location to show you nearby businesses that accept Bitcoin</string>
 	<key>NSMainNibFile</key>
@@ -72,8 +78,6 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
-	<key>UIPrerenderedIcon</key>
-	<true/>
 	<key>UIStatusBarStyle</key>
 	<string>UIStatusBarStyleLightContent</string>
 	<key>UISupportedInterfaceOrientations</key>
@@ -86,5 +90,13 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>WALLET_SERVER</key>
+	<string>$(WALLET_SERVER)</string>
+	<key>WEBSOCKET_SERVER</key>
+	<string>$(WEBSOCKET_SERVER)</string>
+	<key>WEBSOCKET_SERVER_BCH</key>
+	<string>$(WEBSOCKET_SERVER_BCH)</string>
+	<key>WEBSOCKET_SERVER_ETH</key>
+	<string>$(WEBSOCKET_SERVER_ETH)</string>
 </dict>
 </plist>

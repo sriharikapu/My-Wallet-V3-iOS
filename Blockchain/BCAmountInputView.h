@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#define AMOUNT_INPUT_VIEW_HEIGHT 50
 @interface BCAmountInputView : UIView
 @property (nonatomic) UILabel *btcLabel;
 @property (nonatomic) UILabel *fiatLabel;

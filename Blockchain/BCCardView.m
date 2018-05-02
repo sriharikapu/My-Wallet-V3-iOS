@@ -32,7 +32,7 @@
         
         self.backgroundColor = [UIColor whiteColor];
         
-        CGFloat imageViewHeight = actionType == ActionTypeAvailableNow ? self.frame.size.height - 32 : 100;
+        CGFloat imageViewHeight = actionType == ActionTypeBuySell || actionType == ActionTypeBitcoinCash ? self.frame.size.height - 32 : 100;
         
         UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 16, 100, imageViewHeight)];
         imageView.image = [UIImage imageNamed:imageName];
@@ -56,8 +56,8 @@
             actionName = BC_STRING_BUY_AND_SELL_BITCOIN;
             actionColor = COLOR_BLOCKCHAIN_LIGHT_BLUE;
             titleColor = actionColor;
-        } else if (actionType == ActionTypeAvailableNow) {
-            actionName = BC_STRING_BUY_SELL_CARD_ACTION_TITLE;
+        } else if (actionType == ActionTypeBuySell || actionType == ActionTypeBitcoinCash) {
+            actionName = BC_STRING_GET_STARTED;
             actionColor = COLOR_BLOCKCHAIN_BLUE;
             titleColor = COLOR_BLOCKCHAIN_BLUE;
         }
@@ -104,6 +104,15 @@
         [self addSubview:actionButton];
     }
     return self;
+}
+
+- (void)setupCloseButton
+{
+    UIButton *closeButton = [[UIButton alloc] initWithFrame:CGRectMake(self.bounds.size.width - 25, 12.5, 12.5, 12.5)];
+    [closeButton setImage:[[UIImage imageNamed:@"close_large"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    closeButton.tintColor = COLOR_TEXT_DARK_GRAY;
+    [self addSubview:closeButton];
+    self.closeButton = closeButton;
 }
 
 - (CGRect)frameFromContainer:(CGRect)containerFrame

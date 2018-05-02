@@ -2107,3 +2107,60 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Ostaa ja myydä bitcoin suoraan Blockchain lompakko. Aloita luomalla tilin Ostaa Ja Myydä-välilehti.";
+
+/* (No Commment) */
+"All Wallets" = "Kaikki Lompakot";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Pidä xPub yksityinen. Joku, jolla on pääsy xPub voi nähdä kaikki varat ja liiketoimet.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Sinun xPub on kehittynyt ominaisuus, joka sisältää kaikki julkiset osoitteet.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Liiketoimia esiintyä, kun voit lähettää ja pyyntö bitcoin-rahaa.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Hanki Bitcoin-Rahaa";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Pyyntö Bitcoin-Rahaa";
+
+/* (No Commment) */
+"Price" = "Hinta";
+
+/* (No Commment) */
+"See charts" = "Katso kaavioita";
+
+/* (No Commment) */
+"Price charts" = "Hinta kaavioita";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Bitcoin-Rahaa";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Bitcoin Käteishinta";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Anna Bitcoin osoite tai valitse Käteistä";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Kopioi tämä saada-osoite leikepöydälle? Jos niin, on suositeltavaa, että muut sovellukset voivat pystyä katsomaan tätä tietoa.";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "Lähetä BCH Bitcoin osoite Käteistä\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "Palvelumaksut vaikutus, kuinka nopeasti kaivostoiminnan verkosto vahvistaa liiketoimia, ja riippuu nykyisen verkon olosuhteet.";
+
+/* (No Commment) */
+"Trade Refunded" = "Kauppaan Palautetaan";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "Olemme innoissamme ilmoittaa, että Blockchain lompakko avulla voit saumattomasti lähettää, vastaanottaa ja vaihtaa Bitcoin-Rahaa!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "Oletko varma, että tämä on bitcoin-rahaa-osoite?";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "Lähettää varoja bitcoin-osoitteen vahingossa johtaa varojen menetyksen.";

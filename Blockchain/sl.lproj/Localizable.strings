@@ -2107,3 +2107,60 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Nakup in prodaja bitcoin neposredno iz vašega Blockchain denarnice. Začnete z ustvarjanjem računa v Nakup & Prodaja zavihek.";
+
+/* (No Commment) */
+"All Wallets" = "Vse Torbica";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Imejte xPub zasebno. Nekdo, ki ima dostop do vašega xPub bodo lahko videli vse vaše sredstev in transakcije.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Vaš xPub je napredna funkcija, ki vsebuje vse vaše javna obravnava.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Transakcije, ki pride, ko pošljete in na zahtevo bitcoin denar.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Zaslužiti Denar Bitcoin";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Zahtevo Denar Bitcoin";
+
+/* (No Commment) */
+"Price" = "Cena";
+
+/* (No Commment) */
+"See charts" = "Glej kartografska";
+
+/* (No Commment) */
+"Price charts" = "Cena karte";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Bitcoin Denar";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Bitcoin Cene V Denarju";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Vnesite Bitcoin Denarnih naslov ali izberite";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Kopiraj to prejeli na naslov v odložišče? Če je tako, svetujemo, da druge aplikacije lahko, da pogled na te informacije.";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "Prosimo, pošljite BCH za Bitcoin Denarnih naslov\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "Transakcijski stroški vplivajo na to, kako hitro rudarstvo bo omrežje potrditev transakcije, in je odvisna od trenutnih razmer v omrežju.";
+
+/* (No Commment) */
+"Trade Refunded" = "Trgovina Povrnjen";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "Veseli smo, da sporočamo, da svoje Blockchain denarnica vam omogoča, da nevidno pošiljate, prejemate, in izmenja Denar Bitcoin!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "Ali ste prepričani, da je to bitcoin denarnih naslov?";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "Pošiljanje sredstva za bitcoin naslov po nesreči bo imelo za posledico izgubo skladov.";

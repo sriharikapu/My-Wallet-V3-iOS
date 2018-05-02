@@ -12,17 +12,11 @@
 
 #define DICTIONARY_KEY_SERVER @"server"
 #define DICTIONARY_KEY_WEB_SOCKET @"webSocket"
-#define DICTIONARY_KEY_MERCHANT @"merchant"
 #define DICTIONARY_KEY_API @"api"
 #define DICTIONARY_KEY_BUY_WEBVIEW @"buyWebView"
 
 typedef NS_ENUM(NSInteger, DebugTableViewRow) {
     RowWalletJSON,
-    RowServerURL,
-    RowWebsocketURL,
-    RowMerchantURL,
-    RowAPIURL,
-    RowBuyURL,
     RowSurgeToggle,
     RowDontShowAgain,
     RowAppStoreReviewPromptTimer,
@@ -145,59 +139,11 @@ typedef enum {
     [self.navigationController pushViewController:viewController animated:YES];
 }
 
-- (NSDictionary *)getURLUserDefaultsKeys
-{
-    NSString *serverKey;
-    NSString *webSocketKey;
-    NSString *apiKey;
-    NSString *merchantKey;
-    NSString *buyKey;
-    
-    NSInteger env = [[[NSUserDefaults standardUserDefaults] objectForKey:USER_DEFAULTS_KEY_ENV] integerValue];
-    
-    if (env == env_dev) {
-        serverKey = USER_DEFAULTS_KEY_DEBUG_DEV_SERVER_URL;
-        webSocketKey = USER_DEFAULTS_KEY_DEBUG_DEV_WEB_SOCKET_URL;
-        apiKey = USER_DEFAULTS_KEY_DEBUG_DEV_API_URL;
-        merchantKey = USER_DEFAULTS_KEY_DEBUG_DEV_MERCHANT_URL;
-        buyKey = USER_DEFAULTS_KEY_DEBUG_DEV_BUY_WEBVIEW_URL;
-    } else if (env == env_staging) {
-        serverKey = USER_DEFAULTS_KEY_DEBUG_STAGING_SERVER_URL;
-        webSocketKey = USER_DEFAULTS_KEY_DEBUG_STAGING_WEB_SOCKET_URL;
-        apiKey = USER_DEFAULTS_KEY_DEBUG_STAGING_API_URL;
-        merchantKey = USER_DEFAULTS_KEY_DEBUG_STAGING_MERCHANT_URL;
-        buyKey = USER_DEFAULTS_KEY_DEBUG_STAGING_BUY_WEBVIEW_URL;
-    } else if (env == env_production) {
-        serverKey = USER_DEFAULTS_KEY_DEBUG_PRODUCTION_SERVER_URL;
-        webSocketKey = USER_DEFAULTS_KEY_DEBUG_PRODUCTION_WEB_SOCKET_URL;
-        apiKey = USER_DEFAULTS_KEY_DEBUG_PRODUCTION_API_URL;
-        merchantKey = USER_DEFAULTS_KEY_DEBUG_PRODUCTION_MERCHANT_URL;
-        buyKey = USER_DEFAULTS_KEY_DEBUG_PRODUCTION_BUY_WEBVIEW_URL;
-    } else if (env == env_testnet) {
-        serverKey = USER_DEFAULTS_KEY_DEBUG_TESTNET_SERVER_URL;
-        webSocketKey = USER_DEFAULTS_KEY_DEBUG_TESTNET_WEB_SOCKET_URL;
-        apiKey = USER_DEFAULTS_KEY_DEBUG_TESTNET_API_URL;
-        merchantKey = USER_DEFAULTS_KEY_DEBUG_TESTNET_MERCHANT_URL;
-        buyKey = USER_DEFAULTS_KEY_DEBUG_TESTNET_BUY_WEBVIEW_URL;
-    }
-    
-    return @{DICTIONARY_KEY_SERVER : serverKey,
-             DICTIONARY_KEY_WEB_SOCKET : webSocketKey,
-             DICTIONARY_KEY_API : apiKey,
-             DICTIONARY_KEY_MERCHANT: merchantKey,
-             DICTIONARY_KEY_BUY_WEBVIEW: buyKey};
-}
-
 #pragma mark - Table view data source
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    return 1;
-}
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return 12;
+    return 7;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -211,31 +157,6 @@ typedef enum {
             cell.detailTextLabel.text = self.filteredWalletJSON == nil ? DEBUG_STRING_PLEASE_LOGIN : nil;
             cell.detailTextLabel.textColor = COLOR_BUTTON_RED;
             cell.accessoryType = self.filteredWalletJSON == nil ? UITableViewCellAccessoryNone : UITableViewCellAccessoryDisclosureIndicator;
-            break;
-        }
-        case RowServerURL: {
-            cell.textLabel.text = DEBUG_STRING_SERVER_URL;
-            cell.detailTextLabel.text =  URL_SERVER;
-            break;
-        }
-        case RowWebsocketURL: {
-            cell.textLabel.text = DEBUG_STRING_WEBSOCKET_URL;
-            cell.detailTextLabel.text = URL_WEBSOCKET;
-            break;
-        }
-        case RowMerchantURL: {
-            cell.textLabel.text = DEBUG_STRING_MERCHANT_URL;
-            cell.detailTextLabel.text = URL_MERCHANT;
-            break;
-        }
-        case RowAPIURL: {
-            cell.textLabel.text = DEBUG_STRING_API_URL;
-            cell.detailTextLabel.text = URL_API;
-            break;
-        }
-        case RowBuyURL: {
-            cell.textLabel.text = DEBUG_STRING_BUY_WEBVIEW_URL;
-            cell.detailTextLabel.text = URL_BUY_WEBVIEW;
             break;
         }
         case RowSurgeToggle: {
@@ -288,8 +209,6 @@ typedef enum {
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSDictionary *keys = [self getURLUserDefaultsKeys];
-    
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     switch (indexPath.row) {
         case RowWalletJSON: {
@@ -298,21 +217,6 @@ typedef enum {
             }
             break;
         }
-        case RowServerURL:
-            [self alertToChangeURLName:DEBUG_STRING_SERVER_URL userDefaultKey:keys[DICTIONARY_KEY_SERVER] currentURL:URL_SERVER];
-            break;
-        case RowWebsocketURL:
-            [self alertToChangeURLName:DEBUG_STRING_WEBSOCKET_URL userDefaultKey:keys[DICTIONARY_KEY_WEB_SOCKET] currentURL:URL_WEBSOCKET];
-            break;
-        case RowMerchantURL:
-            [self alertToChangeURLName:DEBUG_STRING_MERCHANT_URL userDefaultKey:keys[DICTIONARY_KEY_MERCHANT] currentURL:URL_MERCHANT];
-            break;
-        case RowAPIURL:
-            [self alertToChangeURLName:DEBUG_STRING_API_URL userDefaultKey:keys[DICTIONARY_KEY_API] currentURL:URL_API];
-            break;
-        case RowBuyURL:
-            [self alertToChangeURLName:DEBUG_STRING_BUY_WEBVIEW_URL userDefaultKey:keys[DICTIONARY_KEY_BUY_WEBVIEW] currentURL:URL_BUY_WEBVIEW];
-            break;
         case RowDontShowAgain: {
             UIAlertController *alert = [UIAlertController alertControllerWithTitle:DEBUG_STRING_DEBUG message:DEBUG_STRING_RESET_DONT_SHOW_AGAIN_PROMPT_MESSAGE preferredStyle:UIAlertControllerStyleAlert];
             [alert addAction:[UIAlertAction actionWithTitle:DEBUG_STRING_RESET style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {

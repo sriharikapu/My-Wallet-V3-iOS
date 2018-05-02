@@ -35,11 +35,7 @@
         _amountLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:FONT_SIZE_MEDIUM_LARGE];
         _amountLabel.textColor = [UIColor whiteColor];
         [self addSubview:_amountLabel];
-#ifndef ENABLE_TRANSACTION_FILTERING
-        UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:app action:@selector(toggleSymbol)];
-        [_amountLabel addGestureRecognizer:tapGestureRecognizer];
-        _amountLabel.userInteractionEnabled = YES;
-#endif
+        
         _editButton = [[UIButton alloc] initWithFrame:CGRectMake(self.frame.size.width - sideMenu.anchorLeftPeekAmount - 30 - 12, 0, 40, 40)];
         [_editButton setImage:[UIImage imageNamed:@"edit"] forState:UIControlStateNormal];
         [_editButton addTarget:self action:@selector(editButtonclicked:) forControlEvents:UIControlEventTouchUpInside];
@@ -54,7 +50,7 @@
     BCEditAccountView *editAccountView = [[BCEditAccountView alloc] init];
     
     editAccountView.accountIdx = self.accountIdx;
-    editAccountView.labelTextField.text = [app.wallet getLabelForAccount:self.accountIdx];
+    editAccountView.labelTextField.text = [app.wallet getLabelForAccount:self.accountIdx assetType:self.assetType];
     
     [app showModalWithContent:editAccountView closeType:ModalCloseTypeClose headerText:BC_STRING_EDIT onDismiss:^{
         [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:YES];

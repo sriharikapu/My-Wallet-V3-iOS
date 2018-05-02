@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Assets.h"
 
 @class Wallet;
 
@@ -38,7 +39,7 @@
 @property(nonatomic, copy) void (^on_finish_signing)();
 
 
-- (id)initUsingSendScreen:(BOOL)usesSendScreen;
+- (id)initWithAssetType:(AssetType)assetType usingSendScreen:(BOOL)usesSendScreen;
 - (void)setupTransfersToAccount:(int)account;
 - (void)setupFirstTransferWithAddressesUsed:(NSArray *)addressesUsed;
 - (void)transferAllFundsToAccountWithSecondPassword:(NSString *)secondPassword;

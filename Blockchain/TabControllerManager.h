@@ -11,12 +11,13 @@
 #import "Assets.h"
 #import "TransactionsBitcoinViewController.h"
 #import "SendBitcoinViewController.h"
-#import "ReceiveCoinsViewController.h"
+#import "ReceiveBitcoinViewController.h"
 #import "DashboardViewController.h"
 #import "SendEtherViewController.h"
 #import "TransactionsEtherViewController.h"
 #import "ReceiveEtherViewController.h"
 #import "ExchangeOverviewViewController.h"
+#import "TransactionsBitcoinCashViewController.h"
 
 @protocol TabControllerDelegate
 - (void)toggleSideMenu;
@@ -31,13 +32,18 @@
 @property (strong, nonatomic) TabViewcontroller *tabViewController;
 
 @property (strong, nonatomic) DashboardViewController *dashboardViewController;
+
 @property (strong, nonatomic) TransactionsBitcoinViewController *transactionsBitcoinViewController;
-@property (strong, nonatomic) ReceiveCoinsViewController *receiveBitcoinViewController;
+@property (strong, nonatomic) ReceiveBitcoinViewController *receiveBitcoinViewController;
+@property (strong, nonatomic) ReceiveBitcoinViewController *receiveBitcoinCashViewController;
 @property (strong, nonatomic) SendBitcoinViewController *sendBitcoinViewController;
+@property (strong, nonatomic) SendBitcoinViewController *sendBitcoinCashViewController;
 
 @property (strong, nonatomic) SendEtherViewController *sendEtherViewController;
 @property (strong, nonatomic) TransactionsEtherViewController *transactionsEtherViewController;
 @property (strong, nonatomic) ReceiveEtherViewController *receiveEtherViewController;
+
+@property (strong, nonatomic) TransactionsBitcoinCashViewController *transactionsBitcoinCashViewController;
 
 @property (strong, nonatomic) ExchangeOverviewViewController *exchangeOverviewViewController;
 
@@ -59,11 +65,14 @@
 - (void)sendCoinsClicked:(UITabBarItem *)sender;
 - (void)qrCodeButtonClicked;
 
-- (void)showReceiveEther;
+- (void)showReceiveBitcoinCash;
+- (void)showTransactionsBitcoin;
+- (void)showTransactionsEther;
+- (void)showTransactionsBitcoinCash;
 
 // Send Bitcoin View Controller
 - (BOOL)isSending;
-- (void)showSendCoins;
+- (void)showSendCoinsAnimated:(BOOL)animated;
 - (void)setupTransferAllFunds;
 - (void)hideSendKeyboard;
 - (void)reloadSendController;
@@ -99,11 +108,11 @@
 - (void)didGetEtherAddressWithSecondPassword;
 - (void)clearReceiveAmounts;
 - (void)didSetDefaultAccount;
-- (void)paymentReceived:(NSDecimalNumber *)amount showBackupReminder:(BOOL)showBackupReminder;
+- (void)paymentReceived:(uint64_t)amount showBackupReminder:(BOOL)showBackupReminder;
 
 // Transactions View Controller
 - (void)updateTransactionsViewControllerData:(MultiAddressResponse *)data;
-- (void)filterTransactionsByAccount:(int)accountIndex filterLabel:(NSString *)filterLabel;
+- (void)filterTransactionsByAccount:(int)accountIndex filterLabel:(NSString *)filterLabel assetType:(AssetType)assetType;
 - (NSInteger)getFilterIndex;
 - (void)filterTransactionsByImportedAddresses;
 - (void)selectPayment:(NSString *)payment;
@@ -111,7 +120,6 @@
 - (void)setTransactionsViewControllerMessageIdentifier:(NSString *)identifier;
 
 - (void)removeTransactionsFilter;
-- (void)showFilterResults;
 - (void)reloadSymbols;
 - (void)didChangeLocalCurrency;
 
@@ -119,7 +127,7 @@
 
 - (void)hideSendAndReceiveKeyboards;
 
-- (void)showTransactions;
+- (void)showTransactionsAnimated:(BOOL)animated;
 
 - (void)updateBadgeNumber:(NSInteger)number forSelectedIndex:(int)index;
 

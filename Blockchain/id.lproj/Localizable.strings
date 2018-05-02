@@ -2150,3 +2150,108 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Membeli dan menjual bitcoin dari Blockchain wallet. Mulai dengan membuat akun di Beli & Jual tab.";
+
+/* (No Commment) */
+"All Wallets" = "Semua Dompet";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Menjaga xPub pribadi. Seseorang dengan akses ke xPub akan dapat melihat semua dana dan transaksi.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Anda xPub adalah fitur canggih yang berisi semua alamat publik.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Transaksi yang terjadi ketika anda mengirim dan meminta bitcoin tunai.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Mendapatkan Bitcoin Cash";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Permintaan Uang Bitcoin";
+
+/* (No Commment) */
+"Price" = "Harga";
+
+/* (No Commment) */
+"See charts" = "Lihat grafik";
+
+/* (No Commment) */
+"Price charts" = "Grafik harga";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Bitcoin Cash";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Bitcoin Cash Harga";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Masukkan Bitcoin Cash atau pilih alamat";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Copy ini menerima alamat ke clipboard? Jika demikian, disarankan agar aplikasi lain dapat melihat informasi ini.";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "Silakan kirim BCH untuk Bitcoin Cash alamat\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "Biaya transaksi yang dapat mempengaruhi seberapa cepat jaringan penambangan akan mengkonfirmasi transaksi anda, dan tergantung pada kondisi jaringan saat ini.";
+
+/* (No Commment) */
+"Trade Refunded" = "Perdagangan Dikembalikan";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "Kami sangat gembira untuk mengumumkan bahwa anda Blockchain wallet akan memungkinkan anda untuk mulus mengirim, menerima, dan pertukaran Bitcoin Cash!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "Apakah anda yakin ini adalah bitcoin cash alamat?";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "Pengiriman dana ke alamat bitcoin oleh kecelakaan akan mengakibatkan kerugian dana.";
+
+/* (No Commment) */
+"All Wallets" = "Semua Dompet";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Jaga privasi xPub Anda. Orang yang dapat mengakses xPub Anda dapat melihat semua dana dan transaksi Anda.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "xPub Anda adalah fitur canggih yang menyimpan seluruh alamat publik Anda.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Transaksi terjadi saat Anda mengirim dan meminta bitcoin cash.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Dapatkan Bitcoin Cash";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Minta Bitcoin Cash";
+
+/* (No Commment) */
+"Price" = "Harga";
+
+/* (No Commment) */
+"See charts" = "Lihat grafik";
+
+/* (No Commment) */
+"Price charts" = "Grafik harga";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Bitcoin Cash";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Harga Bitcoin Cash";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Masukkan atau pilih alamat Bitcoin Cash";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Salin alamat penerima ini ke papan klip? Jika demikian, harap perhatikan bahwa aplikasi lain mungkin dapat melihat informasi ini.";
+
+/* (No Commment) */
+"Start trading" = "Mulai berdagang";
+
+/* (No Commment) */
+"Trade bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Dagangkan bitcoin langsung dari dompet Rantai Blok Anda. Mulai dengan membuat akun di tab Jual Beli.";
+
+/* (No Commment) */
+"The wait is over" = "Penantian Anda berakhir";

@@ -7,9 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "Assets.h"
 @interface AccountsAndAddressesDetailViewController : UIViewController
 @property (nonatomic) int account;
 @property (nonatomic) NSString *address;
-
+@property (nonatomic) AssetType assetType;
 @end

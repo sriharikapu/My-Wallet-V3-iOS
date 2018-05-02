@@ -8,6 +8,7 @@
 
 #import "Wallet.h"
 #import <AVFoundation/AVFoundation.h>
+#import "Assets.h"
 
 @interface PrivateKeyReader : UIViewController<AVCaptureMetadataOutputObjectsDelegate>
 
@@ -16,6 +17,6 @@
 @property (nonatomic) BOOL acceptsPublicKeys;
 @property (nonatomic) NSString *busyViewText;
 
-- (id)initWithSuccess:(void (^)(NSString*))__success error:(void (^)(NSString*))__error acceptPublicKeys:(BOOL)acceptPublicKeys busyViewText:(NSString *)text;
+- (id)initWithAssetType:(AssetType)assetType success:(void (^)(NSString*))__success error:(void (^)(NSString*))__error acceptPublicKeys:(BOOL)acceptPublicKeys busyViewText:(NSString *)text;
 
 @end

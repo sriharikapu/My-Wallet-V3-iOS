@@ -22,18 +22,6 @@ Prepare OpenSSL:
     cd ../OpenSSL-for-iPhone
     ./build-libssl.sh
 
-## Public Key Pinning
-
-Create a file named `.env` and define environment variables in it as follows:
-
-    DEV=""
-    STAGING=""
-    TESTNET=""
-
-Get certificates:
-
-    sh scripts/update-certs.sh
-
 ## PSD and Asset Catalog
 
 Images.xcassets contains all images the app needs, but they must be generated first from the PSD sources in /Artwork. This requires ImageMagick and Grunt.
@@ -47,7 +35,7 @@ Once:
     npm install -g grunt-cli
     cd Artwork
     npm install
-    npm -g install svgexport
+    npm -g install svgexport@0.2.8
 
 Whenever you change a PSD or SVG file, run:
 

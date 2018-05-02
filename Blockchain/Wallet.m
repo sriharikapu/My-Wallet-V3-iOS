@@ -1,3 +1,4 @@
+
 //
 //  Wallet.m
 //  Blockchain
@@ -32,16 +33,21 @@
 #import "PrivateHeaders.h"
 #import "Assets.h"
 #import "ExchangeTrade.h"
+#import "Blockchain-Swift.h"
 
 #import "BTCKey.h"
 #import "BTCData.h"
 #import "KeyPair.h"
 #import "NSData+BTCData.h"
 
+#define DICTIONARY_KEY_CURRENCY @"currency"
+
 @interface Wallet ()
 @property (nonatomic) JSContext *context;
 @property (nonatomic) BOOL isSettingDefaultAccount;
 @property (nonatomic) NSMutableDictionary *timers;
+@property (nonatomic) NSDictionary *bitcoinCashExchangeRates;
+@property (nonatomic) uint64_t bitcoinCashConversion;
 @end
 
 @implementation transactionProgressListeners
@@ -613,8 +619,8 @@
         [weakSelf did_archive_or_unarchive];
     };
     
-    self.context[@"objc_did_get_swipe_addresses"] = ^(NSArray *swipeAddresses) {
-        [weakSelf did_get_swipe_addresses:swipeAddresses];
+    self.context[@"objc_did_get_btc_swipe_addresses"] = ^(NSArray *swipeAddresses) {
+        [weakSelf did_get_swipe_addresses:swipeAddresses asset_type:AssetTypeBitcoin];
     };
     
 #pragma mark State
@@ -909,6 +915,24 @@
         [weakSelf did_get_ether_address_with_second_password];
     };
     
+#pragma mark Bitcoin Cash
+    
+    self.context[@"objc_on_fetch_bch_history_success"] = ^() {
+        [weakSelf did_fetch_bch_history];
+    };
+    
+    self.context[@"objc_on_fetch_bch_history_error"] = ^(JSValue *error) {
+        [app standardNotify:[error toString]];
+    };
+    
+    self.context[@"objc_did_get_bitcoin_cash_exchange_rates"] = ^(JSValue *result, JSValue *onLogin) {
+        [weakSelf did_get_bitcoin_cash_exchange_rates:[result toDictionary] onLogin:[onLogin toBool]];
+    };
+    
+    self.context[@"objc_did_get_bch_swipe_addresses"] = ^(NSArray *swipeAddresses) {
+        [weakSelf did_get_swipe_addresses:swipeAddresses asset_type:AssetTypeBitcoinCash];
+    };
+    
 #pragma mark Exchange
     
     self.context[@"objc_on_get_exchange_trades_success"] = ^(NSArray *trades) {
@@ -969,20 +993,35 @@
     _ethSocket.delegate = self;
 }
 
-- (void)setupWebSocket
+- (void)setupSocket:(AssetType)assetType
 {
-    self.webSocket = [[SRWebSocket alloc] initWithURLRequest:[self getWebSocketRequest:AssetTypeBitcoin]];
-    self.webSocket.delegate = self;
-    
-    [self.webSocketTimer invalidate];
-    self.webSocketTimer = nil;
-    self.webSocketTimer = [NSTimer scheduledTimerWithTimeInterval:15.0
-                                     target:self
-                                   selector:@selector(pingWebSocket)
-                                   userInfo:nil
-                                    repeats:YES];
-    
-    [self.webSocket open];
+    if (assetType == AssetTypeBitcoin) {
+        self.btcSocket = [[SRWebSocket alloc] initWithURLRequest:[self getWebSocketRequest:AssetTypeBitcoin]];
+        self.btcSocket.delegate = self;
+        
+        [self.btcSocketTimer invalidate];
+        self.btcSocketTimer = nil;
+        self.btcSocketTimer = [NSTimer scheduledTimerWithTimeInterval:15.0
+                                                               target:self
+                                                             selector:@selector(pingBtcSocket)
+                                                             userInfo:nil
+                                                              repeats:YES];
+        
+        [self.btcSocket open];
+    } else {
+        self.bchSocket = [[SRWebSocket alloc] initWithURLRequest:[self getWebSocketRequest:AssetTypeBitcoinCash]];
+        self.bchSocket.delegate = self;
+        
+        [self.bchSocketTimer invalidate];
+        self.bchSocketTimer = nil;
+        self.bchSocketTimer = [NSTimer scheduledTimerWithTimeInterval:15.0
+                                                               target:self
+                                                             selector:@selector(pingBchSocket)
+                                                             userInfo:nil
+                                                              repeats:YES];
+        
+        [self.bchSocket open];
+    }
 }
 
 - (NSURLRequest *)getWebSocketRequest:(AssetType)assetType
@@ -990,71 +1029,91 @@
     NSString *websocketURL;
     
     if (assetType == AssetTypeBitcoin) {
-        websocketURL = URL_WEBSOCKET;
+        websocketURL = [NSBundle webSocketUri];
     } else if (assetType == AssetTypeEther) {
-        websocketURL = URL_WEBSOCKET_ETH;
+        websocketURL = [NSBundle ethereumWebSocketUri];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        websocketURL = [NSBundle bitcoinCashWebSocketUri];
     }
     
-    NSMutableURLRequest *webSocketRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:URL_WEBSOCKET]];
-    [webSocketRequest addValue:URL_SERVER forHTTPHeaderField:@"Origin"];
-    
-#ifdef ENABLE_CERTIFICATE_PINNING
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:USER_DEFAULTS_KEY_DEBUG_ENABLE_CERTIFICATE_PINNING]) {
-        NSString *cerPath = [[NSBundle mainBundle] pathForResource:[app.certificatePinner getCertificateName] ofType:@"der"];
-        NSData *certData = [[NSData alloc] initWithContentsOfFile:cerPath];
-        CFDataRef certDataRef = (__bridge CFDataRef)certData;
-        SecCertificateRef certRef = SecCertificateCreateWithData(NULL, certDataRef);
-        id certificate = (__bridge id)certRef;
-        
-        [webSocketRequest setSR_SSLPinnedCertificates:@[certificate]];
-        [webSocketRequest setSR_comparesPublicKeys:YES];
-        
-        CFRelease(certRef);
-    }
+    NSMutableURLRequest *webSocketRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:websocketURL]];
+    [webSocketRequest addValue:[NSBundle walletUrl] forHTTPHeaderField:@"Origin"];
+
+#if CERTIFICATE_PINNING == YES
+    NSString *cerPath = [NSBundle localCertificatePath];
+    NSData *certData = [[NSData alloc] initWithContentsOfFile:cerPath];
+    CFDataRef certDataRef = (__bridge CFDataRef)certData;
+    SecCertificateRef certRef = SecCertificateCreateWithData(NULL, certDataRef);
+    id certificate = (__bridge id)certRef;
+
+    [webSocketRequest setSR_SSLPinnedCertificates:@[certificate]];
+    [webSocketRequest setSR_comparesPublicKeys:YES];
+
+    CFRelease(certRef);
 #endif
     
     return webSocketRequest;
 }
 
-- (void)pingWebSocket
+- (void)pingBtcSocket
 {
-    if (self.webSocket.readyState == 1) {
+    if (self.btcSocket.readyState == 1) {
         NSError *error;
-        [self.webSocket sendPing:[@"{ op: \"ping\" }" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+        [self.btcSocket sendPing:[@"{ op: \"ping\" }" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
         if (error) DLog(@"Error sending ping: %@", [error localizedDescription]);
     } else {
         DLog(@"reconnecting websocket");
-        [self setupWebSocket];
+        [self setupSocket:AssetTypeBitcoin];
     }
 }
 
-- (void)subscribeToXPub:(NSString *)xPub
+- (void)pingBchSocket
 {
-    if (self.webSocket && self.webSocket.readyState == 1) {
+    if (self.bchSocket.readyState == 1) {
         NSError *error;
-        [self.webSocket sendString:[NSString stringWithFormat:@"{\"op\":\"xpub_sub\",\"xpub\":\"%@\"}", xPub] error:&error];
+        [self.bchSocket sendPing:[@"{ op: \"ping\" }" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+        if (error) DLog(@"Error sending ping: %@", [error localizedDescription]);
+    } else {
+        DLog(@"reconnecting websocket");
+        [self setupSocket:AssetTypeBitcoinCash];
+    }
+}
+
+- (void)subscribeToXPub:(NSString *)xPub assetType:(AssetType)assetType
+{
+    SRWebSocket *socket = assetType == AssetTypeBitcoin ? self.btcSocket : self.bchSocket;
+
+    if (socket && socket.readyState == 1) {
+        NSError *error;
+        [socket sendString:[NSString stringWithFormat:@"{\"op\":\"xpub_sub\",\"xpub\":\"%@\"}", xPub] error:&error];
         if (error) DLog(@"Error subscribing to xpub: %@", [error localizedDescription]);
     } else {
-        [self setupWebSocket];
+        [self setupSocket:assetType];
     }
 }
 
-- (void)subscribeToAddress:(NSString *)address
-{    
-    if (self.webSocket && self.webSocket.readyState == 1) {
+- (void)subscribeToAddress:(NSString *)address assetType:(AssetType)assetType
+{
+    SRWebSocket *socket = assetType == AssetTypeBitcoin ? self.btcSocket : self.bchSocket;
+    
+    if (socket && socket.readyState == 1) {
         NSError *error;
-        [self.webSocket sendString:[NSString stringWithFormat:@"{\"op\":\"addr_sub\",\"addr\":\"%@\"}", address] error:&error];
+        [socket sendString:[NSString stringWithFormat:@"{\"op\":\"addr_sub\",\"addr\":\"%@\"}", address] error:&error];
         if (error) DLog(@"Error subscribing to address: %@", [error localizedDescription]);
     } else {
-        [self setupWebSocket];
+        [self setupSocket:assetType];
     }
 }
 
-- (void)subscribeToSwipeAddress:(NSString *)address
-{    
-    self.swipeAddressToSubscribe = address;
-
-    [self subscribeToAddress:address];
+- (void)subscribeToSwipeAddress:(NSString *)address assetType:(AssetType)assetType
+{
+    if (assetType == AssetTypeBitcoin) {
+        self.btcSwipeAddressToSubscribe = address;
+    } else if (assetType == AssetTypeBitcoinCash) {
+        self.bchSwipeAddressToSubscribe = address;
+    }
+    
+    [self subscribeToAddress:address assetType:assetType];
 }
 
 - (void)apiGetPINValue:(NSString*)key pin:(NSString*)pin
@@ -1155,10 +1214,16 @@
             [self sendEthSocketMessage:message];
         }
         [self.pendingEthSocketMessages removeAllObjects];
-    } else {
-        DLog(@"websocket opened");
-        NSString *message = self.swipeAddressToSubscribe ? [NSString stringWithFormat:@"{\"op\":\"addr_sub\",\"addr\":\"%@\"}", self.swipeAddressToSubscribe] : [[self.context evaluateScript:@"MyWallet.getSocketOnOpenMessage()"] toString];
+    } else if (webSocket == self.btcSocket) {
+        DLog(@"btc websocket opened");
+        NSString *message = self.btcSwipeAddressToSubscribe ? [NSString stringWithFormat:@"{\"op\":\"addr_sub\",\"addr\":\"%@\"}", [self.btcSwipeAddressToSubscribe escapeStringForJS]] : [[self.context evaluateScript:@"MyWallet.getSocketOnOpenMessage()"] toString];
         
+        NSError *error;
+        [webSocket sendString:message error:&error];
+        if (error) DLog(@"Error subscribing to address: %@", [error localizedDescription]);
+    } else if (webSocket == self.bchSocket) {
+        DLog(@"bch websocket opened");
+        NSString *message = self.bchSwipeAddressToSubscribe ? [NSString stringWithFormat:@"{\"op\":\"addr_sub\",\"addr\":\"%@\"}", [self fromBitcoinCash:[self.bchSwipeAddressToSubscribe escapeStringForJS]]] : [[self.context evaluateScript:@"MyWalletPhone.bch.getSocketOnOpenMessage()"] toString];
         NSError *error;
         [webSocket sendString:message error:&error];
         if (error) DLog(@"Error subscribing to address: %@", [error localizedDescription]);
@@ -1177,16 +1242,22 @@
 {
     if (webSocket == self.ethSocket) {
         DLog(@"eth websocket closed: code %li, reason: %@", code, reason);
-    } else if (webSocket == self.webSocket) {
+    } else if (webSocket == self.btcSocket || webSocket == self.bchSocket) {
         if (code == WEBSOCKET_CODE_BACKGROUNDED_APP || code == WEBSOCKET_CODE_LOGGED_OUT || code == WEBSOCKET_CODE_RECEIVED_TO_SWIPE_ADDRESS) {
             // Socket will reopen when app becomes active and after decryption
             return;
         }
         
         DLog(@"websocket closed: code %li, reason: %@", code, reason);
-        if (self.webSocket.readyState != 1 && [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
-            DLog(@"reconnecting websocket");
-            [self setupWebSocket];
+        if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
+            if (self.btcSocket.readyState != 1) {
+                DLog(@"reconnecting websocket");
+                [self setupSocket:AssetTypeBitcoin];
+            }
+            if (self.bchSocket.readyState != 1) {
+                DLog(@"reconnecting websocket");
+                [self setupSocket:AssetTypeBitcoinCash];
+            }
         }
     }
 }
@@ -1196,44 +1267,80 @@
     if (webSocket == self.ethSocket) {
         DLog(@"received eth socket message string");
         [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.didReceiveEthSocketMessage(\"%@\")", [string escapeStringForJS]]];
-    } else if (webSocket == self.webSocket) {
+    } else {
         DLog(@"received websocket message string");
-        [self.context evaluateScript:[NSString stringWithFormat:@"MyWallet.getSocketOnMessage(\"%@\", { checksum: null })", [string escapeStringForJS]]];
         
-        if (self.swipeAddressToSubscribe) {
-            NSDictionary *message = [string getJSONObject];
-            NSString *hash = message[@"x"][DICTIONARY_KEY_HASH];
-            NSURL *URL = [NSURL URLWithString:[URL_SERVER stringByAppendingString:[NSString stringWithFormat:TRANSACTION_RESULT_URL_SUFFIX_HASH_ARGUMENT_ADDRESS_ARGUMENT, hash, self.swipeAddressToSubscribe]]];
-            NSURLRequest *request = [NSURLRequest requestWithURL:URL];
+        if (webSocket == self.btcSocket) {
+            [self.context evaluateScript:[NSString stringWithFormat:@"MyWallet.getSocketOnMessage(\"%@\", { checksum: null })", [string escapeStringForJS]]];
+        } else if (webSocket == self.bchSocket) {
+            [self.context evaluateScript:@"MyWalletPhone.bch.didGetTxMessage()"];
+        }
+        
+        NSDictionary *message = [string getJSONObject];
+        NSDictionary *transaction = message[@"x"];
+        
+        if (webSocket == self.btcSocket && self.btcSwipeAddressToSubscribe) {
+            NSString *hash = transaction[DICTIONARY_KEY_HASH];
+            [self getAmountReceivedForTransactionHash:hash socket:webSocket];
+        } else if (webSocket == self.bchSocket && self.bchSwipeAddressToSubscribe) {
+            NSArray *outputs = transaction[DICTIONARY_KEY_OUT];
+            NSString *address = [self fromBitcoinCash:self.bchSwipeAddressToSubscribe];
+            uint64_t amountReceived = 0;
+            for (NSDictionary *output in outputs) {
+                if ([[output objectForKey:DICTIONARY_KEY_ADDRESS_OUTPUT] isEqualToString:address]) amountReceived = amountReceived + [[output objectForKey:DICTIONARY_KEY_VALUE] longLongValue];
+            };
             
-            NSURLSessionDataTask *task = [[SessionManager sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-                
-                if (error) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        // TODO: add alert for error here
-                    });
-                    return;
-                }
-                
-                uint64_t amountReceived = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] longLongValue];
-                if (amountReceived > 0) {
-                    if ([delegate respondsToSelector:@selector(paymentReceivedOnPINScreen:)]) {
-                        if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
-                            [delegate paymentReceivedOnPINScreen:[NSNumberFormatter formatMoney:amountReceived localCurrency:NO]];
-                        }
-                    } else {
-                        DLog(@"Error: delegate of class %@ does not respond to selector paymentReceivedOnPINScreen:!", [delegate class]);
+            self.bchSwipeAddressToSubscribe = nil;
+            
+            if (amountReceived > 0) {
+                if ([delegate respondsToSelector:@selector(paymentReceivedOnPINScreen:assetType:)]) {
+                    if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
+                        NSString *amountString = [NSNumberFormatter formatBchWithSymbol:amountReceived localCurrency:NO];
+                        [delegate paymentReceivedOnPINScreen:amountString assetType:AssetTypeBitcoinCash];
                     }
+                } else {
+                    DLog(@"Error: delegate of class %@ does not respond to selector paymentReceivedOnPINScreen:!", [delegate class]);
                 }
-            }];
+            }
             
-            [task resume];
-            
-            self.swipeAddressToSubscribe = nil;
-            
-            [self.webSocket closeWithCode:WEBSOCKET_CODE_RECEIVED_TO_SWIPE_ADDRESS reason:WEBSOCKET_CLOSE_REASON_RECEIVED_TO_SWIPE_ADDRESS];
+            [webSocket closeWithCode:WEBSOCKET_CODE_RECEIVED_TO_SWIPE_ADDRESS reason:WEBSOCKET_CLOSE_REASON_RECEIVED_TO_SWIPE_ADDRESS];
         }
     }
+}
+
+- (void)getAmountReceivedForTransactionHash:(NSString *)txHash socket:(SRWebSocket *)webSocket
+{
+    NSURL *URL = [NSURL URLWithString:[[NSBundle walletUrl] stringByAppendingString:[NSString stringWithFormat:TRANSACTION_RESULT_URL_SUFFIX_HASH_ARGUMENT_ADDRESS_ARGUMENT, txHash, self.btcSwipeAddressToSubscribe]]];
+    NSURLRequest *request = [NSURLRequest requestWithURL:URL];
+    
+    NSURLSessionDataTask *task = [[SessionManager sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        
+        if (error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                // TODO: add alert for error here
+            });
+            return;
+        }
+        
+        uint64_t amountReceived = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] longLongValue];
+        
+        NSString *amountString = [NSNumberFormatter formatMoney:amountReceived localCurrency:NO];
+        self.btcSwipeAddressToSubscribe = nil;
+        
+        if (amountReceived > 0) {
+            if ([delegate respondsToSelector:@selector(paymentReceivedOnPINScreen:assetType:)]) {
+                if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
+                    [delegate paymentReceivedOnPINScreen:amountString assetType:AssetTypeBitcoin];
+                }
+            } else {
+                DLog(@"Error: delegate of class %@ does not respond to selector paymentReceivedOnPINScreen:!", [delegate class]);
+            }
+        }
+        
+        [webSocket closeWithCode:WEBSOCKET_CODE_RECEIVED_TO_SWIPE_ADDRESS reason:WEBSOCKET_CLOSE_REASON_RECEIVED_TO_SWIPE_ADDRESS];
+    }];
+    
+    [task resume];
 }
 
 # pragma mark - Calls from Obj-C to JS
@@ -1285,6 +1392,19 @@
     return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.getPasswordStrength(\"%@\")", [passwordString escapeStringForJS]]] toDouble];
 }
 
+- (void)loadMetadata
+{
+    if ([self isInitialized]) {
+        [self.context evaluateScript:@"MyWalletPhone.loadMetadata()"];
+    }
+}
+
+- (void)getHistoryForAllAssets
+{
+    if ([self isInitialized])
+        [self.context evaluateScript:@"MyWalletPhone.getHistoryForAllAssets()"];
+}
+
 - (void)getHistory
 {
     if ([self isInitialized])
@@ -1306,8 +1426,16 @@
 - (void)getHistoryIfNoTransactionMessage
 {
     if (!self.didReceiveMessageForLastTransaction) {
-        DLog(@"Did not receive tx message for %f seconds - getting history", DELAY_GET_HISTORY_BACKUP);
+        DLog(@"Did not receive btc tx message for %f seconds - getting history", DELAY_GET_HISTORY_BACKUP);
         [self getHistoryWithoutBusyView];
+    }
+}
+
+- (void)getBitcoinCashHistoryIfNoTransactionMessage
+{
+    if (!self.didReceiveMessageForLastTransaction) {
+        DLog(@"Did not receive bch tx message for %f seconds - getting history", DELAY_GET_HISTORY_BACKUP);
+        [self getBitcoinCashHistoryAndRates];
     }
 }
 
@@ -1349,6 +1477,16 @@
     }
     
     [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.changeBtcCurrency(\"%@\")", [btcCode escapeStringForJS]]];
+}
+
+- (uint64_t)conversionForBitcoinAssetType:(AssetType)assetType
+{
+    if (assetType == AssetTypeBitcoin) {
+        return app.latestResponse.symbol_local.conversion;
+    } else if (assetType == AssetTypeBitcoinCash) {
+        return [app.wallet getBitcoinCashConversion];
+    }
+    return 0;
 }
 
 - (void)getAccountInfo
@@ -1517,9 +1655,9 @@
     }
     
     if (secondPassword) {
-        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.quickSend(\"%@\", true, \"%@\")", [txProgressID escapeStringForJS], [secondPassword escapeStringForJS]]];
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.quickSendBtc(\"%@\", true, \"%@\")", [txProgressID escapeStringForJS], [secondPassword escapeStringForJS]]];
     } else {
-        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.quickSend(\"%@\", true)", [txProgressID escapeStringForJS]]];
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.quickSendBtc(\"%@\", true)", [txProgressID escapeStringForJS]]];
     }
 }
 
@@ -1532,9 +1670,9 @@
     }
     
     if (secondPassword) {
-        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.quickSend(\"%@\", false, \"%@\")", [txProgressID escapeStringForJS], [secondPassword escapeStringForJS]]];
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.quickSendBtc(\"%@\", false, \"%@\")", [txProgressID escapeStringForJS], [secondPassword escapeStringForJS]]];
     } else {
-        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.quickSend(\"%@\", false)", [txProgressID escapeStringForJS]]];
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.quickSendBtc(\"%@\", false)", [txProgressID escapeStringForJS]]];
     }
 }
 
@@ -1627,7 +1765,7 @@
 - (BOOL)needsSecondPassword
 {
     if (![self isInitialized]) {
-        return false;
+        return NO;
     }
     
     return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWallet.wallet.isDoubleEncrypted"]] toBool];
@@ -1636,7 +1774,7 @@
 - (BOOL)validateSecondPassword:(NSString*)secondPassword
 {
     if (![self isInitialized]) {
-        return FALSE;
+        return NO;
     }
     
     return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWallet.wallet.validateSecondPassword(\"%@\")", [secondPassword escapeStringForJS]]] toBool];
@@ -1663,7 +1801,7 @@
 - (BOOL)isWatchOnlyLegacyAddress:(NSString*)address
 {
     if (![self isInitialized]) {
-        return false;
+        return NO;
     }
     
     if ([self checkIfWalletHasAddress:address]) {
@@ -1673,17 +1811,32 @@
     }
 }
 
-- (NSString*)labelForLegacyAddress:(NSString*)address
+- (NSString*)labelForLegacyAddress:(NSString*)address assetType:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return nil;
     }
     
-    if ([self checkIfWalletHasAddress:address]) {
-        return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.labelForLegacyAddress(\"%@\")", [address escapeStringForJS]]] toString];
-    } else {
-        return nil;
+    if (assetType == AssetTypeBitcoin) {
+        if ([[app.wallet.addressBook objectForKey:address] length] > 0) {
+            return [app.wallet.addressBook objectForKey:address];
+        } else if ([[app.wallet allLegacyAddresses:assetType] containsObject:address]) {
+            NSString *label = [self checkIfWalletHasAddress:address] ? [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.labelForLegacyAddress(\"%@\")", [address escapeStringForJS]]] toString] : nil;
+            if (label && ![label isEqualToString:@""])
+                return label;
+        }
+        return address;
+    } else if (assetType == AssetTypeBitcoinCash) {
+        return address;
     }
+    return nil;
+}
+
+- (NSString *)labelForContactLegacyAddress:(NSString *)address contactTransaction:(ContactTransaction *)contactTransaction
+{
+    NSString *name = contactTransaction.contactName;
+    if (name && ![name isEqualToString:@""]) return name;
+    return nil;
 }
 
 - (Boolean)isAddressArchived:(NSString *)address
@@ -1695,51 +1848,65 @@
     return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.isArchived(\"%@\")", [address escapeStringForJS]]] toBool];
 }
 
-- (Boolean)isActiveAccountArchived:(int)account
+- (BOOL)isAccountArchived:(int)account assetType:(AssetType)assetType
 {
     if (![self isInitialized]) {
-        return FALSE;
+        return NO;
     }
     
-    return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.isArchived(MyWalletPhone.getIndexOfActiveAccount(%d))", account]] toBool];
+    if (assetType == AssetTypeBitcoin) {
+        return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.isArchived(%d)", account]] toBool];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.isArchived(%d)", account]] toBool];
+    }
+    return NO;
 }
 
-- (Boolean)isAccountArchived:(int)account
+- (BOOL)isValidAddress:(NSString*)string assetType:(AssetType)assetType
 {
     if (![self isInitialized]) {
-        return FALSE;
+        return NO;
     }
     
-    return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.isArchived(%d)", account]] toBool];
-}
-
-- (BOOL)isBitcoinAddress:(NSString*)string
-{
-    if (![self isInitialized]) {
-        return false;
+    if (assetType == AssetTypeBitcoin) {
+        return [[self.context evaluateScript:[NSString stringWithFormat:@"Helpers.isBitcoinAddress(\"%@\");", [string escapeStringForJS]]] toBool];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        return [[self.context evaluateScript:[NSString stringWithFormat:@"Helpers.isBitcoinAddress(\"%@\");", [string escapeStringForJS]]] toBool] || [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.isValidAddress(\"%@\")", [string escapeStringForJS]]] toBool];
+    } else if (assetType == AssetTypeEther) {
+        return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.isEthAddress(\"%@\")", string]] toBool];
     }
-    
-    return [[self.context evaluateScript:[NSString stringWithFormat:@"Helpers.isBitcoinAddress(\"%@\");", [string escapeStringForJS]]] toBool];
+    return NO;
 }
 
-- (NSArray*)allLegacyAddresses
+- (NSArray*)allLegacyAddresses:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return nil;
     }
     
-    NSString * allAddressesJSON = [[self.context evaluateScript:@"JSON.stringify(MyWallet.wallet.addresses)"] toString];
-    
-    return [allAddressesJSON getJSONObject];
+    NSString *allAddressesJSON;
+    if (assetType == AssetTypeBitcoin) {
+        allAddressesJSON = [[self.context evaluateScript:@"JSON.stringify(MyWallet.wallet.addresses)"] toString];
+        return [allAddressesJSON getJSONObject];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        allAddressesJSON = [[self.context evaluateScript:@"JSON.stringify(MyWalletPhone.bch.getActiveLegacyAddresses())"] toString];
+        return [allAddressesJSON getJSONObject];
+    }
+    return nil;
 }
 
-- (NSArray*)activeLegacyAddresses
+- (NSArray*)activeLegacyAddresses:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return nil;
     }
     
-    NSString *activeAddressesJSON = [[self.context evaluateScript:@"JSON.stringify(MyWallet.wallet.activeAddresses)"] toString];
+    NSString *activeAddressesJSON;
+    if (assetType == AssetTypeBitcoin) {
+        activeAddressesJSON = [[self.context evaluateScript:@"JSON.stringify(MyWallet.wallet.activeAddresses)"] toString];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        activeAddressesJSON = [[self.context evaluateScript:@"JSON.stringify(MyWalletPhone.bch.getActiveLegacyAddresses())"] toString];
+    }
     
     return [activeAddressesJSON getJSONObject];
 }
@@ -1788,7 +1955,7 @@
     [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.toggleArchived(\"%@\")", [address escapeStringForJS]]];
 }
 
-- (void)toggleArchiveAccount:(int)account
+- (void)toggleArchiveAccount:(int)account assetType:(AssetType)assetType
 {
     if (![self isInitialized] || ![app checkInternetConnection]) {
         return;
@@ -1796,7 +1963,12 @@
     
     self.isSyncing = YES;
     
-    [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.toggleArchived(%d)", account]];
+    if (assetType == AssetTypeBitcoin) {
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.toggleArchived(%d)", account]];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.toggleArchived(%d)", account]];
+        [self reload];
+    }
 }
 
 - (void)archiveTransferredAddresses:(NSArray *)transferredAddresses
@@ -1808,25 +1980,30 @@
     [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.archiveTransferredAddresses(\"%@\")", [[transferredAddresses jsonString] escapeStringForJS]]];
 }
 
-- (uint64_t)getLegacyAddressBalance:(NSString*)address
+- (id)getLegacyAddressBalance:(NSString*)address assetType:(AssetType)assetType
 {
-    uint64_t errorBalance = 0;
+    NSNumber *errorBalance = @0;
     if (![self isInitialized]) {
         return errorBalance;
     }
-    
-    if ([self checkIfWalletHasAddress:address]) {
-        return [[[self.context evaluateScript:[NSString stringWithFormat:@"MyWallet.wallet.key(\"%@\").balance", [address escapeStringForJS]]] toNumber] longLongValue];
-    } else {
-        DLog(@"Wallet error: Tried to get balance of address %@, which was not found in this wallet", address);
-        return errorBalance;
+
+    if (assetType == AssetTypeBitcoin) {
+        if ([self checkIfWalletHasAddress:address]) {
+            return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWallet.wallet.key(\"%@\").balance", [address escapeStringForJS]]] toNumber];
+        } else {
+            DLog(@"Wallet error: Tried to get balance of address %@, which was not found in this wallet", address);
+            return errorBalance;
+        }
+    } else if (assetType == AssetTypeBitcoinCash) {
+        return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.getBalanceForAddress(\"%@\")", [address escapeStringForJS]]] toNumber];
     }
+    return 0;
 }
 
 - (BOOL)addKey:(NSString*)privateKeyString
 {
     if (![self isInitialized]) {
-        return false;
+        return NO;
     }
     
     return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.addKey(\"%@\")", [privateKeyString escapeStringForJS]]] toBool];
@@ -1835,7 +2012,7 @@
 - (BOOL)addKey:(NSString*)privateKeyString toWatchOnlyAddress:(NSString *)watchOnlyAddress
 {
     if (![self isInitialized]) {
-        return false;
+        return NO;
     }
     
     return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.addKeyToLegacyAddress(\"%@\", \"%@\")", [privateKeyString escapeStringForJS], [watchOnlyAddress escapeStringForJS]]] toBool];
@@ -1879,58 +2056,84 @@
     return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.detectPrivateKeyFormat(\"%@\")", [privateKeyString escapeStringForJS]]] toString];
 }
 
-- (void)createNewBitcoinPayment
+- (void)createNewPayment:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return;
     }
     
-    [self.context evaluateScript:@"MyWalletPhone.createNewBitcoinPayment()"];
+    if (assetType == AssetTypeBitcoin) {
+        [self.context evaluateScript:@"MyWalletPhone.createNewBitcoinPayment()"];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        DLog(@"Bitcoin cash - creating payment is done in selecting from");
+    } else if (assetType == AssetTypeEther) {
+        [self.context evaluateScript:@"MyWalletPhone.createNewEtherPayment()"];
+    }
 }
 
-- (void)changePaymentFromAccount:(int)fromInt isAdvanced:(BOOL)isAdvanced
+- (void)changePaymentFromAddress:(NSString *)address isAdvanced:(BOOL)isAdvanced assetType:(AssetType)assetType
 {
-    if (![self isInitialized]) {
-        return;
+    if (assetType == AssetTypeBitcoin) {
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.changePaymentFrom(\"%@\", %d)", [address escapeStringForJS], isAdvanced]];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        [self.context evaluateScript:@"MyWalletPhone.bch.changePaymentFromImportedAddresses()"];
     }
-    
-    [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.changePaymentFrom(%d, %d)", fromInt, isAdvanced]];
 }
 
-- (void)changePaymentFromAddress:(NSString *)fromString isAdvanced:(BOOL)isAdvanced
+- (void)changePaymentFromAccount:(int)fromInt isAdvanced:(BOOL)isAdvanced assetType:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return;
     }
     
-    [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.changePaymentFrom(\"%@\", %d)", [fromString escapeStringForJS], isAdvanced]];
+    if (assetType == AssetTypeBitcoin) {
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.changePaymentFrom(%d, %d)", fromInt, isAdvanced]];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.changePaymentFromAccount(\"%d\")", fromInt]];
+    }
 }
 
-- (void)changePaymentToAccount:(int)toInt
+- (void)changePaymentToAccount:(int)toInt assetType:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return;
     }
     
-    [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.changePaymentTo(%d)", toInt]];
+    if (assetType == AssetTypeBitcoin) {
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.changePaymentTo(%d)", toInt]];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.changePaymentToAccount(%d)", toInt]];
+    }
 }
 
-- (void)changePaymentToAddress:(NSString *)toString
+- (void)changePaymentToAddress:(NSString *)toString assetType:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return;
     }
     
-    [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.changePaymentTo(\"%@\")", [toString escapeStringForJS]]];
+    if (assetType == AssetTypeBitcoin) {
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.changePaymentTo(\"%@\")", [toString escapeStringForJS]]];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.changePaymentToAddress(\"%@\")", [toString escapeStringForJS]]];
+    } else if (assetType == AssetTypeEther) {
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.setEtherPaymentTo(\"%@\")", [toString escapeStringForJS]]];
+    }
 }
 
-- (void)changePaymentAmount:(uint64_t)amount
+- (void)changePaymentAmount:(id)amount assetType:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return;
     }
     
-    [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.changePaymentAmount(%lld)", amount]];
+    if (assetType == AssetTypeBitcoin) {
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.changePaymentAmount(%lld)", [amount longLongValue]]];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.changePaymentAmount(%lld)", [amount longLongValue]]];
+    } else if (assetType == AssetTypeEther) {
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.setEtherPaymentAmount(\"%@\")", amount ? : @0]];
+    }
 }
 
 - (void)getInfoForTransferAllFundsToAccount
@@ -2132,24 +2335,6 @@
     [self.context evaluateScript:@"MyWalletPhone.disableEmailNotifications()"];
 }
 
-- (void)enableSMSNotifications
-{
-    if (![self isInitialized]) {
-        return;
-    }
-    
-    [self.context evaluateScript:@"MyWalletPhone.enableSMSNotifications()"];
-}
-
-- (void)disableSMSNotifications
-{
-    if (![self isInitialized]) {
-        return;
-    }
-    
-    [self.context evaluateScript:@"MyWalletPhone.disableSMSNotifications()"];
-}
-
 - (void)updateServerURL:(NSString *)newURL
 {
     [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.updateServerURL(\"%@\")", [newURL escapeStringForJS]]];
@@ -2176,13 +2361,18 @@
     return [filteredWalletJSON getJSONObject];
 }
 
-- (NSString *)getXpubForAccount:(int)accountIndex
+- (NSString *)getXpubForAccount:(int)accountIndex assetType:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return nil;
     }
     
-    return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.getXpubForAccount(%d)", accountIndex]] toString];
+    if (assetType == AssetTypeBitcoin) {
+        return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.getXpubForAccount(%d)", accountIndex]] toString];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.getXpubForAccount(%d)", accountIndex]] toString];
+    }
+    return nil;
 }
 
 - (BOOL)isAccountNameValid:(NSString *)name
@@ -2212,13 +2402,18 @@
     return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.isAccountAvailable(%d)", account]] toBool];
 }
 
-- (int)getIndexOfActiveAccount:(int)account
+- (int)getIndexOfActiveAccount:(int)account assetType:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return 0;
     }
     
-    return [[[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.getIndexOfActiveAccount(%d)", account]] toNumber] intValue];
+    if (assetType == AssetTypeBitcoin) {
+        return [[[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.getIndexOfActiveAccount(%d)", account]] toNumber] intValue];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        return [[[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.getIndexOfActiveAccount(%d)", account]] toNumber] intValue];
+    }
+    return 0;
 }
 
 - (void)getSessionToken
@@ -2233,15 +2428,6 @@
     }
     
     return [[self.context evaluateScript:@"MyWalletPhone.emailNotificationsEnabled()"] toBool];
-}
-
-- (BOOL)SMSNotificationsEnabled
-{
-    if (![self isInitialized]) {
-        return NO;
-    }
-    
-    return [[self.context evaluateScript:@"MyWalletPhone.SMSNotificationsEnabled()"] toBool];
 }
 
 - (void)saveNote:(NSString *)note forTransaction:(NSString *)hash
@@ -2268,9 +2454,11 @@
         symbol = CURRENCY_SYMBOL_BTC;
     } else if (assetType == AssetTypeEther) {
         symbol = CURRENCY_SYMBOL_ETH;
+    } else if (assetType == AssetTypeBitcoinCash) {
+        symbol = CURRENCY_SYMBOL_BCH;
     }
     
-    NSURL *URL = [NSURL URLWithString:[URL_API stringByAppendingString:[NSString stringWithFormat:URL_SUFFIX_PRICE_INDEX_ARGUMENTS_BASE_QUOTE_TIME, symbol, currencyCode, time]]];
+    NSURL *URL = [NSURL URLWithString:[[NSBundle apiUrl] stringByAppendingString:[NSString stringWithFormat:URL_SUFFIX_PRICE_INDEX_ARGUMENTS_BASE_QUOTE_TIME, symbol, currencyCode, time]]];
 
     NSURLRequest *request = [NSURLRequest requestWithURL:URL];
     NSURLSessionDataTask *task = [[SessionManager sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
@@ -2299,9 +2487,13 @@
     return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.getNotePlaceholder(\"%@\")", myHash]] toString];
 }
 
-- (NSArray *)getSwipeAddresses:(int)numberOfAddresses label:(NSString *)label
+- (void)getSwipeAddresses:(int)numberOfAddresses assetType:(AssetType)assetType
 {
-    return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.getSwipeAddresses(%d, \"%@\")", numberOfAddresses, label]] toArray];
+    if (assetType == AssetTypeBitcoin) {
+        [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.getBtcSwipeAddresses(%d)", numberOfAddresses]] toArray];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.getSwipeAddresses(%d)", numberOfAddresses]] toArray];
+    }
 }
 
 - (int)getDefaultAccountLabelledAddressesCount
@@ -2477,6 +2669,11 @@
 - (void)getAvailableEthBalance
 {
     if ([self isInitialized]) [self.context evaluateScript:@"MyWalletPhone.getAvailableEthBalance()"];
+}
+
+- (void)getAvailableBchBalanceForAccount:(int)account
+{
+    if ([self isInitialized]) [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.getAvailableBalanceForAccount(\"%d\")", account]];
 }
 
 - (void)buildExchangeTradeFromAccount:(int)fromAccount toAccount:(int)toAccount coinPair:(NSString *)coinPair amount:(NSString *)amount fee:(NSString *)fee
@@ -2767,12 +2964,7 @@
 
 - (NSString *)getEthBalance
 {
-    if ([self isInitialized] && [app.wallet hasEthAccount]) {
-        return [[self.context evaluateScript:@"MyWalletPhone.getEthBalance()"] toString];
-    } else {
-        DLog(@"Warning: getting eth balance when not initialized - returning 0");
-        return 0;
-    }
+    return [self getBalanceForAccount:0 assetType:AssetTypeEther];
 }
 
 - (NSString *)getEthBalanceTruncated
@@ -2800,38 +2992,6 @@
     }
 }
 
-- (void)createNewEtherPayment
-{
-    if (![self isInitialized]) {
-        return;
-    }
-    
-    [self.context evaluateScript:@"MyWalletPhone.createNewEtherPayment()"];
-}
-
-- (void)changeEtherPaymentTo:(NSString *)to
-{
-    if ([self isInitialized]) {
-        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.setEtherPaymentTo(\"%@\")", [to escapeStringForJS]]];
-    }
-}
-
-- (void)changeEtherPaymentAmount:(id)amount
-{
-    if ([self isInitialized]) {
-        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.setEtherPaymentAmount(\"%@\")", amount ? : @0]];
-    }
-}
-
-- (BOOL)isEthAddress:(NSString *)address
-{
-    if ([self isInitialized]) {
-        return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.isEthAddress(\"%@\")", address]] toBool];
-    }
-    
-    return NO;
-}
-
 - (void)sendEtherPaymentWithNote:(NSString *)note
 {
     if ([self isInitialized]) {
@@ -2854,7 +3014,7 @@
 
 - (void)isEtherContractAddress:(NSString *)address completion:(void (^ _Nullable)(NSData *, NSURLResponse *, NSError *))completion
 {
-    NSURL *URL = [NSURL URLWithString:[URL_API stringByAppendingString:[NSString stringWithFormat:URL_SUFFIX_ETH_IS_CONTRACT_ADDRESS_ARGUMENT, address]]];
+    NSURL *URL = [NSURL URLWithString:[[NSBundle apiUrl] stringByAppendingString:[NSString stringWithFormat:URL_SUFFIX_ETH_IS_CONTRACT_ADDRESS_ARGUMENT, address]]];
     NSURLRequest *request = [NSURLRequest requestWithURL:URL];
     NSURLSessionDataTask *task = [[SessionManager sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -2880,13 +3040,134 @@
     return NO;
 }
 
-- (NSString *)getLabelForEthAccount
+- (NSString *)getLabelForDefaultBchAccount
 {
-    if ([self isInitialized] && [self hasEthAccount]) {
-        return [[self.context evaluateScript:@"MyWalletPhone.getLabelForEthAccount()"] toString];
+    if ([self isInitialized] && [self hasBchAccount]) {
+        return [[self.context evaluateScript:@"MyWalletPhone.bch.getLabelForDefaultAccount()"] toString];
+    }
+    return nil;
+}
+
+# pragma mark - Bitcoin cash
+
+- (NSString *)fromBitcoinCash:(NSString *)address
+{
+    return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.fromBitcoinCash(\"%@\")", [address escapeStringForJS]]] toString];
+}
+
+- (NSString *)toBitcoinCash:(NSString *)address includePrefix:(BOOL)includePrefix
+{
+    JSValue *result = [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.toBitcoinCash(\"%@\", %d)", [address escapeStringForJS], includePrefix]];
+    if ([result isUndefined]) return nil;
+    NSString *bitcoinCashAddress = [result toString];
+    return includePrefix ? bitcoinCashAddress : [bitcoinCashAddress substringFromIndex:[PREFIX_BITCOIN_CASH length]];
+}
+
+- (void)getBitcoinCashHistoryAndRates
+{
+    if ([self isInitialized]) {
+        [self.context evaluateScript:@"MyWalletPhone.bch.getHistoryAndRates()"];
+    }
+}
+
+- (NSArray *)getBitcoinCashTransactions:(NSInteger)filterType
+{
+    if ([self isInitialized]) {
+        NSArray *fetchedTransactions = [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.transactions(%ld)", filterType]] toArray];
+        NSMutableArray *transactions = [NSMutableArray new];
+        for (NSDictionary *data in fetchedTransactions) {
+            Transaction *transaction = [Transaction fromJSONDict:data];
+            [transactions addObject:transaction];
+        }
+        self.bitcoinCashTransactions = transactions;
+        return self.bitcoinCashTransactions;
+    }
+    return nil;
+}
+
+- (void)fetchBitcoinCashExchangeRates
+{
+    if ([self isInitialized]) {
+        [self.context evaluateScript:@"MyWalletPhone.bch.fetchExchangeRates()"];
+    }
+}
+
+- (NSString *)getLabelForBitcoinCashAccount:(int)account
+{
+    if ([self isInitialized]) {
+        return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.getLabelForAccount(\"%d\")", account]] toString];
+    }
+    return nil;
+}
+
+- (void)buildBitcoinCashPaymentTo:(id)to amount:(uint64_t)amount
+{
+    if ([self isInitialized]) {
+        if ([to isKindOfClass:[NSString class]]) {
+            [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.buildPayment(\"%@\", %lld)", [to escapeStringForJS], amount]];
+        } else {
+            [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.buildPayment(%d, %lld)", [to intValue], amount]];
+        }
+    }
+}
+
+- (void)sendBitcoinCashPaymentWithListener:(transactionProgressListeners *)listener
+{
+    NSString * txProgressID = [[self.context evaluateScript:@"MyWalletPhone.createTxProgressId()"] toString];
+    
+    if (listener) {
+        [self.transactionProgressListeners setObject:listener forKey:txProgressID];
+    }
+    
+    [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.quickSend(\"%@\", true)", [txProgressID escapeStringForJS]]];
+}
+
+- (NSString *)bitcoinCashExchangeRate
+{
+    if ([self isInitialized]) {
+        if (self.bitcoinCashExchangeRates) {
+            NSString *currency = [self.accountInfo objectForKey:DICTIONARY_KEY_CURRENCY];
+            double lastPrice = [[[self.bitcoinCashExchangeRates objectForKey:currency] objectForKey:DICTIONARY_KEY_LAST] doubleValue];
+            return [NSString stringWithFormat:@"%.2f", lastPrice];
+        }
     }
     
     return nil;
+}
+
+- (uint64_t)getBitcoinCashConversion
+{
+    if ([self isInitialized]) {
+        return self.bitcoinCashConversion;
+    }
+    
+    return 0;
+}
+
+- (uint64_t)bitcoinCashTotalBalance
+{
+    if ([self isInitialized]) {
+        return [[[self.context evaluateScript:@"MyWalletPhone.bch.totalBalance()"] toNumber] longLongValue];
+    }
+    
+    return 0;
+}
+
+- (BOOL)hasBchAccount
+{
+    if ([self isInitialized]) {
+        return [[self.context evaluateScript:@"MyWalletPhone.bch.hasAccount()"] toBool];
+    }
+    return NO;
+}
+
+- (uint64_t)getBchBalance
+{
+    if ([self isInitialized] && [app.wallet hasBchAccount]) {
+        return [[[self.context evaluateScript:@"MyWalletPhone.bch.getBalance()"] toNumber] longLongValue];
+    }
+    DLog(@"Warning: getting bch balance when not initialized - returning 0");
+    return 0;
 }
 
 # pragma mark - Transaction handlers
@@ -3126,7 +3407,6 @@
     [self getFinalBalance];
     
     NSString *filter = @"";
-#ifdef ENABLE_TRANSACTION_FILTERING
     
     TransactionsBitcoinViewController *transactionsBitcoinViewController = app.tabControllerManager.transactionsBitcoinViewController;
     
@@ -3139,7 +3419,6 @@
     } else {
         filter = [NSString stringWithFormat:@"%d", filterIndex];
     }
-#endif
     
     NSString *multiAddrJSON = [[self.context evaluateScript:[NSString stringWithFormat:@"JSON.stringify(MyWalletPhone.getMultiAddrResponse(\"%@\"))", filter]] toString];
     
@@ -3306,10 +3585,16 @@
 {
     DLog(@"did_decrypt");
     
-    if (self.webSocket) {
-        [self.webSocket closeWithCode:WEBSOCKET_CODE_DECRYPTED_WALLET reason:WEBSOCKET_CLOSE_REASON_DECRYPTED_WALLET];
+    if (self.btcSocket) {
+        [self.btcSocket closeWithCode:WEBSOCKET_CODE_DECRYPTED_WALLET reason:WEBSOCKET_CLOSE_REASON_DECRYPTED_WALLET];
     } else {
-        [self setupWebSocket];
+        [self setupSocket:AssetTypeBitcoin];
+    }
+    
+    if (self.bchSocket) {
+        [self.bchSocket closeWithCode:WEBSOCKET_CODE_DECRYPTED_WALLET reason:WEBSOCKET_CLOSE_REASON_DECRYPTED_WALLET];
+    } else {
+        [self setupSocket:AssetTypeBitcoinCash];
     }
     
     [self setupEthSocket];
@@ -3370,9 +3655,10 @@
 {
     DLog(@"on_add_private_key");
     self.isSyncing = YES;
+    self.shouldLoadMetadata = YES;
     
     if (![self isWatchOnlyLegacyAddress:address]) {
-        [self subscribeToAddress:address];
+        [self subscribeToAddress:address assetType:AssetTypeBitcoin];
     }
     
     if ([delegate respondsToSelector:@selector(didImportKey:)]) {
@@ -3398,8 +3684,9 @@
 {
     DLog(@"on_add_private_key_to_legacy_address:");
     self.isSyncing = YES;
+    self.shouldLoadMetadata = YES;
     
-    [self subscribeToAddress:address];
+    [self subscribeToAddress:address assetType:AssetTypeBitcoin];
     
     if ([delegate respondsToSelector:@selector(didImportPrivateKeyToLegacyAddress)]) {
         [delegate didImportPrivateKeyToLegacyAddress];
@@ -3548,6 +3835,11 @@
         } else {
             DLog(@"Error: delegate of class %@ does not respond to selector didSetDefaultAccount!", [delegate class]);
         }
+    }
+    
+    if (self.shouldLoadMetadata) {
+        self.shouldLoadMetadata = NO;
+        [self loadMetadata];
     }
 }
 
@@ -3791,7 +4083,7 @@
 {
     DLog(@"on_add_new_account");
     
-    [self subscribeToXPub:[self getXpubForAccount:[self getActiveAccountsCount] - 1]];
+    [self subscribeToXPub:[self getXpubForAccount:[self getActiveAccountsCount:AssetTypeBitcoin] - 1 assetType:AssetTypeBitcoin] assetType:AssetTypeBitcoin];
     
     [app showBusyViewWithLoadingText:BC_STRING_LOADING_SYNCING_WALLET];
 }
@@ -4263,15 +4555,16 @@
 {
     DLog(@"did_archive_or_unarchive");
     
-    [self.webSocket closeWithCode:WEBSOCKET_CODE_ARCHIVE_UNARCHIVE reason:WEBSOCKET_CLOSE_REASON_ARCHIVED_UNARCHIVED];
+    [self.btcSocket closeWithCode:WEBSOCKET_CODE_ARCHIVE_UNARCHIVE reason:WEBSOCKET_CLOSE_REASON_ARCHIVED_UNARCHIVED];
+    [self.bchSocket closeWithCode:WEBSOCKET_CODE_ARCHIVE_UNARCHIVE reason:WEBSOCKET_CLOSE_REASON_ARCHIVED_UNARCHIVED];
 }
 
-- (void)did_get_swipe_addresses:(NSArray *)swipeAddresses
+- (void)did_get_swipe_addresses:(NSArray *)swipeAddresses asset_type:(AssetType)assetType
 {
     DLog(@"did_get_swipe_addresses");
     
-    if ([self.delegate respondsToSelector:@selector(didGetSwipeAddresses:)]) {
-        [self.delegate didGetSwipeAddresses:swipeAddresses];
+    if ([self.delegate respondsToSelector:@selector(didGetSwipeAddresses:assetType:)]) {
+        [self.delegate didGetSwipeAddresses:swipeAddresses assetType:assetType];
     } else {
         DLog(@"Error: delegate of class %@ does not respond to selector didGetSwipeAddresses!", [delegate class]);
     }
@@ -4388,6 +4681,28 @@
     }
 }
 
+- (void)did_fetch_bch_history
+{
+    if ([self.delegate respondsToSelector:@selector(didFetchBitcoinCashHistory)]) {
+        [self.delegate didFetchBitcoinCashHistory];
+    } else {
+        DLog(@"Error: delegate of class %@ does not respond to selector didFetchBitcoinCashHistory!", [delegate class]);
+    }
+}
+
+- (void)did_get_bitcoin_cash_exchange_rates:(NSDictionary *)rates onLogin:(BOOL)onLogin
+{
+    if ([self.delegate respondsToSelector:@selector(didGetBitcoinCashExchangeRates)]) {
+        NSString *currency = [self.accountInfo objectForKey:DICTIONARY_KEY_CURRENCY];
+        double lastPrice = [[[rates objectForKey:currency] objectForKey:DICTIONARY_KEY_LAST] doubleValue];
+        self.bitcoinCashConversion = [[[(NSDecimalNumber *)[NSDecimalNumber numberWithDouble:SATOSHI] decimalNumberByDividingBy: (NSDecimalNumber *)[NSDecimalNumber numberWithDouble:lastPrice]] stringValue] longLongValue];
+        self.bitcoinCashExchangeRates = rates;
+        if (onLogin) [self.delegate didGetBitcoinCashExchangeRates];
+    } else {
+        DLog(@"Error: delegate of class %@ does not respond to selector didGetBitcoinCashExchangeRates!", [delegate class]);
+    }
+}
+
 - (void)on_get_exchange_trades_success:(NSArray *)trades
 {
     NSMutableArray *exchangeTrades = [NSMutableArray new];
@@ -4479,7 +4794,7 @@
 {
     NSDictionary *tradeInfo = @{
         DICTIONARY_KEY_DEPOSIT_AMOUNT : depositAmount,
-        DICTIONARY_KEY_FEE : [[from lowercaseString] isEqualToString:[CURRENCY_SYMBOL_BTC lowercaseString]] ? [NSNumberFormatter satoshiToBTC:[fee longLongValue]] : [fee stringValue],
+        DICTIONARY_KEY_FEE : [[from lowercaseString] isEqualToString:[CURRENCY_SYMBOL_ETH lowercaseString]] ? [fee stringValue] : [NSNumberFormatter satoshiToBTC:[fee longLongValue]],
         DICTIONARY_KEY_RATE : rate,
         DICTIONARY_KEY_MINER_FEE : minerFee,
         DICTIONARY_KEY_WITHDRAWAL_AMOUNT : withdrawalAmount,
@@ -4553,66 +4868,81 @@
     [self.context evaluateScript:@"MyWallet.wallet.hdwallet.verifyMnemonic()"];
 }
 
-- (int)getActiveAccountsCount
+- (int)getActiveAccountsCount:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return 0;
     }
     
-    return [[[self.context evaluateScript:@"MyWalletPhone.getActiveAccountsCount()"] toNumber] intValue];
+    if (assetType == AssetTypeBitcoin) {
+        return [[[self.context evaluateScript:@"MyWalletPhone.getActiveAccountsCount()"] toNumber] intValue];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        return [[[self.context evaluateScript:@"MyWalletPhone.bch.getActiveAccountsCount()"] toNumber] intValue];
+    }
+    return 0;
+    
 }
 
-- (int)getAllAccountsCount
+- (int)getAllAccountsCount:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return 0;
     }
     
-    return [[[self.context evaluateScript:@"MyWalletPhone.getAllAccountsCount()"] toNumber] intValue];
+    if (assetType == AssetTypeBitcoin) {
+        return [[[self.context evaluateScript:@"MyWalletPhone.getAllAccountsCount()"] toNumber] intValue];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        return [[[self.context evaluateScript:@"MyWalletPhone.bch.getAllAccountsCount()"] toNumber] intValue];
+    }
+    return 0;
 }
 
-- (int)getFilteredOrDefaultAccountIndex
+- (int)getDefaultAccountIndexForAssetType:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return 0;
     }
     
-    NSInteger filterIntex = [app filterIndex];
-    
-    if (filterIntex != FILTER_INDEX_ALL && filterIntex!= FILTER_INDEX_IMPORTED_ADDRESSES && 0 <= filterIntex < [self getActiveAccountsCount]) {
-        return (int)filterIntex;
+    if (assetType == AssetTypeBitcoin) {
+        return [[[self.context evaluateScript:@"MyWalletPhone.getDefaultAccountIndex()"] toNumber] intValue];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        return [[[self.context evaluateScript:@"MyWalletPhone.bch.getDefaultAccountIndex()"] toNumber] intValue];
     }
-    
-    return [[self.context evaluateScript:@"MyWalletPhone.getDefaultAccountIndex()"] toInt32];
+    return 0;
 }
 
-- (int)getDefaultAccountIndex
-{
-    if (![self isInitialized]) {
-        return 0;
-    }
-    
-    return [[[self.context evaluateScript:@"MyWalletPhone.getDefaultAccountIndex()"] toNumber] intValue];
-}
-
-- (void)setDefaultAccount:(int)index
+- (void)setDefaultAccount:(int)index assetType:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return;
     }
     
-    [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.setDefaultAccount(%d)", index]];
-    
-    self.isSettingDefaultAccount = YES;
+    if (assetType == AssetTypeBitcoin) {
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.setDefaultAccount(%d)", index]];
+        self.isSettingDefaultAccount = YES;
+    } else if (assetType == AssetTypeBitcoinCash) {
+        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.setDefaultAccount(%d)", index]];
+        [self getHistory];
+        if ([self.delegate respondsToSelector:@selector(didSetDefaultAccount)]) {
+            [self.delegate didSetDefaultAccount];
+        } else {
+            DLog(@"Error: delegate of class %@ does not respond to selector didSetDefaultAccount!", [delegate class]);
+        }
+    }
 }
 
-- (BOOL)hasLegacyAddresses
+- (BOOL)hasLegacyAddresses:(AssetType)assetType
 {
     if (![self isInitialized]) {
-        return false;
+        return NO;
     }
     
-    return [[self.context evaluateScript:@"MyWallet.wallet.addresses.length > 0"] toBool];
+    if (assetType == AssetTypeBitcoin) {
+        return [[self.context evaluateScript:@"MyWallet.wallet.addresses.length > 0"] toBool];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        return [[self.context evaluateScript:@"MyWalletPhone.bch.hasLegacyAddresses()"] toBool];
+    }
+    return NO;
 }
 
 - (uint64_t)getTotalActiveBalance
@@ -4624,13 +4954,19 @@
     return [[[self.context evaluateScript:@"MyWallet.wallet.balanceActive"] toNumber] longLongValue];
 }
 
-- (uint64_t)getTotalBalanceForActiveLegacyAddresses
+- (uint64_t)getTotalBalanceForActiveLegacyAddresses:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return 0;
     }
     
-    return [[[self.context evaluateScript:@"MyWallet.wallet.balanceActiveLegacy"] toNumber] longLongValue];
+    if (assetType == AssetTypeBitcoin) {
+        return [[[self.context evaluateScript:@"MyWallet.wallet.balanceActiveLegacy"] toNumber] longLongValue];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        return [[[self.context evaluateScript:@"MyWalletPhone.bch.balanceActiveLegacy()"] toNumber] longLongValue];
+    }
+    DLog(@"Error getting total balance for active legacy addresses: unsupported asset type!");
+    return 0;
 }
 
 - (uint64_t)getTotalBalanceForSpendableActiveLegacyAddresses
@@ -4642,32 +4978,56 @@
     return [[[self.context evaluateScript:@"MyWallet.wallet.balanceSpendableActiveLegacy"] toNumber] longLongValue];
 }
 
-- (uint64_t)getBalanceForAccount:(int)account
+- (id)getBalanceForAccount:(int)account assetType:(AssetType)assetType
 {
-    if (![self isInitialized]) {
-        return 0;
+    if (assetType == AssetTypeBitcoin) {
+        if (![self isInitialized]) {
+            return @0;
+        }
+        return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.getBalanceForAccount(%d)", account]] toNumber];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        if (![self isInitialized]) {
+            return @0;
+        }
+        return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.getBalanceForAccount(%d)", account]] toNumber];
+    } else if (assetType == AssetTypeEther) {
+        if (![self isInitialized]) {
+            return nil;
+        }
+        if ([app.wallet hasEthAccount]) {
+            return [[self.context evaluateScript:@"MyWalletPhone.getEthBalance()"] toString];
+        }
     }
-    
-    return [[[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.getBalanceForAccount(%d)", account]] toNumber] longLongValue];
+    return nil;
 }
 
-- (NSString *)getLabelForAccount:(int)account
+- (NSString *)getLabelForAccount:(int)account assetType:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return nil;
     }
     
-    return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.getLabelForAccount(%d)", account]] toString];
+    if (assetType == AssetTypeBitcoin) {
+        return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.getLabelForAccount(%d)", account]] toString];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.getLabelForAccount(%d)", account]] toString];
+    } else if (assetType == AssetTypeEther) {
+        return [[self.context evaluateScript:@"MyWalletPhone.getLabelForEthAccount()"] toString];
+    }
+    return nil;
 }
 
-- (void)setLabelForAccount:(int)account label:(NSString *)label
+- (void)setLabelForAccount:(int)account label:(NSString *)label assetType:(AssetType)assetType
 {
     if ([self isInitialized] && [app checkInternetConnection]) {
-        self.isSyncing = YES;
-        
-        [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.setLabelForAccount(%d, \"%@\")", account, [label escapeStringForJS]]];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didSetLabelForAccount) name:NOTIFICATION_KEY_BACKUP_SUCCESS object:nil];
+        if (assetType == AssetTypeBitcoin) {
+            self.isSyncing = YES;
+            [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.setLabelForAccount(%d, \"%@\")", account, [label escapeStringForJS]]];
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didSetLabelForAccount) name:NOTIFICATION_KEY_BACKUP_SUCCESS object:nil];
+        } else if (assetType == AssetTypeBitcoinCash) {
+            [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.setLabelForAccount(%d, \"%@\")", account, [label escapeStringForJS]]];
+            [self getHistory];
+        }
     }
 }
 
@@ -4685,6 +5045,7 @@
         [self loading_start_create_account];
         
         self.isSyncing = YES;
+        self.shouldLoadMetadata = YES;
         
         // Wait a little bit to make sure the loading text is showing - then execute the blocking and kind of long create account
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ANIMATION_DURATION * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -4693,18 +5054,30 @@
     }
 }
 
-- (NSString *)getReceiveAddressOfDefaultAccount
+- (NSString *)getReceiveAddressOfDefaultAccount:(AssetType)assetType
 {
-    return [[self.context evaluateScript:@"MyWalletPhone.getReceiveAddressOfDefaultAccount()"] toString];
+    if (assetType == AssetTypeBitcoin) {
+        return [[self.context evaluateScript:@"MyWalletPhone.getReceiveAddressOfDefaultAccount()"] toString];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        return [[self.context evaluateScript:@"MyWalletPhone.bch.getReceiveAddressOfDefaultAccount()"] toString];
+    }
+    DLog(@"Warning: unknown asset type!");
+    return nil;
 }
 
-- (NSString *)getReceiveAddressForAccount:(int)account
+- (NSString *)getReceiveAddressForAccount:(int)account assetType:(AssetType)assetType
 {
     if (![self isInitialized]) {
         return nil;
     }
     
-    return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.getReceivingAddressForAccount(%d)", account]] toString];
+    if (assetType == AssetTypeBitcoin) {
+        return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.getReceivingAddressForAccount(%d)", account]] toString];
+    } else if (assetType == AssetTypeBitcoinCash) {
+        return [[self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.bch.getReceivingAddressForAccount(%d)", account]] toString];
+    }
+    DLog(@"Warning: unknown asset type!");
+    return nil;
 }
 
 - (void)setPbkdf2Iterations:(int)iterations
@@ -4907,12 +5280,12 @@
 
 - (void)useDebugSettingsIfSet
 {
-#ifdef ENABLE_DEBUG_MENU
-    [self updateServerURL:URL_SERVER];
+#ifdef DEBUG
+    [self updateServerURL:[NSBundle walletUrl]];
     
-    [self updateWebSocketURL:URL_WEBSOCKET];
+    [self updateWebSocketURL:[NSBundle webSocketUri]];
     
-    [self updateAPIURL:URL_API];
+    [self updateAPIURL:[NSBundle apiUrl]];
     
     BOOL testnetOn = [[[NSUserDefaults standardUserDefaults] objectForKey:USER_DEFAULTS_KEY_ENV] isEqual:ENV_INDEX_TESTNET];
     NSString *network;

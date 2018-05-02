@@ -2107,3 +2107,61 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Comprar e vender bitcoin directamente a partir do seu Blockchain carteira. Comece por criar uma conta na Compra & Venda de guia.";
+
+/* (No Commment) */
+"All Wallets" = "Todas As Carteiras";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Mantenha o seu xPub privado. Alguém com acesso ao seu xPub será capaz de ver todos os seus fundos e operações.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Seu xPub é um recurso avançado que contém todos os endereços públicos.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "As transações ocorrem quando você enviar e solicitação de bitcoin dinheiro.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Obter Bitcoin Dinheiro";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Pedido De Bitcoin Dinheiro";
+
+/* (No Commment) */
+"Price" = "Preço";
+
+/* (No Commment) */
+"See charts" = "Ver gráficos de";
+
+/* (No Commment) */
+"Price charts" = "Tabelas de preços";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Bitcoin Dinheiro";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Bitcoin Preço À Vista";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Digite Bitcoin Dinheiro, endereço ou seleccione";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Copie este endereço de recebimento para a área de transferência? Se for assim, é aconselhável que outras aplicações podem ser capazes de olhar para esta informação.";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "Por favor, envie BCH para o Bitcoin Caixa de endereços\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "Taxas de transação de impacto rapidez com que a mineração de rede irá confirmar suas transações, e dependem as condições atuais da rede.";
+
+/* (No Commment) */
+"Trade Refunded" = "Comércio Reembolsado";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "Estamos muito animado para anunciar que seu Blockchain carteira irá permitir que você facilmente enviar, receber e trocar Bitcoin Dinheiro!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "Você está certo que este é um bitcoin caixa de endereço?";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "O envio de fundos para um endereço bitcoin por acidente irá resultar na perda de fundos.";
+

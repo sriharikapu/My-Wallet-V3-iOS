@@ -13,6 +13,7 @@
 #import "RootService.h"
 #import <SafariServices/SafariServices.h>
 #import "TransactionDetailNavigationController.h"
+#import "Blockchain-Swift.h"
 
 #define URL_BUY_WEBVIEW_SUFFIX @"/#/intermediate"
 
@@ -50,7 +51,7 @@ NSString* loginWithJsonScript(NSString*, NSString*, NSString*, NSString*, BOOL);
         self.automaticallyAdjustsScrollViewInsets = NO;
         
         NSString *walletOptionsRootURL = [app.wallet buySellWebviewRootURLString];
-        NSString *urlString = walletOptionsRootURL ? [walletOptionsRootURL stringByAppendingString:URL_BUY_WEBVIEW_SUFFIX] : URL_BUY_WEBVIEW;
+        NSString *urlString = walletOptionsRootURL ? [walletOptionsRootURL stringByAppendingString:URL_BUY_WEBVIEW_SUFFIX] : [NSBundle buyWebViewUrl];
         NSURL *login = [NSURL URLWithString:urlString];
         NSURLRequest *request = [NSURLRequest requestWithURL:login cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval: 10.0];
         [self.webView loadRequest:request];

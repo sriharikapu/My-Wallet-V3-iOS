@@ -2132,3 +2132,108 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Купувати і продавати біткойни прямо зі свого гаманця blockchain. Почніть зі створення облікового запису в розділі Купити і продати.";
+
+/* (No Commment) */
+"All Wallets" = "Всі Гаманці";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Тримайте ваші Приватна xPub. Хтось має доступ до вашого xPub зможете побачити всі свої кошти і операції.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Ваш xPub-це додаткова функція, яка містить всі ваші публічні виступи.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Укладення угод відбувається, коли ви посилаєте і запит биткоин готівку.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Отримати Bitcoin Готівки";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Запит Биткоин Готівку";
+
+/* (No Commment) */
+"Price" = "Ціна";
+
+/* (No Commment) */
+"See charts" = "Дивіться графіки";
+
+/* (No Commment) */
+"Price charts" = "Цінові графіки";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Биткоин Готівка";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Ціна Bitcoin Готівки";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Введіть Биткоин готівку адреси або вибору";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Копія цього отримаєте адресу в буфер обміну? Якщо це так, що інші програми можуть подивитися цю інформацію.";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "Будь ласка, відправте ВСН на Биткоин готівки адреси\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "Збори дії угоди як швидко гірничодобувної мережа буде підтвердити свої угоди, і залежить від поточного стану мережі.";
+
+/* (No Commment) */
+"Trade Refunded" = "Торгівля Повертається";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "Ми раді повідомити, що ваш blockchain гаманець дозволить вам легко відправляти, отримувати і обмін Биткоина Готівкові гроші!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "Ви впевнені, що це биткоин готівку адреси?";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "Відправка коштів у биткоин-адреса випадково призведе до втрати коштів.";
+
+/* (No Commment) */
+"All Wallets" = "Всі гаманці";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "Зберігайте свій xPub приватним. Той, хто має доступ до вашого xPub, зможе бачити всі ваші кошти та транзакції.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "Ваш xPub - це додаткова можливість, яка містить всі ваші загальнодоступні адреси.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "Операції відбуваються, коли ви відправляєте та надсилаєте запити на валюту біткойн.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "Отримати валюту Біткойн";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "Надіслати запит на валюту Біткойн";
+
+/* (No Commment) */
+"Price" = "Ціна";
+
+/* (No Commment) */
+"See charts" = "Подивитися графіки";
+
+/* (No Commment) */
+"Price charts" = "Графіки з цінами";
+
+/* (No Commment) */
+"Bitcoin Cash" = "Валюта Біткойн";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "Ціна валюти Біткойн";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "Введіть адресу валюти Біткойн або виберіть";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "Скопіювати цю адресу в буфер обміну? Якщо так, пам'ятайте, що інші програми можуть переглядати цю інформацію.";
+
+/* (No Commment) */
+"Start trading" = "Почніть торгувати";
+
+/* (No Commment) */
+"Trade bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "Торгуйте біткойн прямо з вашого гаманця Blockchain. Почніть зі створення облікового запису у вкладці Купівля та продаж.";
+
+/* (No Commment) */
+"The wait is over" = "Очікування закінчилося";

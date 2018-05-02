@@ -2107,3 +2107,60 @@
 
 /* (No Commment) */
 "Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy & Sell tab." = "לקנות ולמכור ביטקוין ישירות מה-Blockchain הארנק. התחל על ידי יצירת חשבון לקנות & למכור כרטיסייה.";
+
+/* (No Commment) */
+"All Wallets" = "כל הארנקים.";
+
+/* (No Commment) */
+"Keep your xPub private. Someone with access to your xPub will be able to see all of your funds and transactions." = "שמור את xPub פרטי. מישהו עם גישה xPub יהיה מסוגל לראות את כל הכספים שלך ועסקאות.";
+
+/* (No Commment) */
+"Your xPub is an advanced feature that contains all of your public addresses." = "את xPub הוא תכונה מתקדמת אשר מכילה את כל כתובות ציבוריות.";
+
+/* (No Commment) */
+"Transactions occur when you send and request bitcoin cash." = "עסקאות להתרחש בעת שליחת הבקשה ביטקוין במזומן.";
+
+/* (No Commment) */
+"Get Bitcoin Cash" = "לקבל ביטקוין במזומן";
+
+/* (No Commment) */
+"Request Bitcoin Cash" = "בקשה ביטקוין במזומן";
+
+/* (No Commment) */
+"Price" = "מחיר";
+
+/* (No Commment) */
+"See charts" = "לראות את הרישומים.";
+
+/* (No Commment) */
+"Price charts" = "מחיר תרשימים";
+
+/* (No Commment) */
+"Bitcoin Cash" = "ביטקוין במזומן";
+
+/* (No Commment) */
+"Bitcoin Cash Price" = "ביטקוין במזומן מחיר";
+
+/* (No Commment) */
+"Enter Bitcoin Cash address or select" = "הזן ביטקוין במזומן הכתובת, או בחר";
+
+/* (No Commment) */
+"Copy this receive address to the clipboard? If so, be advised that other applications may be able to look at this information." = "להעתיק זה לקבל כתובת ללוח? אם כך, שימו לב כי יישומים אחרים עשויים להיות מסוגלים להסתכל על זה מידע.";
+
+/* (No Commment) */
+"Please send BCH to the Bitcoin Cash address\n%@" = "בבקשה תשלח מסלקת הנייר על ביטקוין במזומן כתובת\n%@";
+
+/* (No Commment) */
+"Transaction fees impact how quickly the mining network will confirm your transactions, and depend on the current network conditions." = "עלויות עסקה השפעה כמה מהר הכרייה ברשת יהיה לאשר את העסקות שלך, תלויים על הרשת הנוכחית התנאים.";
+
+/* (No Commment) */
+"Trade Refunded" = "סחר יוחזר";
+
+/* (No Commment) */
+"We are excited to announce that your Blockchain wallet will allow you to seamlessly send, receive, and exchange Bitcoin Cash!" = "אנחנו שמחים להודיע כי את Blockchain הארנק יאפשר לך בצורה חלקה לשלוח, לקבל, להחליף ביטקוין במזומן!";
+
+/* (No Commment) */
+"Are you sure this is a bitcoin cash address?" = "אתה בטוח זה ביטקוין במזומן כתובת?";
+
+/* (No Commment) */
+"Sending funds to a bitcoin address by accident will result in loss of funds." = "שולח כספים כתובת bitcoin בטעות לגרום לאובדן כספים.";
