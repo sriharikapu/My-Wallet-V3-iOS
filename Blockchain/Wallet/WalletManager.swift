@@ -30,7 +30,6 @@ class WalletManager: NSObject {
 
     weak var authDelegate: WalletAuthDelegate?
     weak var pinEntryDelegate: WalletPinEntryDelegate?
-    weak var tradeDelegate: WalletTradeDelegate?
     weak var buySellDelegate: WalletBuySellDelegate?
     @objc weak var addressesDelegate: WalletAddressesDelegate?
 
@@ -176,11 +175,11 @@ extension WalletManager: WalletDelegate {
     }
 
     func didCompleteTrade(_ trade: Trade) {
-        tradeDelegate?.didCompleteTrade(trade: trade)
+        buySellDelegate?.didCompleteTrade(trade: trade)
     }
 
     func showCompletedTrade(_ txHash: String) {
-        tradeDelegate?.showCompletedTrade(tradeHash: txHash)
+        buySellDelegate?.showCompletedTrade(tradeHash: txHash)
     }
 
     // MARK: - Pin Entry

@@ -13,4 +13,10 @@ protocol WalletBuySellDelegate: class {
 
     /// Method invoked when the web view needs to be initialized
     func initializeWebView()
+    
+    /// Method invoked when trade initiated from buy is completed
+    func didCompleteTrade(trade: Trade)
+    
+    /// Method invoked when a user requests from inside the web view to see trade details
+    func showCompletedTrade(tradeHash: String)
 }
