@@ -67,11 +67,6 @@ struct Constants {
         static let newAddress = NSNotification.Name("newAddress")
         static let appEnteredBackground = NSNotification.Name("applicationDidEnterBackground")
     }
-    struct TradeKeys {
-        static let created = "createdAt"
-        static let receiveAddress = "receiveAddress"
-        static let tradeHash = "txHash"
-    }
     struct PushNotificationKeys {
         static let userInfoType = "type"
         static let userInfoId = "id"

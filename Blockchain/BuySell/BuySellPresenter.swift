@@ -20,21 +20,13 @@ final class BuySellPresenter: WalletTradeDelegate {
         self.walletManager.tradeDelegate = self
     }
 
-    func didCompleteTrade(trade: [String: String?]) {
-        guard let date = trade[Constants.TradeKeys.created] as? String else {
-            print("No trade date found")
-            return
-        }
-        guard let hash = trade[Constants.TradeKeys.tradeHash] as? String else {
-            print("No trade hash found")
-            return
-        }
+    func didCompleteTrade(trade: Trade) {
         let alert = UIAlertController(title: LocalizationConstants.BuySell.tradeCompleted,
-                                      message: String(format: LocalizationConstants.BuySell.tradeCompletedDetailArg, date),
+                                      message: String(format: LocalizationConstants.BuySell.tradeCompletedDetailArg, trade.date),
                                       preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: LocalizationConstants.okString, style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(title: LocalizationConstants.BuySell.viewDetails, style: .default, handler: { _ in
-            AppCoordinator.shared.tabControllerManager.showTransactionDetail(forHash: hash)
+            AppCoordinator.shared.tabControllerManager.showTransactionDetail(forHash: trade.hash)
         }))
         UIApplication.shared.keyWindow?.rootViewController?.topMostViewController?.present(alert, animated: true, completion: nil)
     }

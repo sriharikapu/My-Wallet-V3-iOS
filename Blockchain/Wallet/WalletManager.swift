@@ -175,7 +175,7 @@ extension WalletManager: WalletDelegate {
         buySellDelegate?.initializeWebView()
     }
 
-    func didCompleteTrade(_ trade: [String: String?]) {
+    func didCompleteTrade(_ trade: Trade) {
         tradeDelegate?.didCompleteTrade(trade: trade)
     }
 
