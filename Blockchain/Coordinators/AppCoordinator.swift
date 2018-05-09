@@ -346,6 +346,7 @@ extension AppCoordinator: SideMenuViewControllerDelegate {
 extension AppCoordinator: WalletBuySellDelegate {
     func initializeWebView() {
         buyBitcoinViewController = BuyBitcoinViewController()
+        let _ = BuySellPresenter()
     }
 }
 

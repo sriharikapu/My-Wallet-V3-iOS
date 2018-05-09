@@ -396,6 +396,10 @@
 		C7E2750B1F589C8D0054EFA5 /* ReceiveEtherViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7E2750A1F589C8D0054EFA5 /* ReceiveEtherViewController.m */; };
 		C7E2750E1F59C2D50054EFA5 /* UILabel+Animations.m in Sources */ = {isa = PBXBuildFile; fileRef = C7E2750D1F59C2D50054EFA5 /* UILabel+Animations.m */; };
 		C7E4D293203E12AA00F6DCEB /* TransactionsBitcoinCashViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7E4D292203E12AA00F6DCEB /* TransactionsBitcoinCashViewController.m */; };
+		C7E93BBA20A2333800A05CD2 /* BuySellPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E93BB920A2333800A05CD2 /* BuySellPresenter.swift */; };
+		C7E93BBB20A2333800A05CD2 /* BuySellPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E93BB920A2333800A05CD2 /* BuySellPresenter.swift */; };
+		C7E93BBD20A2343A00A05CD2 /* WalletTradeDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E93BBC20A2343A00A05CD2 /* WalletTradeDelegate.swift */; };
+		C7E93BBE20A2343A00A05CD2 /* WalletTradeDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E93BBC20A2343A00A05CD2 /* WalletTradeDelegate.swift */; };
 		C7EEB8451EA95505002F28B9 /* UIView+ChangeFrameAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = C7EEB8441EA95505002F28B9 /* UIView+ChangeFrameAttribute.m */; };
 		C7F041961E3BD4A6004E8B4A /* BuyBitcoinViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7F041951E3BD4A6004E8B4A /* BuyBitcoinViewController.m */; };
 		C9BE917B1945D8F600FD516D /* PENumpadView.m in Sources */ = {isa = PBXBuildFile; fileRef = C9BE91681945D8F600FD516D /* PENumpadView.m */; };
@@ -1403,6 +1407,8 @@
 		C7E2750D1F59C2D50054EFA5 /* UILabel+Animations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UILabel+Animations.m"; sourceTree = "<group>"; };
 		C7E4D291203E12AA00F6DCEB /* TransactionsBitcoinCashViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TransactionsBitcoinCashViewController.h; sourceTree = "<group>"; };
 		C7E4D292203E12AA00F6DCEB /* TransactionsBitcoinCashViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TransactionsBitcoinCashViewController.m; sourceTree = "<group>"; };
+		C7E93BB920A2333800A05CD2 /* BuySellPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuySellPresenter.swift; sourceTree = "<group>"; };
+		C7E93BBC20A2343A00A05CD2 /* WalletTradeDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WalletTradeDelegate.swift; path = Blockchain/Wallet/WalletTradeDelegate.swift; sourceTree = SOURCE_ROOT; };
 		C7EEB8431EA95505002F28B9 /* UIView+ChangeFrameAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+ChangeFrameAttribute.h"; sourceTree = "<group>"; };
 		C7EEB8441EA95505002F28B9 /* UIView+ChangeFrameAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+ChangeFrameAttribute.m"; sourceTree = "<group>"; };
 		C7F041941E3BD4A6004E8B4A /* BuyBitcoinViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BuyBitcoinViewController.h; sourceTree = "<group>"; };
@@ -2042,6 +2048,7 @@
 				511646C02081247700C43522 /* Assets */,
 				510EA1732080F58700A63AB8 /* Authentication */,
 				AAD279DE209A99CA00C0EAFC /* AV */,
+				C7E93BB720A2332300A05CD2 /* BuySell */,
 				9F1831F315176F2200FB3D52 /* Categories */,
 				AAA33338208811460019AD55 /* Coordinators */,
 				510EA19620811FF100A63AB8 /* Extensions */,
@@ -2273,6 +2280,7 @@
 			isa = PBXGroup;
 			children = (
 				C787180020A22362000CC46E /* WalletAddressesDelegate.swift */,
+				C7E93BBC20A2343A00A05CD2 /* WalletTradeDelegate.swift */,
 				C74FEA222093B38A007CAB5D /* JSContextWithDOM.swift */,
 				AA1E522E2097CC010099BD10 /* WalletAuthDelegate.swift */,
 				AA31A7D02099310B00FE6268 /* WalletBuySellDelegate.swift */,
@@ -2365,6 +2373,14 @@
 				C790E10C1E5206020063D141 /* Montserrat-ThinItalic.ttf */,
 			);
 			name = Montserrat;
+			sourceTree = "<group>";
+		};
+		C7E93BB720A2332300A05CD2 /* BuySell */ = {
+			isa = PBXGroup;
+			children = (
+				C7E93BB920A2333800A05CD2 /* BuySellPresenter.swift */,
+			);
+			path = BuySell;
 			sourceTree = "<group>";
 		};
 		C9B32CF9194F3F5800BDF3A0 /* Cells */ = {
@@ -2905,6 +2921,7 @@
 				AACE31D42092A99B00B7B806 /* AppCoordinator.swift in Sources */,
 				AACE31D02092A99B00B7B806 /* AuthenticationError.swift in Sources */,
 				AACE31D92092A99B00B7B806 /* Reachability.swift in Sources */,
+				C7E93BBE20A2343A00A05CD2 /* WalletTradeDelegate.swift in Sources */,
 				AACE31DE2092A99B00B7B806 /* BlockchainAPI.swift in Sources */,
 				516546F6208FCF710019EE63 /* NetworkManager+UserAgent.swift in Sources */,
 				51135708209CF69C00056D65 /* BackupWordsViewController.swift in Sources */,
@@ -2942,6 +2959,7 @@
 				AACE31B82092A87900B7B806 /* PinTests.swift in Sources */,
 				AACE31C82092A99B00B7B806 /* ModalPresenter.swift in Sources */,
 				AACE31C32092A99B00B7B806 /* AppDelegate.swift in Sources */,
+				C7E93BBB20A2333800A05CD2 /* BuySellPresenter.swift in Sources */,
 				AACE31822092858600B7B806 /* Pin.swift in Sources */,
 				AACE31D72092A99B00B7B806 /* Enum+Enumeratable.swift in Sources */,
 				AACE31D82092A99B00B7B806 /* Enum+RawValued.swift in Sources */,
@@ -2987,6 +3005,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AACE31582091681100B7B806 /* WalletManager.swift in Sources */,
+				C7E93BBA20A2333800A05CD2 /* BuySellPresenter.swift in Sources */,
 				AACE31572091680B00B7B806 /* PushNotificationManager.swift in Sources */,
 				2343E4031CB434BC008DC7D1 /* NSArray+EncodedJSONString.m in Sources */,
 				511646DF20851BC600C43522 /* Bundle.swift in Sources */,
@@ -3116,6 +3135,7 @@
 				23107F831BBEF0AC00A6A9D4 /* BCConfirmPaymentView.m in Sources */,
 				23FB5C131D9ABB8B0008C6AB /* TransactionDetailStatusCell.m in Sources */,
 				CFA0671F1E65D426008456C1 /* WebLoginViewController.m in Sources */,
+				C7E93BBD20A2343A00A05CD2 /* WalletTradeDelegate.swift in Sources */,
 				A2599BA51B0B725400C2EA81 /* BackupWordsViewController.swift in Sources */,
 				5185E12A208F7ACA00A26B64 /* BlockchainAPI+URI.swift in Sources */,
 				23444F7E1DCD213D00573C8C /* BTCKey.m in Sources */,

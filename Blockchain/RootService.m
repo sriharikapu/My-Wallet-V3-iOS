@@ -2235,31 +2235,31 @@ SideMenuViewController *sideMenuViewController;
 //    [self.tabControllerManager updateBadgeNumber:badgeNumber forSelectedIndex:TAB_TRANSACTIONS];
 //}
 
-- (void)didCompleteTrade:(NSDictionary *)trade
-{
-    NSString *date = [trade objectForKey:DICTIONARY_KEY_TRADE_DATE_CREATED];
-    NSString *hash = [trade objectForKey:DICTIONARY_KEY_TRADE_HASH];
-
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:BC_STRING_TRADE_COMPLETED message:[NSString stringWithFormat:BC_STRING_THE_TRADE_YOU_CREATED_ON_DATE_ARGUMENT_HAS_BEEN_COMPLETED, date] preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:BC_STRING_OK style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-    }]];
-    [alert addAction:[UIAlertAction actionWithTitle:BC_STRING_VIEW_DETAILS style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [self.tabControllerManager showTransactionDetailForHash:hash];
-    }]];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        UIViewController *topViewController = UIApplication.sharedApplication.keyWindow.rootViewController.topMostViewController;
-        [topViewController presentViewController:alert animated:YES completion:nil];
-    });
-}
-
-- (void)showCompletedTrade:(NSString *)txHash
-{
-    [[AppCoordinator sharedInstance] closeSideMenu];
-
-    [self showTransactions];
-
-    [self.tabControllerManager showTransactionDetailForHash:txHash];
-}
+//- (void)didCompleteTrade:(NSDictionary *)trade
+//{
+//    NSString *date = [trade objectForKey:DICTIONARY_KEY_TRADE_DATE_CREATED];
+//    NSString *hash = [trade objectForKey:DICTIONARY_KEY_TRADE_HASH];
+//
+//    UIAlertController *alert = [UIAlertController alertControllerWithTitle:BC_STRING_TRADE_COMPLETED message:[NSString stringWithFormat:BC_STRING_THE_TRADE_YOU_CREATED_ON_DATE_ARGUMENT_HAS_BEEN_COMPLETED, date] preferredStyle:UIAlertControllerStyleAlert];
+//    [alert addAction:[UIAlertAction actionWithTitle:BC_STRING_OK style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+//    }]];
+//    [alert addAction:[UIAlertAction actionWithTitle:BC_STRING_VIEW_DETAILS style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+//        [self.tabControllerManager showTransactionDetailForHash:hash];
+//    }]];
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        UIViewController *topViewController = UIApplication.sharedApplication.keyWindow.rootViewController.topMostViewController;
+//        [topViewController presentViewController:alert animated:YES completion:nil];
+//    });
+//}
+//
+//- (void)showCompletedTrade:(NSString *)txHash
+//{
+//    [[AppCoordinator sharedInstance] closeSideMenu];
+//
+//    [self showTransactions];
+//
+//    [self.tabControllerManager showTransactionDetailForHash:txHash];
+//}
 
 - (void)didPushTransaction
 {

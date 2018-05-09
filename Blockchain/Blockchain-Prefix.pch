@@ -427,9 +427,9 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define DICTIONARY_KEY_FEE_LIMITS_MIN @"min"
 #define DICTIONARY_KEY_FEE_LIMITS_MAX @"max"
 
-#define DICTIONARY_KEY_TRADE_DATE_CREATED @"createdAt"
-#define DICTIONARY_KEY_TRADE_RECEIVE_ADDRESS @"receiveAddress"
-#define DICTIONARY_KEY_TRADE_HASH @"txHash"
+//#define DICTIONARY_KEY_TRADE_DATE_CREATED @"createdAt"
+//#define DICTIONARY_KEY_TRADE_RECEIVE_ADDRESS @"receiveAddress"
+//#define DICTIONARY_KEY_TRADE_HASH @"txHash"
 
 #define DICTIONARY_KEY_TRANSACTION_FROM @"from"
 #define DICTIONARY_KEY_TRANSACTION_TO @"to"

@@ -118,6 +118,13 @@ struct LocalizationConstants {
         static let logoutConfirm = NSLocalizedString("Do you really want to log out?", comment: "")
         static let buySellBitcoin = NSLocalizedString("Buy & Sell Bitcoin", comment: "")
     }
+
+    struct BuySell {
+        static let tradeCompleted = NSLocalizedString("Trade Completed", comment: "")
+        static let tradeCompletedDetailArg = NSLocalizedString("The trade you created on %@ has been completed!", comment: "")
+        static let viewDetails = NSLocalizedString("View details", comment: "")
+        static let errorTryAgain = NSLocalizedString("Something went wrong, please try reopening Buy & Sell Bitcoin again.", comment: "")
+    }
 }
 
 /// LocalizationConstants class wrapper so that LocalizationConstants can be accessed from Obj-C.
