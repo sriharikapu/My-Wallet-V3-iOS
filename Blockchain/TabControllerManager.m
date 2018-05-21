@@ -333,12 +333,23 @@
 {
     [[ModalPresenter sharedInstance] closeAllModals];
 
-    [[AlertViewPresenter sharedInstance] standardErrorWithMessage:error title:nil handler:nil];
+    [[AlertViewPresenter sharedInstance] standardErrorWithMessage:error title:BC_STRING_ERROR handler:nil];
 }
 
 - (void)didUpdateEthPaymentWithPayment:(NSDictionary * _Nonnull)payment
 {
     [_sendEtherViewController didUpdatePayment:payment];
+}
+
+- (BOOL)checkIfWaitingOnEtherTransaction
+{
+    BOOL isWaiting = [WalletManager.sharedInstance.wallet isWaitingOnEtherTransaction];
+
+    if (isWaiting) {
+        [[AlertViewPresenter sharedInstance] standardNotifyWithMessage:BC_STRING_WAITING_FOR_ETHER_PAYMENT_TO_FINISH_MESSAGE title:BC_STRING_WAITING_FOR_ETHER_PAYMENT_TO_FINISH_TITLE handler:nil];
+    }
+
+    return isWaiting;
 }
 
 #pragma mark - Receive
