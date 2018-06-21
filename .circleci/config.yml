@@ -13,10 +13,10 @@ jobs:
     steps:
       - checkout
 
-      # Install CocoaPods
+      # Download Git Submodules
       - run:
-          name: Install CocoaPods
-          command: pod install
+          name: Download Git Submodules
+          command: git submodule update --init
 
       # Build the app and run tests
       - run:
