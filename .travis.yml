@@ -2,3 +2,9 @@ language: objective-c
 osx_image: xcode9.4
 xcode_project: Blockchain.xcodeproj
 xcode_scheme: BlockchainTests
+git:
+    submodules: false
+before_install:
+    - git submodule update --init --remote
+    - sh scripts/install-js.sh && scripts/build-js.sh
+    - ./Submodules/OpenSSL-for-iPhone/build-libssl.sh
