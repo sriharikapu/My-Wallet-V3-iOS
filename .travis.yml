@@ -4,8 +4,7 @@ xcode_project: Blockchain.xcodeproj
 xcode_scheme: BlockchainTests
 git:
     depth: false
-    submodules: false
 before_install:
-    - git submodule update --init --remote
+    - npm install -g yarn
     - sh scripts/install-js.sh && scripts/build-js.sh
     - ./Submodules/OpenSSL-for-iPhone/build-libssl.sh
