@@ -2165,8 +2165,16 @@
 		517536D520F3B632002275A7 /* BuySell */ = {
 			isa = PBXGroup;
 			children = (
+				517536F020F3B6DC002275A7 /* KYC */,
 			);
 			path = BuySell;
+			sourceTree = "<group>";
+		};
+		517536F020F3B6DC002275A7 /* KYC */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = KYC;
 			sourceTree = "<group>";
 		};
 		5194359F208E61F3001EF882 /* BlockchainTests */ = {
