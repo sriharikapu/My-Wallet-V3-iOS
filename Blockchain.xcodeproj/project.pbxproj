@@ -2162,6 +2162,13 @@
 			path = Config;
 			sourceTree = "<group>";
 		};
+		517536D520F3B632002275A7 /* BuySell */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = BuySell;
+			sourceTree = "<group>";
+		};
 		5194359F208E61F3001EF882 /* BlockchainTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -2482,6 +2489,7 @@
 				511BF4F020E6828900A14072 /* AppReviewPrompt */,
 				510EA1732080F58700A63AB8 /* Authentication */,
 				AAD279DE209A99CA00C0EAFC /* AV */,
+				517536D520F3B632002275A7 /* BuySell */,
 				9F1831F315176F2200FB3D52 /* Categories */,
 				AAA33338208811460019AD55 /* Coordinators */,
 				510EA19620811FF100A63AB8 /* Extensions */,
