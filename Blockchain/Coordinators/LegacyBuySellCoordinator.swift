@@ -9,6 +9,7 @@
 import Foundation
 import RxSwift
 
+/// Coordinator for the (legacy) buy/sell flow
 @objc class LegacyBuySellCoordinator: NSObject, Coordinator {
     static let shared = LegacyBuySellCoordinator()
 

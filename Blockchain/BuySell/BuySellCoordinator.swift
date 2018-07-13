@@ -16,7 +16,7 @@ class BuySellCoordinator: Coordinator {
 
     // MARK: - Computed Properties
 
-    private var hasCoinifyAccount: Boolean {
+    private var hasCoinifyAccount: Bool {
         // TODO: this value needs to be retrieved from the wallet metadata - return false for now
         return false
     }
