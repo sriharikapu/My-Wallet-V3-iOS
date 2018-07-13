@@ -66,7 +66,6 @@
 		23964C031DCA3F19001323BE /* KeyPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 23964C021DCA3F19001323BE /* KeyPair.m */; };
 		239CD4C81C12214A00997DF5 /* Settings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 239CD4CA1C12214A00997DF5 /* Settings.storyboard */; };
 		239CD5171C12217F00997DF5 /* Upgrade.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 239CD5191C12217F00997DF5 /* Upgrade.storyboard */; };
-		239CD5681C122BDE00997DF5 /* SettingsTwoStepViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 239CD5671C122BDE00997DF5 /* SettingsTwoStepViewController.m */; };
 		23B731D31E01AC1100129770 /* ReminderModalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 23B731D21E01AC1100129770 /* ReminderModalViewController.m */; };
 		23BA220E1D6B4AB500D0472B /* KeychainItemWrapper+Credentials.m in Sources */ = {isa = PBXBuildFile; fileRef = 23BA220D1D6B4AB500D0472B /* KeychainItemWrapper+Credentials.m */; };
 		23BA22111D6B736900D0472B /* NSNumberFormatter+Currencies.m in Sources */ = {isa = PBXBuildFile; fileRef = 23BA22101D6B736900D0472B /* NSNumberFormatter+Currencies.m */; };
@@ -81,7 +80,6 @@
 		23DF4EFC1DBA586C0059CF92 /* KeychainItemWrapper+SwipeAddresses.m in Sources */ = {isa = PBXBuildFile; fileRef = 23DF4EFB1DBA586C0059CF92 /* KeychainItemWrapper+SwipeAddresses.m */; };
 		23E2FC081C7F60E7004CFF79 /* BCInsetLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 23E2FC071C7F60E7004CFF79 /* BCInsetLabel.m */; };
 		23E579541DB45F3A00220542 /* TransferAmountTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 23E579531DB45F3A00220542 /* TransferAmountTableCell.m */; };
-		23EA61C51B54258D0032B907 /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 23EA61C41B54258D0032B907 /* SettingsTableViewController.m */; };
 		23EA61C81B54282D0032B907 /* SettingsNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 23EA61C71B54282D0032B907 /* SettingsNavigationController.m */; };
 		23EA61CB1B5591260032B907 /* SettingsSelectorTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 23EA61CA1B5591260032B907 /* SettingsSelectorTableViewController.m */; };
 		23F601A41D09C931009102BF /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 23F601A31D09C931009102BF /* Reachability.m */; };
@@ -175,6 +173,23 @@
 		51DC2F6120B7312600E03AF2 /* EthereumAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51DC2F5F20B7312600E03AF2 /* EthereumAddress.swift */; };
 		51E5C73220741A130000A7FD /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51E5C72F20741A130000A7FD /* AuthenticationManager.swift */; };
 		51E5C73320741A130000A7FD /* LocalizationConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51E5C73020741A130000A7FD /* LocalizationConstants.swift */; };
+		603582A420EBD1180077AFFB /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603582A320EBD1180077AFFB /* SettingsViewController.swift */; };
+		603582A620EBFB110077AFFB /* ToggleCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 603582A520EBFB110077AFFB /* ToggleCell.xib */; };
+		603582AA20EC0DF20077AFFB /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603582A920EC0DF20077AFFB /* UIView.swift */; };
+		605A900F20F3AFCE008F5E1A /* SettingsTwoStepVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 605A900E20F3AFCE008F5E1A /* SettingsTwoStepVC.swift */; };
+		605A901320F3BCA6008F5E1A /* SettingsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 605A901220F3BCA6008F5E1A /* SettingsCell.swift */; };
+		605A901520F3BD0D008F5E1A /* SettingsProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 605A901420F3BD0D008F5E1A /* SettingsProtocols.swift */; };
+		6070F3DA20EC1C25004D6A71 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6070F3D920EC1C25004D6A71 /* Colors.swift */; };
+		60B7905E20F52A6100605CE7 /* Settings+Table.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B7905D20F52A6100605CE7 /* Settings+Table.swift */; };
+		60B7908020F537D600605CE7 /* Settings+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B7907F20F537D600605CE7 /* Settings+Helpers.swift */; };
+		60B790CD20F6413B00605CE7 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6070F3D920EC1C25004D6A71 /* Colors.swift */; };
+		60CCA97620F91DC80021CA77 /* Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60CCA97520F91DC80021CA77 /* Currency.swift */; };
+		60EA8905210A06AC009021F2 /* SettingsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 605A901220F3BCA6008F5E1A /* SettingsCell.swift */; };
+		60EA8920210A06AF009021F2 /* SettingsProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 605A901420F3BD0D008F5E1A /* SettingsProtocols.swift */; };
+		60EA8921210A06B2009021F2 /* Settings+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B7907F20F537D600605CE7 /* Settings+Helpers.swift */; };
+		60EA8922210A06B4009021F2 /* Settings+Table.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B7905D20F52A6100605CE7 /* Settings+Table.swift */; };
+		60EA8923210A06B7009021F2 /* SettingsTwoStepVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 605A900E20F3AFCE008F5E1A /* SettingsTwoStepVC.swift */; };
+		60EA8924210A06BA009021F2 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603582A320EBD1180077AFFB /* SettingsViewController.swift */; };
 		670595A41AB0F59D00D2D6D9 /* KeychainItemWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 670595A31AB0F59D00D2D6D9 /* KeychainItemWrapper.m */; };
 		6710DA0E1A8E82D80089DDED /* BCLine.m in Sources */ = {isa = PBXBuildFile; fileRef = 6710DA0D1A8E82D80089DDED /* BCLine.m */; };
 		674709EC19D1D14300757D46 /* BCWelcomeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 674709EB19D1D14300757D46 /* BCWelcomeView.m */; };
@@ -1255,8 +1270,6 @@
 		239CD5611C12223100997DF5 /* sv-SE */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "sv-SE"; path = "sv-SE.lproj/Upgrade.strings"; sourceTree = "<group>"; };
 		239CD5631C12223200997DF5 /* zh-CN */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-CN"; path = "zh-CN.lproj/Upgrade.strings"; sourceTree = "<group>"; };
 		239CD5651C12223300997DF5 /* zh-TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-TW"; path = "zh-TW.lproj/Upgrade.strings"; sourceTree = "<group>"; };
-		239CD5661C122BDE00997DF5 /* SettingsTwoStepViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsTwoStepViewController.h; sourceTree = "<group>"; };
-		239CD5671C122BDE00997DF5 /* SettingsTwoStepViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsTwoStepViewController.m; sourceTree = "<group>"; };
 		23B731D11E01AC1100129770 /* ReminderModalViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReminderModalViewController.h; sourceTree = "<group>"; };
 		23B731D21E01AC1100129770 /* ReminderModalViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReminderModalViewController.m; sourceTree = "<group>"; };
 		23BA220C1D6B4AB500D0472B /* KeychainItemWrapper+Credentials.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "KeychainItemWrapper+Credentials.h"; sourceTree = "<group>"; };
@@ -1347,8 +1360,6 @@
 		23E2FC071C7F60E7004CFF79 /* BCInsetLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCInsetLabel.m; sourceTree = "<group>"; };
 		23E579521DB45F3A00220542 /* TransferAmountTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TransferAmountTableCell.h; sourceTree = "<group>"; };
 		23E579531DB45F3A00220542 /* TransferAmountTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TransferAmountTableCell.m; sourceTree = "<group>"; };
-		23EA61C31B54258D0032B907 /* SettingsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsTableViewController.h; sourceTree = "<group>"; };
-		23EA61C41B54258D0032B907 /* SettingsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsTableViewController.m; sourceTree = "<group>"; };
 		23EA61C61B54282D0032B907 /* SettingsNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsNavigationController.h; sourceTree = "<group>"; };
 		23EA61C71B54282D0032B907 /* SettingsNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsNavigationController.m; sourceTree = "<group>"; };
 		23EA61C91B5591260032B907 /* SettingsSelectorTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsSelectorTableViewController.h; sourceTree = "<group>"; };
@@ -1449,6 +1460,16 @@
 		51E5C72F20741A130000A7FD /* AuthenticationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AuthenticationManager.swift; path = Authentication/AuthenticationManager.swift; sourceTree = "<group>"; };
 		51E5C73020741A130000A7FD /* LocalizationConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalizationConstants.swift; sourceTree = "<group>"; };
 		51F6A9BB206964D6002968EC /* Release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		603582A320EBD1180077AFFB /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		603582A520EBFB110077AFFB /* ToggleCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ToggleCell.xib; sourceTree = "<group>"; };
+		603582A920EC0DF20077AFFB /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIView.swift; path = Extensions/UIView.swift; sourceTree = "<group>"; };
+		605A900E20F3AFCE008F5E1A /* SettingsTwoStepVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTwoStepVC.swift; sourceTree = "<group>"; };
+		605A901220F3BCA6008F5E1A /* SettingsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsCell.swift; sourceTree = "<group>"; };
+		605A901420F3BD0D008F5E1A /* SettingsProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsProtocols.swift; sourceTree = "<group>"; };
+		6070F3D920EC1C25004D6A71 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Colors.swift; path = Extensions/Colors.swift; sourceTree = "<group>"; };
+		60B7905D20F52A6100605CE7 /* Settings+Table.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Settings+Table.swift"; path = "Settings/Settings+Table.swift"; sourceTree = "<group>"; };
+		60B7907F20F537D600605CE7 /* Settings+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Settings+Helpers.swift"; path = "Settings/Settings+Helpers.swift"; sourceTree = "<group>"; };
+		60CCA97520F91DC80021CA77 /* Currency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Currency.swift; sourceTree = "<group>"; };
 		670595A21AB0F59D00D2D6D9 /* KeychainItemWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeychainItemWrapper.h; sourceTree = "<group>"; };
 		670595A31AB0F59D00D2D6D9 /* KeychainItemWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeychainItemWrapper.m; sourceTree = "<group>"; };
 		6710DA0C1A8E82D80089DDED /* BCLine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCLine.h; sourceTree = "<group>"; };
@@ -2093,6 +2114,8 @@
 		510EA19620811FF100A63AB8 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				603582A920EC0DF20077AFFB /* UIView.swift */,
+				6070F3D920EC1C25004D6A71 /* Colors.swift */,
 				511646DE20851BC600C43522 /* Bundle.swift */,
 				516546F7208FCF800019EE63 /* Enum+Enumeratable.swift */,
 				5185E123208F6E5E00A26B64 /* Enum+RawValued.swift */,
@@ -2244,6 +2267,19 @@
 				AA56423920DDBDBB0092A022 /* String+EscapeJSTests.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		6035828820EBD0DD0077AFFB /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				605A901220F3BCA6008F5E1A /* SettingsCell.swift */,
+				605A901420F3BD0D008F5E1A /* SettingsProtocols.swift */,
+				60B7907F20F537D600605CE7 /* Settings+Helpers.swift */,
+				60B7905D20F52A6100605CE7 /* Settings+Table.swift */,
+				605A900E20F3AFCE008F5E1A /* SettingsTwoStepVC.swift */,
+				603582A320EBD1180077AFFB /* SettingsViewController.swift */,
+			);
+			name = Settings;
 			sourceTree = "<group>";
 		};
 		670595A11AB0F59D00D2D6D9 /* KeychainItemWrapper */ = {
@@ -2399,8 +2435,9 @@
 			isa = PBXGroup;
 			children = (
 				C764372820ED199500CA7CA4 /* BalanceChartModel.swift */,
-				C79A239720B3520D000D96B9 /* DestinationAddressSource.h */,
+				60CCA97520F91DC80021CA77 /* Currency.swift */,
 				C78893E420A36572003C0A8F /* Trade.swift */,
+				C79A239720B3520D000D96B9 /* DestinationAddressSource.h */,
 				6780DB961A40BDF40048EED2 /* AccountInOut.h */,
 				6780DB971A40BDF40048EED2 /* AccountInOut.m */,
 				9F2D934814C05DD00053F0FF /* Address.h */,
@@ -2573,8 +2610,7 @@
 				23C95EA41C0779C600E4692A /* SettingsChangePasswordViewController.h */,
 				23EA61C61B54282D0032B907 /* SettingsNavigationController.h */,
 				23EA61C91B5591260032B907 /* SettingsSelectorTableViewController.h */,
-				23EA61C31B54258D0032B907 /* SettingsTableViewController.h */,
-				239CD5661C122BDE00997DF5 /* SettingsTwoStepViewController.h */,
+				6035828820EBD0DD0077AFFB /* Settings */,
 				231FF2CB1B56F9F1009EEB02 /* SettingsWebViewController.h */,
 				67E9674C19DF285000305358 /* SideMenuViewController.h */,
 				C7414E511FD72574001A89FA /* StateSelectorViewController.h */,
@@ -2619,8 +2655,6 @@
 				23C95EA51C0779C600E4692A /* SettingsChangePasswordViewController.m */,
 				23EA61C71B54282D0032B907 /* SettingsNavigationController.m */,
 				23EA61CA1B5591260032B907 /* SettingsSelectorTableViewController.m */,
-				23EA61C41B54258D0032B907 /* SettingsTableViewController.m */,
-				239CD5671C122BDE00997DF5 /* SettingsTwoStepViewController.m */,
 				231FF2CC1B56F9F1009EEB02 /* SettingsWebViewController.m */,
 				67E9674D19DF285000305358 /* SideMenuViewController.m */,
 				C7414E521FD72574001A89FA /* StateSelectorViewController.m */,
@@ -2775,6 +2809,7 @@
 		AABB74C420D44ACA00C0F7C5 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				603582A520EBFB110077AFFB /* ToggleCell.xib */,
 				AABB74C520D44AE300C0F7C5 /* AboutUsView.storyboard */,
 				AABB74C720D44B0600C0F7C5 /* AboutUsViewController.swift */,
 			);
@@ -3616,6 +3651,7 @@
 				C790E1121E52061B0063D141 /* Montserrat-ExtraBoldItalic.ttf in Resources */,
 				A2599BAA1B0B762400C2EA81 /* Backup.storyboard in Resources */,
 				C9BE91881945D8F600FD516D /* PEKeyboard-2.png in Resources */,
+				603582A620EBFB110077AFFB /* ToggleCell.xib in Resources */,
 				67EEE7731A8E547900288753 /* PEPin-on@3x.png in Resources */,
 				C9BE91821945D8F600FD516D /* PEKeyboard-1-next.png in Resources */,
 				ECD244ED19A8AC45004B1F40 /* PEKeyboard-3-edit.png in Resources */,
@@ -3670,7 +3706,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "# update submodule source\ngit submodule update ${SRCROOT}/Submodules/My-Wallet-V3\n\n# reinstall node modules, grunt build, and run tests\ncd ${SRCROOT} && sh ./scripts/install-js.sh && sh ./scripts/build-js.sh && cd ./Submodules/My-Wallet-V3 && yarn test --single-run";
+			shellScript = "# update submodule source\ngit submodule update ${SRCROOT}/Submodules/My-Wallet-V3\n\n# reinstall node modules, grunt build, and run tests\ncd ${SRCROOT} && sh ./scripts/install-js.sh && sh ./scripts/build-js.sh && cd ./Submodules/My-Wallet-V3 && yarn test --single-run\n";
 		};
 		23FDEFA31D6E22C900FC80D6 /* Get SSL Certificate */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3684,7 +3720,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -ue\nif [ ! -d ${SRCROOT}/Cert ]; then\n    mkdir ${SRCROOT}/Cert\nfi\ncd ${SRCROOT}/Cert\nopenssl s_client -connect ${WALLET_SERVER}:443 -showcerts < /dev/null | openssl x509 -outform DER > ${LOCAL_CERTIFICATE_FILE}.der";
+			shellScript = "set -ue\nif [ ! -d ${SRCROOT}/Cert ]; then\n    mkdir ${SRCROOT}/Cert\nfi\ncd ${SRCROOT}/Cert\nopenssl s_client -connect ${WALLET_SERVER}:443 -showcerts < /dev/null | openssl x509 -outform DER > ${LOCAL_CERTIFICATE_FILE}.der\n";
 		};
 		51B9D9272063EA1D007DED65 /* Run SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3698,11 +3734,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi";
+			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 		C718594D1F460C4A00745A87 /* Run Fabric */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			files = (
 			);
 			inputPaths = (
@@ -3751,6 +3787,7 @@
 				C74E866220B3272B00F7263D /* TransferAllCoordinator.swift in Sources */,
 				AAE94F3D20C70F4B005A3595 /* BIP21URI.swift in Sources */,
 				51A862BE2090DD6400B338E0 /* PairingInstructionsView.swift in Sources */,
+				60EA8924210A06BA009021F2 /* SettingsViewController.swift in Sources */,
 				AA722C1A20B4BBA900262A5F /* AssetAddressRepository.swift in Sources */,
 				511356E4209CAFC600056D65 /* NetworkManager+PushNotifications.swift in Sources */,
 				AAD27A29209CFE2100C0EAFC /* PasswordConfirmView.swift in Sources */,
@@ -3770,11 +3807,13 @@
 				C77C19B920C580E5005CB600 /* WalletSecondPasswordDelegate.swift in Sources */,
 				519435A1208E61F3001EF882 /* BlockchainTests.swift in Sources */,
 				AA6911A120D18B6E00DDB541 /* MockWalletService.swift in Sources */,
+				60EA8920210A06AF009021F2 /* SettingsProtocols.swift in Sources */,
 				5113570A209CF6CE00056D65 /* BCSecureTextField.swift in Sources */,
 				C76D731820B24B5400040B57 /* WalletTransferAllDelegate.swift in Sources */,
 				AACE31D52092A99B00B7B806 /* Coordinator.swift in Sources */,
 				AACE32082097835F00B7B806 /* AuthenticationManagerTests.swift in Sources */,
 				5185E11C208E7F7C00A26B64 /* BlockchainSettings.swift in Sources */,
+				60EA8905210A06AC009021F2 /* SettingsCell.swift in Sources */,
 				AA63F86820A27AC6002B719B /* PostAuthenticationRoute.swift in Sources */,
 				AAE9113220A51C900093A431 /* ReminderType.swift in Sources */,
 				AACE31DB2092A99B00B7B806 /* UIDevice.swift in Sources */,
@@ -3785,10 +3824,12 @@
 				AA1E52332097CC260099BD10 /* WalletAuthDelegate.swift in Sources */,
 				AAE94DCF20C25F37005A3595 /* MockNetworkManager.swift in Sources */,
 				AACE31CF2092A99B00B7B806 /* AuthenticationManager.swift in Sources */,
+				60EA8921210A06B2009021F2 /* Settings+Helpers.swift in Sources */,
 				AA1E52322097CC230099BD10 /* WalletPinEntryDelegate.swift in Sources */,
 				51135707209CF68500056D65 /* BackupViewController.swift in Sources */,
 				AA94965F20CB5FA600A9C2DD /* AssetAddressFactory.swift in Sources */,
 				AACE31CA2092A99B00B7B806 /* AssetAddress.swift in Sources */,
+				60EA8922210A06B4009021F2 /* Settings+Table.swift in Sources */,
 				51135702209CEEB900056D65 /* PushNotificationAuthPayload.swift in Sources */,
 				AA63F87820A39DCF002B719B /* AppFeature.swift in Sources */,
 				C77217D020AE44B20087836A /* WalletAccountInfoAndExchangeRatesDelegate.swift in Sources */,
@@ -3847,6 +3888,7 @@
 				511BF4EE20E67B3B00A14072 /* AppReviewPrompt.swift in Sources */,
 				51A862D620921A6E00B338E0 /* BlockchainAPI+URLSuffix.swift in Sources */,
 				5185E12B208F7ACA00A26B64 /* BlockchainAPI+URI.swift in Sources */,
+				60EA8923210A06B7009021F2 /* SettingsTwoStepVC.swift in Sources */,
 				AACE31CB2092A99B00B7B806 /* AssetType.swift in Sources */,
 				51C2ADD720BDECE700D66108 /* String+EscapeJS.swift in Sources */,
 				5114EA2020CB2BA90098E26E /* TabControllerManager+Nib.swift in Sources */,
@@ -3861,6 +3903,7 @@
 				AACE31D22092A99B00B7B806 /* UINavigationController+PopToRootWithCompletion.swift in Sources */,
 				513C828720EBF30C00ECDE52 /* UIDevice+Biometrics.swift in Sources */,
 				AA63F85120A12DA6002B719B /* BitcoinURLPayload.swift in Sources */,
+				60B790CD20F6413B00605CE7 /* Colors.swift in Sources */,
 				AACE31D32092A99B00B7B806 /* OnboardingCoordinator.swift in Sources */,
 				C7E4E41920EE98590061059E /* WatchOnlyBalanceView.swift in Sources */,
 				AACE3132209121B300B7B806 /* PushNotificationManager.swift in Sources */,
@@ -3923,6 +3966,7 @@
 				C9BE917D1945D8F600FD516D /* PEViewController.m in Sources */,
 				674709EC19D1D14300757D46 /* BCWelcomeView.m in Sources */,
 				67D95A281B3DDC900012EBB1 /* Constants.swift in Sources */,
+				605A900F20F3AFCE008F5E1A /* SettingsTwoStepVC.swift in Sources */,
 				9F765F3214BC622E00048EFB /* TransactionsBitcoinViewController.m in Sources */,
 				2322DCC21D771831000E5AC1 /* SRURLUtilities.m in Sources */,
 				C7A0E9261FA89FE9004F4267 /* ExchangeModalView.m in Sources */,
@@ -3951,6 +3995,8 @@
 				23FDEFAC1D6F669100FC80D6 /* NSURLSession+SendSynchronousRequest.m in Sources */,
 				C74E865220B3043E00F7263D /* WalletHistoryDelegate.swift in Sources */,
 				AABDED70208FACB9002D8BAC /* Reachability.swift in Sources */,
+				603582AA20EC0DF20077AFFB /* UIView.swift in Sources */,
+				6070F3DA20EC1C25004D6A71 /* Colors.swift in Sources */,
 				C74FEA232093B38A007CAB5D /* JSContextWithDOM.swift in Sources */,
 				231A66EE1DB9434B0043F862 /* HDNode.m in Sources */,
 				C78893DA20A34DF4003C0A8F /* WalletSettingsDelegate.swift in Sources */,
@@ -3977,7 +4023,6 @@
 				C780A446202228A400E49274 /* BCPriceChartView.m in Sources */,
 				FA6323391A433B1C00EB3974 /* Foundation-Utility.m in Sources */,
 				AA9B30D120F6D85000A7F809 /* WalletUpgradeDelegate.swift in Sources */,
-				239CD5681C122BDE00997DF5 /* SettingsTwoStepViewController.m in Sources */,
 				23BF73391C454B8C00204503 /* AccountsAndAddressesNavigationController.m in Sources */,
 				51A862D520921A6E00B338E0 /* BlockchainAPI+URLSuffix.swift in Sources */,
 				2378271A1B7E472D00E9EE03 /* BCSecureTextField.swift in Sources */,
@@ -3994,6 +4039,7 @@
 				9F0CBAAA151351F400CD945D /* Wallet.m in Sources */,
 				9F0CBAD81513CA2600CD945D /* BCFadeView.m in Sources */,
 				C78893EE20A4D690003C0A8F /* WalletSendBitcoinDelegate.swift in Sources */,
+				605A901320F3BCA6008F5E1A /* SettingsCell.swift in Sources */,
 				C787180120A22362000CC46E /* WalletAddressesDelegate.swift in Sources */,
 				511646C5208124E200C43522 /* AssetType.swift in Sources */,
 				67E9674E19DF285000305358 /* SideMenuViewController.m in Sources */,
@@ -4007,6 +4053,7 @@
 				51578AEA20B448BF00B0080A /* WalletKeyImportDelegate.swift in Sources */,
 				23FDEFA91D6E43DE00FC80D6 /* TransactionDetailTableCell.m in Sources */,
 				2326C6C21BBD7A8100AB7C4D /* UIViewController+AutoDismiss.m in Sources */,
+				60B7908020F537D600605CE7 /* Settings+Helpers.swift in Sources */,
 				23EA61C81B54282D0032B907 /* SettingsNavigationController.m in Sources */,
 				FCB33B6F1FC369D700317E6B /* ExchangeDetailView.m in Sources */,
 				AAD27A28209CFE2100C0EAFC /* PasswordConfirmView.swift in Sources */,
@@ -4025,6 +4072,7 @@
 				23FB5C0D1D9ABB650008C6AB /* TransactionDetailFromCell.m in Sources */,
 				2322DCBA1D771831000E5AC1 /* SRConstants.m in Sources */,
 				A2599BA71B0B726900C2EA81 /* BackupVerifyViewController.swift in Sources */,
+				60CCA97620F91DC80021CA77 /* Currency.swift in Sources */,
 				C77217ED20AFCF940087836A /* WalletRecoveryDelegate.swift in Sources */,
 				C78893E520A36572003C0A8F /* Trade.swift in Sources */,
 				AA1E523D2097E6AC0099BD10 /* GetPinResponse.swift in Sources */,
@@ -4037,6 +4085,7 @@
 				5185E12A208F7ACA00A26B64 /* BlockchainAPI+URI.swift in Sources */,
 				23444F7E1DCD213D00573C8C /* BTCKey.m in Sources */,
 				C7A923ED1F8531FD003D9DAF /* GraphTimeFrame.m in Sources */,
+				603582A420EBD1180077AFFB /* SettingsViewController.swift in Sources */,
 				C77217CF20AE44B20087836A /* WalletAccountInfoAndExchangeRatesDelegate.swift in Sources */,
 				C7E4E41820EE98590061059E /* WatchOnlyBalanceView.swift in Sources */,
 				C79EEFC21E898E380087DDCD /* WalletSetupViewController.m in Sources */,
@@ -4127,6 +4176,7 @@
 				67EE1DCB19E3325900DBBFC9 /* ECSlidingAnimationController.m in Sources */,
 				67470A0819D43AFE00757D46 /* BCManualPairView.m in Sources */,
 				C7E2750E1F59C2D50054EFA5 /* UILabel+Animations.m in Sources */,
+				605A901520F3BD0D008F5E1A /* SettingsProtocols.swift in Sources */,
 				AA1E52382097D3C50099BD10 /* PutPinResponse.swift in Sources */,
 				6E2D90A21BBEC34800B719EC /* BCRecoveryView.m in Sources */,
 				A2599B9F1B0B5FC800C2EA81 /* BackupViewController.swift in Sources */,
@@ -4163,10 +4213,10 @@
 				AA24D4C720D9D1EC0096DD5D /* AssetTypeLegacyHelper.swift in Sources */,
 				AA63F84B20A12AE9002B719B /* URLs.swift in Sources */,
 				23F601A41D09C931009102BF /* Reachability.m in Sources */,
+				60B7905E20F52A6100605CE7 /* Settings+Table.swift in Sources */,
 				510EA1702080F16100A63AB8 /* PasscodePayload.swift in Sources */,
 				AAE9113D20A640A40093A431 /* PinPayload.swift in Sources */,
 				23444F931DCD21B700573C8C /* BTCBase58.m in Sources */,
-				23EA61C51B54258D0032B907 /* SettingsTableViewController.m in Sources */,
 				C793E1FC1F8E7921001F171C /* ExchangeOverviewViewController.m in Sources */,
 				511646C8208129D800C43522 /* Environment.swift in Sources */,
 				23FB5C161D9ABBB20008C6AB /* TransactionDetailValueCell.m in Sources */,

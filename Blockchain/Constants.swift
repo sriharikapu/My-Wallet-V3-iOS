@@ -22,6 +22,8 @@ struct Constants {
     //: Prefix colors with `Color` for easy filtering in asset catalog
     //: Adding new color: create entry in Images.xcassets, then add constant here with same name
     struct Colors {
+        static let ColorRedPrimary = UIColorFromRGB(0xB83940)      // Error State
+        static let ColorGreenPrimary = UIColorFromRGB(0x199D69)    // Success State
         static let ColorBrandPrimary = UIColorFromRGB(0x004A7C)    // previously BlockchainBlue
         static let ColorBrandSecondary = UIColorFromRGB(0x10ADE4)  // previously BlockchainLightBlue
         static let ColorBrandTertiary = UIColorFromRGB(0xB2D5E5)   // previously BlockchainLighterBlue
@@ -238,15 +240,4 @@ struct Constants {
     @objc class func grayLineColor() -> UIColor {
         return Constants.Colors.ColorGrayLine
     }
-}
-
-// MARK: Helper functions
-
-func UIColorFromRGB(_ rgbValue: UInt) -> UIColor {
-    return UIColor(
-        red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
-        green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
-        blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
-        alpha: CGFloat(1.0)
-    )
 }
