@@ -15,12 +15,21 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    UIView *topBar = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, DEFAULT_HEADER_HEIGHT)];
+
+    UIWindow *window = UIApplication.sharedApplication.keyWindow;
+    CGFloat safeAreaInsetTop;
+    if (@available(iOS 11.0, *)) {
+        safeAreaInsetTop = window.rootViewController.view.safeAreaInsets.top;
+    } else {
+        safeAreaInsetTop = 20;
+    }
+
+    CGFloat topBarHeight = ConstantsObjcBridge.defaultNavigationBarHeight + safeAreaInsetTop;
+    UIView *topBar = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, topBarHeight)];
     topBar.backgroundColor = COLOR_BLOCKCHAIN_BLUE;
     [self.view addSubview:topBar];
     
-    self.headerLabel = [[UILabel alloc] initWithFrame:FRAME_HEADER_LABEL];
+    self.headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(60, safeAreaInsetTop + 6, 200, 30)];
     self.headerLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:FONT_SIZE_TOP_BAR_TEXT];
     self.headerLabel.textColor = [UIColor whiteColor];
     self.headerLabel.textAlignment = NSTextAlignmentCenter;
@@ -61,7 +70,7 @@
     busyLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:BUSY_VIEW_LABEL_FONT_SYSTEM_SIZE];
     busyLabel.alpha = BUSY_VIEW_LABEL_ALPHA;
     busyLabel.textAlignment = NSTextAlignmentCenter;
-    busyLabel.text = BC_STRING_LOADING_SYNCING_WALLET;
+    busyLabel.text = [LocalizationConstantsObjcBridge syncingWallet];
     busyLabel.center = CGPointMake(textWithSpinnerView.bounds.origin.x + textWithSpinnerView.bounds.size.width/2, textWithSpinnerView.bounds.origin.y + textWithSpinnerView.bounds.size.height/2 + 15);
     [textWithSpinnerView addSubview:busyLabel];
     self.busyLabel = busyLabel;
@@ -89,16 +98,17 @@
     if (self.viewControllers.count > 1) {
         [self.backButton removeTarget:nil action:NULL forControlEvents:UIControlEventAllEvents];
         [self.backButton setImage:[UIImage imageNamed:@"back_chevron_icon"] forState:UIControlStateNormal];
-        self.backButton.imageEdgeInsets = IMAGE_EDGE_INSETS_BACK_BUTTON_CHEVRON;
+        self.backButton.imageEdgeInsets = UIEdgeInsetsMake(0, 8, 0, 0);
         [self.backButton addTarget:self action:@selector(popViewController) forControlEvents:UIControlEventTouchUpInside];
         self.closeButton.hidden = YES;
     } else {
         [self.backButton removeTarget:nil action:NULL forControlEvents:UIControlEventAllEvents];
         [self.backButton setImage:[UIImage imageNamed:@"icon_share"] forState:UIControlStateNormal];
-        self.backButton.imageEdgeInsets = IMAGE_EDGE_INSETS_BACK_BUTTON_SHARE;
+        self.backButton.imageEdgeInsets = UIEdgeInsetsMake(0, 12, 0, 0);
         [self.backButton addTarget:self action:@selector(share) forControlEvents:UIControlEventTouchUpInside];
         self.closeButton.hidden = NO;
     }
+    self.backButton.center = CGPointMake(self.backButton.center.x, self.headerLabel.center.y);
     
     if ([self.visibleViewController isMemberOfClass:[TransactionRecipientsViewController class]]) {
         self.headerLabel.text = BC_STRING_RECIPIENTS;
@@ -145,8 +155,13 @@
 
 - (void)share
 {
-    NSURL *url = app.tabControllerManager.assetType == AssetTypeBitcoin ? [NSURL URLWithString:[[NSBundle walletUrl] stringByAppendingFormat:@"/tx/%@", self.transactionHash]] : [NSURL URLWithString:[URL_PREFIX_VIEW_TRANSACTION_BITCOIN_CASH stringByAppendingString:self.transactionHash]];
-        
+    TabControllerManager *tabControllerManager = [AppCoordinator sharedInstance].tabControllerManager;
+
+    AssetType assetType = [AssetTypeLegacyHelper convertFromLegacy:tabControllerManager.assetType];
+
+    NSString *txDetailString = [BlockchainAPI.sharedInstance transactionDetailURLFor:self.transactionHash assetType:assetType];
+    NSURL *url = [NSURL URLWithString:txDetailString];
+
     NSArray *activityItems = @[self, url];
     
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];

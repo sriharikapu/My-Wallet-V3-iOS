@@ -9,7 +9,6 @@
 #import "BCConfirmPaymentView.h"
 #import "UIView+ChangeFrameAttribute.h"
 #import "Blockchain-Swift.h"
-#import "ContactTransaction.h"
 #import "BCTotalAmountView.h"
 #import "BCConfirmPaymentViewModel.h"
 
@@ -18,24 +17,25 @@
 
 @interface BCConfirmPaymentView () <UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate>
 @property (nonatomic) BCSecureTextField *descriptionField;
-@property (nonatomic) ContactTransaction *contactTransaction;
 @property (nonatomic) BCTotalAmountView *totalAmountView;
 @property (nonatomic) BCConfirmPaymentViewModel *viewModel;
 @property (nonatomic) NSMutableArray *rows;
 @end
 @implementation BCConfirmPaymentView
 
-- (id)initWithWindow:(UIView *)window viewModel:(BCConfirmPaymentViewModel *)viewModel sendButtonFrame:(CGRect)sendButtonFrame
+- (id)initWithFrame:(CGRect)frame viewModel:(BCConfirmPaymentViewModel *)viewModel sendButtonFrame:(CGRect)sendButtonFrame
 {
-    self = [super initWithFrame:CGRectMake(0, DEFAULT_HEADER_HEIGHT, window.frame.size.width, window.frame.size.height - DEFAULT_HEADER_HEIGHT)];
-    
+    self = [super initWithFrame:frame];
+
     if (self) {
         
+        self.frame = frame;
+
         self.viewModel = viewModel;
         
         BCTotalAmountView *totalAmountView = [[BCTotalAmountView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, TOTAL_AMOUNT_VIEW_HEIGHT) color:COLOR_BLOCKCHAIN_RED amount:0];
         
-        totalAmountView.btcAmountLabel.text = self.viewModel.btcTotalAmountText;
+        totalAmountView.btcAmountLabel.text = self.viewModel.totalAmountText;
         totalAmountView.fiatAmountLabel.text = self.viewModel.fiatTotalAmountText;
         
         [self addSubview:totalAmountView];
@@ -47,7 +47,7 @@
         
         self.backgroundColor = [UIColor whiteColor];
         
-        UITableView *summaryTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, totalAmountView.frame.origin.y + totalAmountView.frame.size.height, window.frame.size.width, tableViewHeight)];
+        UITableView *summaryTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, totalAmountView.frame.origin.y + totalAmountView.frame.size.height, frame.size.width, tableViewHeight)];
         summaryTableView.scrollEnabled = NO;
         summaryTableView.delegate = self;
         summaryTableView.dataSource = self;
@@ -58,30 +58,24 @@
         summaryTableView.clipsToBounds = YES;
         
         CALayer *topBorder = [CALayer layer];
-        topBorder.borderColor = [COLOR_LINE_GRAY CGColor];
+        topBorder.borderColor = [[ConstantsObjcBridge grayLineColor] CGColor];
         topBorder.borderWidth = 1;
         topBorder.frame = CGRectMake(0, 0, CGRectGetWidth(summaryTableView.frame), lineWidth);
         [summaryTableView.layer addSublayer:topBorder];
         
         CALayer *bottomBorder = [CALayer layer];
-        bottomBorder.borderColor = [COLOR_LINE_GRAY CGColor];
+        bottomBorder.borderColor = [[ConstantsObjcBridge grayLineColor] CGColor];
         bottomBorder.borderWidth = 1;
         bottomBorder.frame = CGRectMake(0, CGRectGetHeight(summaryTableView.frame) - lineWidth, CGRectGetWidth(summaryTableView.frame), lineWidth);
         [summaryTableView.layer addSublayer:bottomBorder];
         
         self.tableView = summaryTableView;
         
-        NSString *buttonTitle;
-        
-        if (self.contactTransaction) {
-            buttonTitle = [self.contactTransaction.role isEqualToString:TRANSACTION_ROLE_RPR_INITIATOR] ? BC_STRING_SEND : BC_STRING_PAY;
-        } else {
-            buttonTitle = BC_STRING_SEND;
-        }
+        NSString *buttonTitle = BC_STRING_SEND;
         
         self.reallyDoPaymentButton = [[UIButton alloc] initWithFrame:sendButtonFrame];
         self.reallyDoPaymentButton.layer.cornerRadius = CORNER_RADIUS_BUTTON;
-        [self.reallyDoPaymentButton changeYPosition:self.bounds.size.height - 12 - sendButtonFrame.size.height];
+        [self.reallyDoPaymentButton changeYPosition:self.frame.size.height - 20 + 49];
         
         [self.reallyDoPaymentButton setTitle:buttonTitle forState:UIControlStateNormal];
         self.reallyDoPaymentButton.backgroundColor = COLOR_BLOCKCHAIN_LIGHT_BLUE;
@@ -90,7 +84,7 @@
         [self.reallyDoPaymentButton addTarget:self action:@selector(reallyDoPaymentButtonClicked) forControlEvents:UIControlEventTouchUpInside];
         
         [self addSubview:self.reallyDoPaymentButton];
-        
+
         if (viewModel.warningText) {
             UITextView *warning = [[UITextView alloc] initWithFrame:self.reallyDoPaymentButton.frame];
             warning.textContainerInset = UIEdgeInsetsMake(8, 8, 8, 8);
@@ -115,15 +109,13 @@
     if (self.viewModel.from) [self.rows addObject:@[BC_STRING_FROM, self.viewModel.from]];
     if (self.viewModel.to) [self.rows addObject:@[BC_STRING_TO, self.viewModel.to]];
     if (self.viewModel.showDescription) [self.rows addObject:@[BC_STRING_DESCRIPTION, self.viewModel.noteText ? : @""]];
-    if (self.viewModel.btcWithFiatAmountText) [self.rows addObject:@[BC_STRING_AMOUNT, self.viewModel.btcWithFiatAmountText]];
-    if (self.viewModel.btcWithFiatFeeText) [self.rows addObject:@[BC_STRING_FEE, self.viewModel.btcWithFiatFeeText]];
+    if (self.viewModel.cryptoWithFiatAmountText) [self.rows addObject:@[BC_STRING_AMOUNT, self.viewModel.cryptoWithFiatAmountText]];
+    if (self.viewModel.amountWithFiatFeeText) [self.rows addObject:@[BC_STRING_FEE, self.viewModel.amountWithFiatFeeText]];
 }
 
 - (void)reallyDoPaymentButtonClicked
 {
-    if (!self.contactTransaction) {
-        [self.confirmDelegate setupNoteForTransaction:self.note];
-    }
+    [self.confirmDelegate setupNoteForTransaction:self.note];
 }
 
 - (void)feeInformationButtonClicked
@@ -177,14 +169,13 @@
     if (self.isEditingDescription) {
         cell = [self configureDescriptionTextViewForCell:cell];
     } else {
-        
         NSString *textLabel = [self.rows[indexPath.row] firstObject];
         NSString *detailTextLabel = [self.rows[indexPath.row] lastObject];
 
         cell.textLabel.text = textLabel;
         cell.detailTextLabel.text = detailTextLabel;
         
-        cell.detailTextLabel.adjustsFontSizeToFitWidth = [textLabel isEqualToString:BC_STRING_FROM] || [textLabel isEqualToString:BC_STRING_TO];
+        cell.detailTextLabel.adjustsFontSizeToFitWidth = [textLabel isEqualToString:BC_STRING_FROM] || [textLabel isEqualToString:BC_STRING_TO] || [textLabel isEqualToString:BC_STRING_AMOUNT];
         
         if ([textLabel isEqualToString:BC_STRING_FEE]) {
             UILabel *testLabel = [[UILabel alloc] initWithFrame:CGRectZero];

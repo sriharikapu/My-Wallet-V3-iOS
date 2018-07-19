@@ -37,7 +37,7 @@
     // Keyboard accessory view
     UIView *amountKeyboardAccessoryView;
 }
-@property (nonatomic) AssetType assetType;
+@property (nonatomic) LegacyAssetType assetType;
 
 @property(nonatomic, strong) NSArray *activeKeys;
 @property(nonatomic, strong) UITapGestureRecognizer *tapGesture;
@@ -46,9 +46,6 @@
 
 @property(nonatomic) UIView *bottomContainerView;
 @property(nonatomic) UILabel *receiveToLabel;
-@property(nonatomic) UILabel *receiveFromLabel;
-@property(nonatomic) UIButton *selectFromButton;
-@property(nonatomic) UIButton *whatsThisButton;
 @property(nonatomic) UIView *headerView;
 
 - (IBAction)archiveAddressClicked:(id)sender;

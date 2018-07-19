@@ -8,7 +8,6 @@
 
 #import "DebugTableViewController.h"
 #import "Blockchain-Swift.h"
-#import "RootService.h"
 
 #define DICTIONARY_KEY_SERVER @"server"
 #define DICTIONARY_KEY_WEB_SOCKET @"webSocket"
@@ -19,7 +18,6 @@ typedef NS_ENUM(NSInteger, DebugTableViewRow) {
     RowWalletJSON,
     RowSurgeToggle,
     RowDontShowAgain,
-    RowAppStoreReviewPromptTimer,
     RowCertificatePinning,
     RowSecurityReminderTimer,
     RowZeroTickerValue
@@ -75,7 +73,7 @@ typedef enum {
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    self.filteredWalletJSON = [app.wallet filteredWalletJSON];
+    self.filteredWalletJSON = [WalletManager.sharedInstance.wallet filteredWalletJSON];
 }
 
 - (void)dismiss
@@ -172,11 +170,6 @@ typedef enum {
             cell.textLabel.text = DEBUG_STRING_RESET_DONT_SHOW_AGAIN_PROMPT;
             break;
         }
-        case RowAppStoreReviewPromptTimer: {
-            cell.textLabel.adjustsFontSizeToFitWidth = YES;
-            cell.textLabel.text = DEBUG_STRING_APP_STORE_REVIEW_PROMPT_TIMER;
-            break;
-        }
         case RowCertificatePinning: {
             cell.textLabel.text = DEBUG_STRING_CERTIFICATE_PINNING;
             UISwitch *pinningToggle = [[UISwitch alloc] init];
@@ -220,32 +213,13 @@ typedef enum {
         case RowDontShowAgain: {
             UIAlertController *alert = [UIAlertController alertControllerWithTitle:DEBUG_STRING_DEBUG message:DEBUG_STRING_RESET_DONT_SHOW_AGAIN_PROMPT_MESSAGE preferredStyle:UIAlertControllerStyleAlert];
             [alert addAction:[UIAlertAction actionWithTitle:DEBUG_STRING_RESET style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                [[NSUserDefaults standardUserDefaults] setBool:NO forKey:USER_DEFAULTS_KEY_HIDE_TRANSFER_ALL_FUNDS_ALERT];
+                BlockchainSettings.sharedAppInstance.hideTransferAllFundsAlert = NO;
                 [[NSUserDefaults standardUserDefaults] setBool:NO forKey:USER_DEFAULTS_KEY_HIDE_APP_REVIEW_PROMPT];
                 [[NSUserDefaults standardUserDefaults] setBool:NO forKey:USER_DEFAULTS_KEY_HIDE_WATCH_ONLY_RECEIVE_WARNING];
                 [[NSUserDefaults standardUserDefaults] setBool:NO forKey:USER_DEFAULTS_KEY_HAS_SEEN_SURVEY_PROMPT];
-                [[NSUserDefaults standardUserDefaults] setBool:NO forKey:USER_DEFAUTS_KEY_HAS_ENDED_FIRST_SESSION];
+                BlockchainSettings.sharedAppInstance.hasEndedFirstSession = NO;
             }]];
             [alert addAction:[UIAlertAction actionWithTitle:BC_STRING_CANCEL style:UIAlertActionStyleCancel handler:nil]];
-            [self presentViewController:alert animated:YES completion:nil];
-            break;
-        }
-        case RowAppStoreReviewPromptTimer: {
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:DEBUG_STRING_DEBUG message:DEBUG_STRING_APP_STORE_REVIEW_PROMPT_TIMER preferredStyle:UIAlertControllerStyleAlert];
-            [alert addAction:[UIAlertAction actionWithTitle:BC_STRING_OK style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:[[[alert textFields] firstObject].text intValue]] forKey:USER_DEFAULTS_KEY_DEBUG_APP_REVIEW_PROMPT_CUSTOM_TIMER];
-            }]];
-            [alert addAction:[UIAlertAction actionWithTitle:BC_STRING_CANCEL style:UIAlertActionStyleCancel handler:nil]];
-            [alert addAction:[UIAlertAction actionWithTitle:DEBUG_STRING_RESET style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:TIME_INTERVAL_APP_STORE_REVIEW_PROMPT] forKey:USER_DEFAULTS_KEY_DEBUG_APP_REVIEW_PROMPT_CUSTOM_TIMER];
-            }]];
-            [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-                textField.keyboardType = UIKeyboardTypeNumberPad;
-                
-                id customTimeValue = [[NSUserDefaults standardUserDefaults] objectForKey:USER_DEFAULTS_KEY_DEBUG_APP_REVIEW_PROMPT_CUSTOM_TIMER];
-                
-                textField.text = [NSString stringWithFormat:@"%i", customTimeValue ? [customTimeValue intValue] : TIME_INTERVAL_APP_STORE_REVIEW_PROMPT];
-            }];
             [self presentViewController:alert animated:YES completion:nil];
             break;
         }

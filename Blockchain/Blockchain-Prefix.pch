@@ -14,18 +14,9 @@
     #import "LocalizationConstants.h"
 #endif
 
-#define ENABLE_TRANSFER_FUNDS 1
-// #define ENABLE_TRANSACTION_FETCHING 1
-#define ENABLE_SWIPE_TO_RECEIVE 1
-#define ENABLE_TOUCH_ID 1
-// #define ENABLE_CONTACTS 1
-
-#define APP_STORE_LINK_PREFIX @"itms-apps://itunes.apple.com/app/"
-#define APP_STORE_ID @"id493253309"
-
-#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
 #define SYSTEM_VERSION_LESS_THAN(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
 
+// TODO: migrate to asset catalog
 #pragma mark - Colors
 
 #define UIColorFromRGB(rgbValue) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 \
@@ -81,8 +72,6 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define COLOR_TAB_BAR_BUTTON_TEXT_GRAY UIColorFromRGB(0xc9c7c8)
 #define COLOR_TAB_BAR_BUTTON_TEXT_BLUE UIColorFromRGB(0x1c8ac7)
 
-#define COLOR_LINE_GRAY UIColorFromRGB(0xcdcdcd)
-
 #define COLOR_LABEL_BALANCE_GREEN COLOR_BLOCKCHAIN_GREEN
 
 #define COLOR_BACKGROUND_GRAY UIColorFromRGB(0xf7f7f7)
@@ -128,9 +117,6 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define IS_USING_SCREEN_SIZE_4S [[UIScreen mainScreen] bounds].size.height <= HEIGHT_IPHONE_4S
 #define IS_USING_SCREEN_SIZE_5S [[UIScreen mainScreen] bounds].size.height == HEIGHT_IPHONE_5S
 
-#define WINDOW_HEIGHT IS_USING_6_OR_7_PLUS_SCREEN_SIZE ? HEIGHT_IPHONE_6_PLUS : (IS_USING_6_OR_7_SCREEN_SIZE ? HEIGHT_IPHONE_6 : IS_USING_SCREEN_SIZE_4S ? HEIGHT_IPHONE_4S : HEIGHT_IPHONE_5S)
-#define WINDOW_WIDTH IS_USING_6_OR_7_PLUS_SCREEN_SIZE ? IPHONE_6_OR_7_PLUS_WIDTH : (IS_USING_6_OR_7_SCREEN_SIZE ? IPHONE_6_OR_7_WIDTH : IS_USING_SCREEN_SIZE_4S ? WIDTH_IPHONE_4S : WIDTH_IPHONE_5S)
-
 #define FONT_SIZE_EXTRA_EXTRA_EXTRA_SMALL IS_USING_SCREEN_SIZE_LARGER_THAN_5S ? 13.0 : 10.0
 #define FONT_SIZE_EXTRA_EXTRA_SMALL IS_USING_SCREEN_SIZE_LARGER_THAN_5S ? 14.0 : 11.0
 #define FONT_SIZE_EXTRA_SMALL IS_USING_SCREEN_SIZE_LARGER_THAN_5S ? 15.0 : 12.0
@@ -149,7 +135,6 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define FRAME_HEADER_LABEL CGRectMake(60, 26, 200, 30)
 #define FRAME_BACK_BUTTON CGRectMake(0, 12, 85, 51)
 
-#define IMAGE_EDGE_INSETS_BACK_BUTTON_SHARE UIEdgeInsetsMake(4, 12, 0, 0)
 #define IMAGE_EDGE_INSETS_BACK_BUTTON_CHEVRON UIEdgeInsetsMake(10, 8, 0, 0)
 #define IMAGE_EDGE_INSETS_CLOSE_BUTTON_X UIEdgeInsetsMake(3, 0, 0, 18)
 
@@ -180,8 +165,6 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define OFFSET_TEXTVIEW_ADJUSTED_TOP CGPointMake(0, 3.5)
 
 #pragma mark - Strings
-
-#define URL_PUSH_NOTIFICATIONS_SERVER_ARGUMENT_GUID_ARGUMENT_SHAREDKEY_ARGUMENT_TOKEN_ARGUMENT_LENGTH_ARGUMENT_LANGUAGE_ARGUMENT @"%@/wallet?method=update-ios&guid=%@&sharedKey=%@&payload=%@&length=%lu&lang=%s"
 
 #define URL_SUFFIX_WALLET_OPTIONS @"/Resources/wallet-options.json"
 
@@ -237,32 +220,24 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 
 #define INFO_PLIST_KEY_CFBUNDLE_SHORT_VERSION_STRING @"CFBundleShortVersionString"
 
-#define PREFIX_BITCOIN_URI @"bitcoin:"
-#define PREFIX_ETHEREUM_URI @"ethereum:"
-#define PREFIX_BITCOIN_CASH @"bitcoincash:"
-#define PREFIX_BLOCKCHAIN_WALLET_URI @"blockchain-wallet://"
-#define PREFIX_MAIL_URI @"message://"
-#define PREFIX_BLOCKCHAIN_URI @"blockchain://"
-
 #define TX_TYPE_TRANSFER @"transfer"
 #define TX_TYPE_SENT @"sent"
 #define TX_TYPE_RECEIVED @"received"
 
+// TODO Start - Deprecate these in favor of Constants.FontNames
 #define FONT_MONTSERRAT_REGULAR @"Montserrat-Regular"
 #define FONT_MONTSERRAT_SEMIBOLD @"Montserrat-SemiBold"
 #define FONT_MONTSERRAT_LIGHT @"Montserrat-Light"
 #define FONT_MONTSERRAT_EXTRALIGHT @"Montserrat-ExtraLight"
-
 #define FONT_GILL_SANS_REGULAR @"GillSans"
 #define FONT_GILL_SANS_LIGHT @"GillSans-Light"
-
 #define FONT_HELVETICA_NUEUE @"Helvetica Neue"
 #define FONT_HELVETICA_NUEUE_MEDIUM @"HelveticaNeue-Medium"
+// TODO End
 
 #define NUMBER_KEYPAD_CHARACTER_SET_STRING @"1234567890"
 
 #define DICTIONARY_KEY_MESSAGE @"message"
-#define DICTIONARY_KEY_AMOUNT @"amount"
 #define DICTIONARY_KEY_FEE @"fee"
 
 #define ERROR_NO_FREE_OUTPUTS_TO_SPEND @"No free outputs to spend"
@@ -273,30 +248,15 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define ERROR_BELOW_DUST_THRESHOLD @"BELOW_DUST_THRESHOLD"
 #define ERROR_NO_UNSPENT_OUTPUTS @"NO_UNSPENT_OUTPUTS"
 #define ERROR_AMOUNTS_ADDRESSES_MUST_EQUAL @"The number of destiny addresses and destiny amounts should be the same."
-#define ERROR_NEEDS_BIP38 @"needsBip38"
-#define ERROR_PRESENT_IN_WALLET @"presentInWallet"
-#define ERROR_NOT_PRESENT_IN_WALLET @"addressNotPresentInWallet"
-#define ERROR_ADDRESS_NOT_WATCH_ONLY @"addressNotWatchOnly"
-#define ERROR_WRONG_PRIVATE_KEY @"wrongPrivateKey"
-#define ERROR_WRONG_BIP_PASSWORD @"wrongBipPass"
-#define ERROR_PRIVATE_KEY_OF_ANOTHER_WATCH_ONLY_ADDRESS @"privateKeyOfAnotherNonWatchOnlyAddress"
 #define ERROR_TYPE_MUST_START_WITH_NUMBER @"TypeError: must start with number"
 #define ERROR_FIRST_ARGUMENT_MUST_BE_STRING @"TypeError: First argument must be a string"
 #define ERROR_INVALID_PAIRING_VERSION_CODE @"Invalid Pairing Version Code"
 
-#define NOTIFICATION_KEY_RELOAD_TO_DISMISS_VIEWS @"reloadToDismissViews"
+// TODO: Move these in Constants.NotificationKeys
 #define NOTIFICATION_KEY_LOADING_TEXT @"SetLoadingText"
-#define NOTIFICATION_KEY_NEW_ADDRESS @"newAddress"
-#define NOTIFICATION_KEY_BACKUP_SUCCESS @"backupSuccess"
 #define NOTIFICATION_KEY_RELOAD_ACCOUNTS_AND_ADDRESSES @"reloadAccountsAndAddresses"
-#define NOTIFICATION_KEY_MULTIADDRESS_RESPONSE_RELOAD @"multiaddressResponseReload"
-#define NOTIFICATION_KEY_GET_FIAT_AT_TIME @"getFiatAtTime"
 
 #define NOTIFICATION_KEY_SHARE_CONTACT_LINK @"shareContactLink"
-
-#define NOTIFICATION_KEY_SYNC_ERROR @"syncError"
-
-#define NOTIFICATION_KEY_MODAL_VIEW_DISMISSED @"modalViewDismissed"
 
 // Notifications used in settings
 #define NOTIFICATION_KEY_RELOAD_SETTINGS @"reloadSettings"
@@ -319,19 +279,8 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define NOTIFICATION_KEY_CHANGE_NOTIFICATIONS_SUCCESS @"ChangeEmailNotifications"
 #define NOTIFICATION_KEY_CHANGE_NOTIFICATIONS_ERROR @"ChangeEmailNotificationsError"
 
-#define URL_SUFFIX_TERMS_OF_SERVICE @"/Resources/TermsofServicePolicy.pdf"
-#define URL_SUFFIX_PRIVACY_POLICY @"/Resources/PrivacyPolicy.pdf"
-
 #define URL_SUFFIX_ETH_IS_CONTRACT_ADDRESS_ARGUMENT @"/eth/account/%@/isContract"
 #define URL_SUFFIX_PRICE_INDEX_ARGUMENTS_BASE_QUOTE_TIME @"/price/index?base=%@&quote=%@&time=%lld"
-
-#define URL_API_COINIFY @"app-api.coinify.com"
-#define URL_API_SFOX @"api.sfox.com"
-#define URL_QUOTES_SFOX @"quotes.sfox.com"
-#define URL_KYC_SFOX @"sfox-kyc.s3.amazonaws.com"
-#define URL_API_ISIGNTHIS @"verify.isignthis.com"
-#define URL_GOOGLE_ANALYTICS @"www.google-analytics.com"
-#define URL_SHAPESHIFT @"shapeshift.io"
 
 #define SEGUE_IDENTIFIER_CURRENCY @"currency"
 #define SEGUE_IDENTIFIER_ABOUT @"about"
@@ -344,15 +293,6 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define SEGUE_SENDER_TERMS_OF_SERVICE @"termsOfService"
 #define SEGUE_SENDER_PRIVACY_POLICY @"privacyPolicy"
 #define SEGUE_IDENTIFIER_DEBUG_MENU @"debugMenu"
-
-#define HOST_NAME_WALLET_SERVER @"blockchain.info"
-#define HOST_NAME_API @"api.blockchain.info"
-
-#define HOST_NAME_ETHERSCAN @"etherscan.io"
-#define URL_ETHERSCAN @"https://etherscan.io"
-
-#define URL_BLOCKCHAIR @"blockchair.com"
-#define URL_PREFIX_VIEW_TRANSACTION_BITCOIN_CASH @"https://blockchair.com/bitcoin-cash/transaction/"
 
 #define NETWORK_MAINNET @"bitcoin"
 #define NETWORK_TESTNET @"testnet"
@@ -368,8 +308,6 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 
 #define CHARTS_URL_SUFFIX_ARGUMENTS_BASE_QUOTE_START_SCALE @"/price/index-series?base=%@&quote=%@&start=%@&scale=%@&omitnull=true"
 #define TRANSACTION_RESULT_URL_SUFFIX_HASH_ARGUMENT_ADDRESS_ARGUMENT @"/q/txresult/%@/%@"
-#define ADDRESS_URL_SUFFIX_HASH_ARGUMENT_ADDRESS_ARGUMENT @"/address/%@?format=json"
-#define ADDRESS_URL_SUFFIX_BCH_ADDRESS_ARGUMENT @"/bch/multiaddr?active=%@"
 
 #define URL_SURVEY @"https://blockchain.co1.qualtrics.com/SE/?SID=SV_8c6uSMW5eBV9nal"
 
@@ -387,11 +325,6 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define WALLET_EVENT_TX_FROM_CONTACTS @"wallet_ios_tx_from_contacts"
 
 #define URL_INFORMATION_RECEIVE @"https://support.blockchain.com/hc/en-us/articles/210353663-Why-is-my-bitcoin-address-changing"
-
-#define SOUND_FORMAT @"wav"
-
-#define ANIMATION_KEY_HIDE_MODAL @"HideModal"
-#define ANIMATION_KEY_SHOW_MODAL @"ShowModal"
 
 #define TRANSACTION_FILTER_IMPORTED @"imported"
 
@@ -432,14 +365,8 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define CURRENCY_CODE_BRL @"BRL"
 #define CURRENCY_CODE_RUB @"RUB"
 
-#define PUSH_NOTIFICATION_TYPE_PAYMENT @"payment"
-#define PUSH_NOTIFICATION_TYPE_CONTACT_REQUEST @"contact_request"
-
 #define DICTIONARY_KEY_SUCCESS @"success"
 #define DICTIONARY_KEY_ERROR @"error"
-
-#define DICTIONARY_KEY_MOBILE_INFO @"mobileInfo"
-#define DICTIONARY_KEY_MAINTENANCE @"maintenance"
 
 #define DICTIONARY_KEY_STATE @"state"
 #define DICTIONARY_KEY_INTENDED_AMOUNT @"intended_amount"
@@ -456,18 +383,7 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define DICTIONARY_KEY_PAYLOAD @"payload"
 
 #define DICTIONARY_KEY_ID @"id"
-#define DICTIONARY_KEY_COMPANY @"company"
-#define DICTIONARY_KEY_EMAIL @"email"
-#define DICTIONARY_KEY_INVITATION_RECEIVED @"invitationReceived"
-#define DICTIONARY_KEY_INVITATION_SENT @"invitationSent"
-#define DICTIONARY_KEY_MDID @"mdid"
 #define DICTIONARY_KEY_NOTE @"note"
-#define DICTIONARY_KEY_PUBKEY @"pubKey"
-#define DICTIONARY_KEY_SURNAME @"surname"
-#define DICTIONARY_KEY_TRUSTED @"trusted"
-#define DICTIONARY_KEY_XPUB @"xpub"
-#define DICTIONARY_KEY_SENDER_NAME @"senderName"
-#define DICTIONARY_KEY_TRANSACTION_LIST @"facilitatedTxList"
 
 #define DICTIONARY_KEY_FEE_REGULAR @"regular"
 #define DICTIONARY_KEY_FEE_PRIORITY @"priority"
@@ -475,9 +391,9 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define DICTIONARY_KEY_FEE_LIMITS_MIN @"min"
 #define DICTIONARY_KEY_FEE_LIMITS_MAX @"max"
 
-#define DICTIONARY_KEY_TRADE_DATE_CREATED @"createdAt"
-#define DICTIONARY_KEY_TRADE_RECEIVE_ADDRESS @"receiveAddress"
-#define DICTIONARY_KEY_TRADE_HASH @"txHash"
+//#define DICTIONARY_KEY_TRADE_DATE_CREATED @"createdAt"
+//#define DICTIONARY_KEY_TRADE_RECEIVE_ADDRESS @"receiveAddress"
+//#define DICTIONARY_KEY_TRADE_HASH @"txHash"
 
 #define DICTIONARY_KEY_TRANSACTION_FROM @"from"
 #define DICTIONARY_KEY_TRANSACTION_TO @"to"
@@ -574,28 +490,14 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 
 #define USER_DEFAULTS_KEY_ASSET_TYPE @"assetType"
 
-#define USER_DEFAULTS_KEY_CONTACTS_LAST_NAME_USED @"lastNameUsed"
-
-#define USER_DEFAULTS_KEY_DEFAULT_ACCOUNT_LABELLED_ADDRESSES_COUNT @"defaultAccountLabelledAddressesCount"
 #define USER_DEFAULTS_KEY_NEXT_ADDRESS @"nextReceivingAddress"
 #define USER_DEFAULTS_KEY_NEXT_ADDRESS_USED @"nextReceivingAddressUsed"
-#define USER_DEFAULTS_KEY_APP_REVIEW_PROMPT_DATE @"appReviewPromptDate"
 #define USER_DEFAULTS_KEY_LOADED_SETTINGS @"loadedSettings"
 #define USER_DEFAULTS_KEY_HIDE_APP_REVIEW_PROMPT @"hideAppReviewPrompt"
 #define USER_DEFAULTS_KEY_SHARED_KEY @"sharedKey"
 #define USER_DEFAULTS_KEY_GUID @"guid"
-#define USER_DEFAULTS_KEY_FIRST_RUN @"firstRun"
-#define USER_DEFAULTS_KEY_SYMBOL_LOCAL @"symbolLocal"
-#define USER_DEFAULTS_KEY_PASSWORD @"password"
-#define USER_DEFAULTS_KEY_PIN @"pin"
-#define USER_DEFAULTS_KEY_ENCRYPTED_PIN_PASSWORD @"encryptedPINPassword"
-#define USER_DEFAULTS_KEY_PIN_KEY @"pinKey"
-#define USER_DEFAULTS_KEY_PASSWORD_PART_HASH @"passwordPartHash"
-#define USER_DEFAULTS_KEY_HAS_SEEN_UPGRADE_TO_HD_SCREEN @"hasSeenUpgradeToHdScreen"
-#define USER_DEFAULTS_KEY_TOUCH_ID_ENABLED @"touchIDEnabled"
-#define USER_DEFAULTS_KEY_SWIPE_TO_RECEIVE_ENABLED @"swipeToReceive"
+//#define USER_DEFAULTS_KEY_SWIPE_TO_RECEIVE_ENABLED @"swipeToReceive"
 #define USER_DEFAULTS_KEY_HIDE_WATCH_ONLY_RECEIVE_WARNING @"hideWatchOnlyReceiveWarning"
-#define USER_DEFAULTS_KEY_HIDE_TRANSFER_ALL_FUNDS_ALERT @"hideTransferAllFundsAlert"
 #define USER_DEFAULTS_KEY_HAS_SEEN_CUSTOM_FEE_WARNING @"hasSeenCustomFeeWarning"
 
 // TODO: - Migrate debug flags to DebugTableViewController
@@ -603,19 +505,14 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define USER_DEFAULTS_KEY_DEBUG_ENABLE_CERTIFICATE_PINNING @"certificatePinning"
 #define USER_DEFAULTS_KEY_DEBUG_SIMULATE_SURGE @"simulateSurge"
 #define USER_DEFAULTS_KEY_DEBUG_SIMULATE_ZERO_TICKER @"zeroTicker"
-
-#define USER_DEFAULTS_KEY_DEBUG_APP_REVIEW_PROMPT_CUSTOM_TIMER @"appReviewPromptTimer"
 #define USER_DEFAULTS_KEY_HAS_SEEN_SURVEY_PROMPT @"hasSeenSurveyPrompt"
-#define USER_DEFAULTS_KEY_REMINDER_MODAL_DATE @"reminderModalDate"
-#define USER_DEFAUTS_KEY_HAS_ENDED_FIRST_SESSION @"hasEndedFirstSession"
-#define USER_DEFAULTS_KEY_HAS_SEEN_ALL_CARDS @"hasSeenAllCards"
-#define USER_DEFAULTS_KEY_SHOULD_HIDE_ALL_CARDS @"shouldHideAllCards"
+//#define USER_DEFAULTS_KEY_REMINDER_MODAL_DATE @"reminderModalDate"
+//#define USER_DEFAUTS_KEY_HAS_ENDED_FIRST_SESSION @"hasEndedFirstSession"
 #define USER_DEFAULTS_KEY_LAST_CARD_OFFSET @"lastCardOffset"
-#define USER_DEFAULTS_KEY_SHOULD_HIDE_BUY_SELL_CARD @"shouldHideBuySellNotificationCard"
-#define USER_DEFAULTS_KEY_SHOULD_HIDE_BITCOIN_CASH_CARD @"shouldHideBitcoinCashNotificationCard"
+//#define USER_DEFAULTS_KEY_SHOULD_HIDE_BUY_SELL_CARD @"shouldHideBuySellNotificationCard"
 
 #define USER_DEFAULTS_KEY_DEBUG_SECURITY_REMINDER_CUSTOM_TIMER @"securiterReminderTimer"
-#define USER_DEFAULTS_KEY_HAS_SEEN_EMAIL_REMINDER @"hasSeenEmailReminder"
+//#define USER_DEFAULTS_KEY_HAS_SEEN_EMAIL_REMINDER @"hasSeenEmailReminder"
 
 #define KEYCHAIN_KEY_SHARED_KEY @"sharedKey"
 #define KEYCHAIN_KEY_GUID @"guid"
@@ -628,10 +525,7 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define QR_CODE_KEY_SHARED_KEY @"sharedKey"
 #define QR_CODE_KEY_PASSWORD @"password"
 
-#define STORYBOARD_NAME_ACCOUNTS_AND_ADDRESSES @"AccountsAndAddresses"
-#define STORYBOARD_NAME_SETTINGS @"Settings"
 #define STORYBOARD_NAME_BACKUP @"Backup"
-#define STORYBOARD_NAME_UPGRADE @"Upgrade"
 
 #define TRANSACTION_STATE_WAITING_PAYMENT @"waiting_payment"
 #define TRANSACTION_STATE_WAITING_ADDRESS @"waiting_address"
@@ -644,13 +538,9 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define TRANSACTION_ROLE_RPR_INITIATOR @"rpr_initiator"
 #define TRANSACTION_ROLE_RPR_RECEIVER @"rpr_receiver"
 
-#define NAVIGATION_CONTROLLER_NAME_ACCOUNTS_AND_ADDRESSES @"AccountsAndAddressesNavigationController"
 #define NAVIGATION_CONTROLLER_NAME_SETTINGS @"SettingsNavigationController"
 #define NAVIGATION_CONTROLLER_NAME_BACKUP @"BackupNavigation"
 
-#define VIEW_CONTROLLER_NAME_UPGRADE @"UpgradeViewController"
-
-#define NIB_NAME_TAB_CONTROLLER @"TabController"
 #define NIB_NAME_TRANSACTIONS @"Transactions"
 #define NIB_NAME_SEND_COINS @"SendCoins"
 #define NIB_NAME_RECEIVE_COINS @"ReceiveCoins"
@@ -720,30 +610,11 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define TAB_TRANSACTIONS 2
 #define TAB_RECEIVE 3
 
-// SideMenuViewController
-#define SECTION_HEADER_HEIGHT 44
-
-#define MENU_ENTRY_HEIGHT 54
-#define BALANCE_ENTRY_HEIGHT 58
-
-#define MENU_TOP_BANNER_HEIGHT 65
-
 #define PIN_API_STATUS_CODE_DELETED 1
 #define PIN_API_STATUS_PIN_INCORRECT 2
 #define PIN_API_STATUS_OK 0
-#define PIN_API_STATUS_UNKNOWN 3
-#define PIN_API_STATUS_DUPLICATE_KEY 4
-
-#define PIN_COMMON_CODE_1 1234
-#define PIN_COMMON_CODE_2 1111
-#define PIN_COMMON_CODE_3 1212
-#define PIN_COMMON_CODE_4 7777
-#define PIN_COMMON_CODE_5 1004
-#define PIN_INVALID_CODE 0000
 
 // Most common pin codes: http://datagenetics.com/blog/september32012/index.html
-
-#define NUMBER_OF_TRANSACTIONS_REQUIRED_FOR_FOR_APP_STORE_REVIEW_PROMPT 3
 
 #define TWO_STEP_AUTH_TYPE_SMS 5
 #define TWO_STEP_AUTH_TYPE_GOOGLE 4
@@ -752,8 +623,6 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 
 #define DELAY_KEYBOARD_DISMISSAL 0.6f
 #define DELAY_GET_HISTORY_BACKUP 3.0f
-
-#define PIN_PBKDF2_ITERATIONS 1 // This does not need to be large because the key is already 256 bits
 
 #define BTC_LIMIT_IN_SATOSHI 21e14 // 21,000,000 (Total possible Bitcoins) * 100,000,000 (Satoshi)
 #define ETH_DECIMAL_LIMIT 18
@@ -765,7 +634,6 @@ green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/
 #define DEBUG_PRESENTER_PIN_VERIFY 1
 #define DEBUG_PRESENTER_SETTINGS_ABOUT 2
 
-#define TIME_INTERVAL_APP_STORE_REVIEW_PROMPT 60*60*24*7 // Seconds in one week
 #define TIME_INTERVAL_SECURITY_REMINDER_PROMPT 60*60*24*30 // Seconds in thirty days
 
 #define MSEC_PER_SEC 1000

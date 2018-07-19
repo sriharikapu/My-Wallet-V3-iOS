@@ -24,10 +24,10 @@
 
 #import "PEPinEntryController.h"
 #import "QRCodeGenerator.h"
-#import "RootService.h"
 #import "KeychainItemWrapper+SwipeAddresses.h"
 #import "BCSwipeAddressViewModel.h"
 #import "UIView+ChangeFrameAttribute.h"
+#import "Blockchain-Swift.h"
 
 #define PS_VERIFY	0
 #define PS_ENTER1	1
@@ -40,7 +40,7 @@ static PEViewController *EnterController()
 	c.prompt = BC_STRING_PLEASE_ENTER_PIN;
 	c.title = @"";
 
-    c.versionLabel.text = [app getVersionLabelString];
+    c.versionLabel.text = [NSBundle applicationVersion];
     c.versionLabel.hidden = NO;
     
 	return c;
@@ -52,7 +52,7 @@ static PEViewController *NewController()
 	c.prompt = BC_STRING_PLEASE_ENTER_NEW_PIN;
 	c.title = @"";
 
-    c.versionLabel.text = [app getVersionLabelString];
+    c.versionLabel.text = [NSBundle applicationVersion];
 
     return c;
 }
@@ -63,10 +63,14 @@ static PEViewController *VerifyController()
 	c.prompt = BC_STRING_CONFIRM_PIN;
 	c.title = @"";
 
-    c.versionLabel.text = [app getVersionLabelString];
+    c.versionLabel.text = [NSBundle applicationVersion];
 
 	return c;
 }
+
+@interface PEPinEntryController ()
+@property (nonatomic) Pin *lastEnteredPIN;
+@end
 
 @implementation PEPinEntryController
 
@@ -79,7 +83,8 @@ static PEViewController *VerifyController()
 	c.delegate = n;
     n->pinController = c;
 	n->pinStage = PS_VERIFY;
-	n->verifyOnly = YES;
+	n->verifyOnly = YES;    
+    [n setupQRCode];
 	return n;
 }
 
@@ -128,19 +133,22 @@ static PEViewController *VerifyController()
 
 - (void)reset
 {
-    [pinController resetPin];
+    UIViewController * viewController = self.viewControllers.firstObject;
+    if ([viewController isKindOfClass:[PEViewController class]]) {
+        [((PEViewController *) viewController) resetPin];
+    }
 }
 
 - (void)setupQRCode
 {
-#ifdef ENABLE_SWIPE_TO_RECEIVE
-    if (self.verifyOnly &&
-        [[NSUserDefaults standardUserDefaults] boolForKey:USER_DEFAULTS_KEY_SWIPE_TO_RECEIVE_ENABLED]) {
-        
-        for (NSNumber *key in self.swipeViews) {
-            BCSwipeAddressView *swipeView = [self.swipeViews objectForKey:key];
-            [swipeView removeFromSuperview];
-        }
+    AppFeatureConfiguration *swipeToReceiveConfiguration = [AppFeatureConfigurator.sharedInstance configurationFor:AppFeatureSwipeToReceive];
+    if (!swipeToReceiveConfiguration.isEnabled) {
+        pinController.swipeLabel.hidden = YES;
+        pinController.swipeLabelImageView.hidden = YES;
+        return;
+    }
+
+    if (self.verifyOnly && BlockchainSettings.sharedAppInstance.swipeToReceiveEnabled) {
         
         pinController.swipeLabel.alpha = 1;
         pinController.swipeLabel.hidden = NO;
@@ -151,128 +159,141 @@ static PEViewController *VerifyController()
         pinController.scrollView.backgroundColor = [UIColor clearColor];
         
         [pinController.scrollView setUserInteractionEnabled:YES];
-        
+
+        CGFloat windowWidth = self.view.frame.size.width;
         NSArray *assets = [self assets];
-        
-        UIPageControl *backgroundViewPageControl = [self pageControlWithAssets:assets];
-        [self.view addSubview:backgroundViewPageControl];
-        backgroundViewPageControl.hidden = YES;
-        self.backgroundViewPageControl = backgroundViewPageControl;
 
-        CGFloat windowWidth = WINDOW_WIDTH;
-        CGFloat windowHeight = WINDOW_HEIGHT;
-
-        [pinController.scrollView setContentSize:CGSizeMake(windowWidth * (assets.count + 1), windowHeight)];
+        [pinController.scrollView setContentSize:CGSizeMake(windowWidth * (assets.count + 1), self.view.frame.size.height)];
         [pinController.scrollView setPagingEnabled:YES];
         pinController.scrollView.delegate = self;
-        
-        for (int assetIndex = 0; assetIndex < assets.count; assetIndex++) {
-            AssetType asset = [assets[assetIndex] integerValue];
-            BCSwipeAddressViewModel *viewModel = [[BCSwipeAddressViewModel alloc] initWithAssetType:asset];
-            BCSwipeAddressView *swipeView = [[BCSwipeAddressView alloc] initWithFrame:CGRectMake(windowWidth * (assetIndex + 1), 0, windowWidth, windowHeight) viewModel:viewModel delegate:self];
-            [self addAddressToSwipeView:swipeView assetType:asset];
-            [self.swipeViews setObject:swipeView forKey:[NSNumber numberWithInteger:asset]];
-            [pinController.scrollView addSubview:swipeView];
-        }
     } else {
         pinController.swipeLabel.hidden = YES;
         pinController.swipeLabelImageView.hidden = YES;
     }
-#else
-    pinController.swipeLabel.hidden = YES;
-    pinController.swipeLabelImageView.hidden = YES;
-#endif
 }
 
-- (void)addAddressToSwipeView:(BCSwipeAddressView *)swipeView assetType:(AssetType)assetType
+- (void)viewWillLayoutSubviews
 {
-    if (assetType == AssetTypeBitcoin || assetType == AssetTypeBitcoinCash) {
-        NSString *nextAddress = [[KeychainItemWrapper getSwipeAddressesForAssetType:assetType] firstObject];
-        
+    [super viewWillLayoutSubviews];
+    [self updateSwipeToReceiveViews];
+}
+
+- (void)updateSwipeToReceiveViews
+{
+    CGFloat windowWidth = self.view.frame.size.width;
+    NSArray *assets = [self assets];
+
+    for (NSNumber *key in self.swipeViews) {
+        SwipeToReceiveAddressView *swipeView = [self.swipeViews objectForKey:key];
+        [swipeView removeFromSuperview];
+    }
+
+    for (int assetIndex = 0; assetIndex < assets.count; assetIndex++) {
+        LegacyAssetType asset = [assets[assetIndex] integerValue];
+        BCSwipeAddressViewModel *viewModel = [[BCSwipeAddressViewModel alloc] initWithAssetType:asset];
+        SwipeToReceiveAddressView *swipeView = [SwipeToReceiveAddressView instanceFromNib];
+        swipeView.onRequestAssetTapped = ^(NSString * _Nonnull address) {
+            [self confirmCopyAddressToClipboard:address];
+        };
+        swipeView.frame = CGRectMake(windowWidth * (assetIndex + 1), 0, windowWidth, pinController.scrollView.frame.size.height);
+        [swipeView layoutIfNeeded];
+        swipeView.viewModel = viewModel;
+        [self addAddressToSwipeToReceiveView:swipeView assetType:asset];
+        [self.swipeViews setObject:swipeView forKey:[NSNumber numberWithInteger:asset]];
+        [pinController.scrollView addSubview:swipeView];
+    }
+}
+
+- (void)addAddressToSwipeToReceiveView:(SwipeToReceiveAddressView *)swipeView assetType:(LegacyAssetType)assetType
+{
+    AssetAddressRepository *assetAddressRepository = AssetAddressRepository.sharedInstance;
+    if (assetType == LegacyAssetTypeBitcoin || assetType == LegacyAssetTypeBitcoinCash) {
+
+        AssetType type = [AssetTypeLegacyHelper convertFromLegacy:assetType];
+
+        NSString *nextAddress = [[assetAddressRepository swipeToReceiveAddressesFor:type] firstObject].address;
+
         if (nextAddress) {
-            
+
             void (^error)(void) = ^() {
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:BC_STRING_NO_INTERNET_CONNECTION message:BC_STRING_SWIPE_TO_RECEIVE_NO_INTERNET_CONNECTION_WARNING preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:LocalizationConstantsObjcBridge.noInternetConnection message:BC_STRING_SWIPE_TO_RECEIVE_NO_INTERNET_CONNECTION_WARNING preferredStyle:UIAlertControllerStyleAlert];
                 [alert addAction:[UIAlertAction actionWithTitle:BC_STRING_CANCEL style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-                    [swipeView updateAddress:BC_STRING_REQUEST_FAILED_PLEASE_CHECK_INTERNET_CONNECTION];
+                    swipeView.address = LocalizationConstantsObjcBridge.requestFailedCheckConnection;
                 }]];
                 [alert addAction:[UIAlertAction actionWithTitle:BC_STRING_CONTINUE style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                    [app.wallet subscribeToSwipeAddress:nextAddress assetType:assetType];
-                    [swipeView updateAddress:nextAddress];
+                    [WalletManager.sharedInstance.wallet subscribeToSwipeAddress:nextAddress assetType:assetType];
+                    swipeView.address = nextAddress;
                 }]];
                 self.errorAlert = alert;
             };
-            
+
             void (^success)(NSString *, BOOL) = ^(NSString *address, BOOL isUnused) {
-                
+
                 if (isUnused) {
-                    [app.wallet subscribeToSwipeAddress:nextAddress assetType:assetType];
-                    [swipeView updateAddress:address];
+                    [WalletManager.sharedInstance.wallet subscribeToSwipeAddress:nextAddress assetType:assetType];
+                    swipeView.address = address;
                     self.errorAlert = nil;
                 } else {
-                    [KeychainItemWrapper removeFirstSwipeAddressForAssetType:assetType];
+                    [assetAddressRepository removeFirstSwipeAddressFor:type];
                     self.errorAlert = nil;
                 }
             };
-            [app checkForUnusedAddress:nextAddress success:success error:error assetType:assetType];
+            [[AssetAddressRepository sharedInstance] checkForUnusedAddress:nextAddress
+                                                            displayAddress:nextAddress
+                                                                 assetType:[AssetTypeLegacyHelper convertFromLegacy:assetType]
+                                                            successHandler:success
+                                                              errorHandler:error];
         } else {
-            [swipeView updateAddress:nextAddress];
+            swipeView.address = nextAddress;
         }
-    } else if (assetType == AssetTypeEther) {
-        NSString *etherAddress = [KeychainItemWrapper getSwipeEtherAddress];
-        [swipeView updateAddress:etherAddress];
+    } else if (assetType == LegacyAssetTypeEther) {
+        NSString *etherAddress = [[assetAddressRepository swipeToReceiveAddressesFor:AssetTypeEthereum] firstObject].address;
+        if (etherAddress) {
+            swipeView.address = etherAddress;
+        }
     }
 }
 
-- (void)paymentReceived:(AssetType)assetType
+- (void)paymentReceived:(LegacyAssetType)assetType
 {
-    if ((assetType == AssetTypeBitcoin || assetType == AssetTypeBitcoinCash) &&
-        [KeychainItemWrapper getSwipeAddressesForAssetType:assetType].count > 0) {
-        [KeychainItemWrapper removeFirstSwipeAddressForAssetType:assetType];
-        BCSwipeAddressView *swipeView = [self.swipeViews objectForKey:[NSNumber numberWithInteger:assetType]];
-        [self addAddressToSwipeView:swipeView assetType:assetType];
+    AssetType type = [AssetTypeLegacyHelper convertFromLegacy:assetType];
+
+    if (type != AssetTypeBitcoin && type != AssetTypeBitcoinCash) {
+        return;
     }
+
+    AssetAddressRepository *assetAddressRepository = AssetAddressRepository.sharedInstance;
+    if ([assetAddressRepository swipeToReceiveAddressesFor:type].count <= 0) {
+        return;
+    }
+    [assetAddressRepository removeFirstSwipeAddressFor:type];
+
+    SwipeToReceiveAddressView *swipeView = [self.swipeViews objectForKey:[NSNumber numberWithInteger:assetType]];
+    [self addAddressToSwipeToReceiveView:swipeView assetType:assetType];
 }
 
 - (void)pinEntryControllerDidEnteredPin:(PEViewController *)controller
 {
 	switch (pinStage) {
 		case PS_VERIFY: {
-			[self.pinDelegate pinEntryController:self shouldAcceptPin:[controller.pin intValue] callback:^(BOOL yes) {
-                if (yes) {
-                    if(verifyOnly == NO) {
-                        PEViewController *c = NewController();
-                        c.delegate = self;
-                        pinStage = PS_ENTER1;
-                        [[self navigationController] pushViewController:c animated:NO];
-                        self.viewControllers = [NSArray arrayWithObject:c];
-                    }
-                } else {
-                    controller.prompt = BC_STRING_INCORRECT_PIN_RETRY;
-                    [controller resetPin];
-                }
-            }];
+            self.lastEnteredPIN = [[Pin alloc] initWithCode:[controller.pin intValue]];
+            [self validateWithPin:self.lastEnteredPIN];
 			break;
         }
 		case PS_ENTER1: {
-			pinEntry1 = [controller.pin intValue];
-			PEViewController *c = VerifyController();
-			c.delegate = self;
-			[[self navigationController] pushViewController:c animated:NO];
-			self.viewControllers = [NSArray arrayWithObject:c];
-			pinStage = PS_ENTER2;
-            [self.pinDelegate pinEntryController:self willChangeToNewPin:[controller.pin intValue]];
+            [self didEnter1Pin:controller];
 			break;
 		}
 		case PS_ENTER2:
 			if([controller.pin intValue] != pinEntry1) {
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:BC_STRING_ERROR message:BC_PIN_NO_MATCH preferredStyle:UIAlertControllerStyleAlert];
-                [alert addAction:[UIAlertAction actionWithTitle:BC_STRING_OK style:UIAlertActionStyleCancel handler:nil]];
 				PEViewController *c = NewController();
 				c.delegate = self;
 				self.viewControllers = [NSArray arrayWithObjects:c, [self.viewControllers objectAtIndex:0], nil];
 				[self popViewControllerAnimated:NO];
-                [self presentViewController:alert animated:YES completion:nil];
+                [AlertViewPresenter.sharedInstance standardErrorWithMessage:LocalizationConstantsObjcBridge.pinsDoNotMatch
+                                                                      title:LocalizationConstantsObjcBridge.error
+                                                                         in:self
+                                                                    handler:nil];
 			} else {
 				[self.pinDelegate pinEntryController:self changedPin:[controller.pin intValue]];
 			}
@@ -280,6 +301,75 @@ static PEViewController *VerifyController()
 		default:
 			break;
 	}
+}
+
+- (void)didEnter1Pin:(PEViewController *)controller
+{
+    Pin *pin = [[Pin alloc] initWithCode: [controller.pin intValue]];
+
+    // Check that the selected pin passes checks
+    if (!pin.isValid) {
+        [self errorAndResetWithMessage:[LocalizationConstantsObjcBridge chooseAnotherPin]];
+        return;
+    }
+
+    if ([pin isEqual:self.lastEnteredPIN]) {
+        [self errorAndResetWithMessage:[LocalizationConstantsObjcBridge newPinMustBeDifferent]];
+        return;
+    }
+
+    if (pin.isCommon) {
+        __weak PEPinEntryController *weakSelf = self;
+        NSArray *actions = @[
+            [UIAlertAction actionWithTitle:[LocalizationConstantsObjcBridge continueString]
+                                     style:UIAlertActionStyleDefault
+                                   handler:^(UIAlertAction * _Nonnull action) {
+                [weakSelf goToEnter2Pin:controller];
+            }],
+            [UIAlertAction actionWithTitle:[LocalizationConstantsObjcBridge tryAgain]
+                                     style:UIAlertActionStyleDefault
+                                   handler:^(UIAlertAction * _Nonnull action) {
+                [weakSelf reset];
+            }],
+        ];
+        [AlertViewPresenter.sharedInstance standardNotifyWithMessage:[LocalizationConstantsObjcBridge pinCodeCommonMessage]
+                                                               title:[LocalizationConstantsObjcBridge warning]
+                                                             actions:actions
+                                                                  in:self];
+        return;
+    }
+
+    [self goToEnter2Pin:controller];
+}
+
+- (void)goToEnter1Pin
+{
+    PEViewController *c = NewController();
+    c.delegate = self;
+    pinStage = PS_ENTER1;
+    [[self navigationController] pushViewController:c animated:NO];
+    self.viewControllers = [NSArray arrayWithObject:c];
+}
+
+- (void)goToEnter2Pin:(PEViewController *)controller
+{
+    pinEntry1 = [controller.pin intValue];
+    PEViewController *c = VerifyController();
+    c.delegate = self;
+    [[self navigationController] pushViewController:c animated:NO];
+    self.viewControllers = [NSArray arrayWithObject:c];
+    pinStage = PS_ENTER2;
+}
+
+- (void)errorAndResetWithMessage:(NSString *)errorMessage
+{
+    __weak PEPinEntryController *weakSelf = self;
+    [AlertViewPresenter.sharedInstance standardErrorWithMessage:errorMessage
+                                                          title:[LocalizationConstantsObjcBridge error]
+                                                             in:self
+                                                        handler:^(UIAlertAction * _Nonnull action) {
+                                                            [weakSelf reset];
+                                                        }];
 }
 
 - (UIViewController *)popViewControllerAnimated:(BOOL)animated
@@ -301,10 +391,16 @@ static PEViewController *VerifyController()
 
 - (NSArray *)assets
 {
-    return @[[NSNumber numberWithInteger:AssetTypeBitcoin], [NSNumber numberWithInteger:AssetTypeEther], [NSNumber numberWithInteger:AssetTypeBitcoinCash]];
+    return @[[NSNumber numberWithInteger:LegacyAssetTypeBitcoin], [NSNumber numberWithInteger:LegacyAssetTypeEther], [NSNumber numberWithInteger:LegacyAssetTypeBitcoinCash]];
 }
 
 #pragma mark Debug Menu
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    self.pinPresenter = [[PinPresenter alloc] initWithView:self interactor:[PinInteractor sharedInstance] walletService: [WalletService sharedInstance]];
+}
 
 - (void)viewDidAppear:(BOOL)animated
 {
@@ -313,7 +409,16 @@ static PEViewController *VerifyController()
     if (self.verifyOnly) {
         self.longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
         self.longPressGesture.minimumPressDuration = DURATION_LONG_PRESS_GESTURE_DEBUG;
-        self.debugButton = [[UIButton alloc] initWithFrame:CGRectMake(self.view.frame.size.width - 80, 15, 80, 51)];
+
+        UIWindow *window = UIApplication.sharedApplication.keyWindow;
+        CGFloat safeAreaInsetTop;
+        if (@available(iOS 11.0, *)) {
+            safeAreaInsetTop = window.rootViewController.view.safeAreaInsets.top;
+        } else {
+            safeAreaInsetTop = 20;
+        }
+
+        self.debugButton = [[UIButton alloc] initWithFrame:CGRectMake(self.view.frame.size.width - 80, safeAreaInsetTop, 80, 51)];
         self.debugButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
         self.debugButton.titleLabel.adjustsFontSizeToFitWidth = YES;
         [self.debugButton setTitleEdgeInsets:UIEdgeInsetsMake(0.0, 10.0, 0.0, 10.0)];
@@ -335,7 +440,7 @@ static PEViewController *VerifyController()
 - (void)handleLongPress:(UILongPressGestureRecognizer *)longPress
 {
     if (longPress.state == UIGestureRecognizerStateBegan) {
-        [app showDebugMenu:DEBUG_PRESENTER_PIN_VERIFY];
+        [[AppCoordinator sharedInstance] showDebugViewWithPresenter:DEBUG_PRESENTER_PIN_VERIFY];
     }
 }
 
@@ -356,8 +461,15 @@ static PEViewController *VerifyController()
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+    if (!self.backgroundViewPageControl) {
+        UIPageControl *backgroundViewPageControl = [self pageControlWithAssets:[self assets]];
+        [self.view addSubview:backgroundViewPageControl];
+        backgroundViewPageControl.hidden = YES;
+        self.backgroundViewPageControl = backgroundViewPageControl;
+    }
+
     if (!self.scrollViewPageControl) {
-        CGFloat windowWidth = WINDOW_WIDTH;
+        CGFloat windowWidth = self.view.frame.size.width;
         UIPageControl *scrollViewPageControl = [self pageControlWithAssets:[self assets]];
         [scrollViewPageControl changeXPosition:scrollViewPageControl.frame.origin.x + windowWidth];
         [pinController.scrollView addSubview:scrollViewPageControl];
@@ -402,7 +514,13 @@ static PEViewController *VerifyController()
 
 - (UIPageControl *)pageControlWithAssets:(NSArray *)assets
 {
-    UIPageControl *pageControl = [[UIPageControl alloc] initWithFrame:CGRectMake(0, [BCSwipeAddressView pageIndicatorYOrigin], 100, 30)];
+    SwipeToReceiveAddressView *swipeView;
+    for (NSNumber *key in self.swipeViews) {
+        swipeView = [[self swipeViews] objectForKey:key];
+        break;
+    }
+
+    UIPageControl *pageControl = [[UIPageControl alloc] initWithFrame:CGRectMake(0, swipeView.pageIndicatorYOrigin, 100, 30)];
     pageControl.center = CGPointMake(self.view.bounds.size.width/2, pageControl.center.y);
     pageControl.pageIndicatorTintColor = COLOR_BLOCKCHAIN_LIGHTEST_BLUE;
     pageControl.currentPageIndicatorTintColor = COLOR_BLOCKCHAIN_DARK_BLUE;
@@ -410,17 +528,14 @@ static PEViewController *VerifyController()
     return pageControl;
 }
 
-#pragma mark - Swipe View Delegate
-
-- (void)requestButtonClickedForAddress:(NSString *)address
+- (void)confirmCopyAddressToClipboard:(NSString *)address
 {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:BC_STRING_COPY_ADDRESS message:BC_STRING_COPY_WARNING_TEXT preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:BC_STRING_CANCEL style:UIAlertActionStyleCancel handler:nil]];
     [alert addAction:[UIAlertAction actionWithTitle:BC_STRING_COPY_ADDRESS style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [UIPasteboard generalPasteboard].string = address;
     }]];
-
-    [self.view.window.rootViewController presentViewController:alert animated:YES completion:nil];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 @end

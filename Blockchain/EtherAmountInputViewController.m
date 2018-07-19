@@ -9,7 +9,7 @@
 #import "EtherAmountInputViewController.h"
 #import "BCAmountInputView.h"
 #import "NSNumberFormatter+Currencies.h"
-#import "RootService.h"
+#import "Blockchain-Swift.h"
 
 @interface EtherAmountInputViewController ()
 @property (nonatomic) NSDecimalNumber *latestExchangeRate;
@@ -19,6 +19,7 @@
 @property (nonatomic) NSDecimalNumber *ethAmount;
 @property (nonatomic) NSDecimalNumber *ethAvailable;
 @property (nonatomic) BOOL displayingLocalSymbolSend;
+@property (nonatomic, readwrite) DestinationAddressSource addressSource;
 @end
 
 @implementation EtherAmountInputViewController
@@ -106,6 +107,7 @@
         return YES;
     } else if (textField == self.toField) {
         self.toAddress = [textField.text stringByReplacingCharactersInRange:range withString:string];
+        self.addressSource = DestinationAddressSourcePaste;
         if (self.toAddress && [self isEtherAddress:self.toAddress]) {
             [self selectToAddress:self.toAddress];
             return NO;
@@ -135,10 +137,7 @@
 
 - (void)convertToFiatField
 {
-    app.localCurrencyFormatter.usesGroupingSeparator = NO;
-    self.amountInputView.fiatField.text = [NSNumberFormatter formatEthToFiat:[self.ethAmount stringValue] exchangeRate:self.latestExchangeRate];
-    app.localCurrencyFormatter.usesGroupingSeparator = YES;
-
+    self.amountInputView.fiatField.text = [NSNumberFormatter formatEthToFiat:[self.ethAmount stringValue] exchangeRate:self.latestExchangeRate localCurrencyFormatter:[NSNumberFormatter localCurrencyFormatter]];
 }
 
 - (void)convertToBtcField

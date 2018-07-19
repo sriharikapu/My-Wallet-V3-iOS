@@ -7,11 +7,11 @@
 //
 
 #import "UpgradeViewController.h"
-#import "RootService.h"
 #import "LocalizationConstants.h"
 #import "UILabel+MultiLineAutoSize.h"
+#import "Blockchain-Swift.h"
 
-@interface UpgradeViewController ()
+@interface UpgradeViewController () <WalletUpgradeDelegate>
 @property (weak, nonatomic) IBOutlet UIPageControl *pageControl;
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UILabel *captionLabel;
@@ -33,30 +33,24 @@
 
 - (IBAction)upgradeTapped:(UIButton *)sender
 {
-    if (![app checkInternetConnection]) {
+    if (!Reachability.hasInternetConnection) {
+        [AlertViewPresenter.sharedInstance showNoInternetConnectionAlert];
         return;
     }
-    
-    app.topViewControllerDelegate = nil;
-    
-    [app.wallet loading_start_upgrade_to_hd];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * ANIMATION_DURATION * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [app closeSideMenu];
-        [app.wallet performSelector:@selector(upgradeToV3Wallet) withObject:nil afterDelay:0.1f];
-    });
-    
-    [self dismissViewControllerAnimated:YES completion:nil];
+
+    [LoadingViewPresenter.sharedInstance showBusyViewWithLoadingText:BC_STRING_LOADING_CREATING_V3_WALLET];
+
+    [WalletManager.sharedInstance.wallet upgradeToV3Wallet];
 }
 
 - (NSArray *)imageNamesArray
 {
-    return @[@"upgrade1", @"upgrade2", @"upgrade3"];
+    return @[@"ImageUpgradeFeature1", @"ImageUpgradeFeature2", @"ImageUpgradeFeature3"];
 }
 
 - (NSArray *)captionLabelStringsArray
 {
-    return @[BC_STRING_UPGRADE_FEATURE_ONE, BC_STRING_UPGRADE_FEATURE_TWO, BC_STRING_UPGRADE_FEATURE_THREE];
+    return @[[LocalizationConstantsObjcBridge upgradeFeatureOne], [LocalizationConstantsObjcBridge upgradeFeatureTwo], [LocalizationConstantsObjcBridge upgradeFeatureThree]];
 }
 
 - (NSAttributedString *)createBlueAttributedStringWithWideLineSpacingFromString:(NSString *)string
@@ -154,13 +148,14 @@
     [self setTextForCaptionLabel];
     
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
+
+    WalletManager.sharedInstance.upgradeWalletDelegate = self;
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
-    app.topViewControllerDelegate = nil;
 }
 
 - (void)viewDidLayoutSubviews
@@ -221,11 +216,17 @@
     [self setTextForCaptionLabel];
 }
 
-#pragma mark Top View Delegate
+#pragma mark - WalletUpgradeDelegate
 
-- (void)presentAlertController:(UIAlertController *)alertController
+- (void)onWalletUpgraded
 {
-    [self presentViewController:alertController animated:YES completion:nil];
+    __weak UpgradeViewController *weakSelf = self;
+    [AlertViewPresenter.sharedInstance standardNotifyWithMessage:LocalizationConstantsObjcBridge.upgradeSuccess
+                                                           title:LocalizationConstantsObjcBridge.upgradeSuccessTitle
+                                                              in:self
+                                                         handler:^(UIAlertAction * _Nonnull action) {
+                                                             [weakSelf dismissViewControllerAnimated:YES completion:nil];
+                                                         }];
 }
 
 @end

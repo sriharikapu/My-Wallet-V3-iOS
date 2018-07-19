@@ -11,7 +11,8 @@
 #import "Assets.h"
 
 @interface DashboardViewController : CardsViewController
-@property (nonatomic) AssetType assetType;
+@property (nonatomic) LegacyAssetType assetType;
 - (void)reload;
+- (void)reloadSymbols;
 - (void)updateEthExchangeRate:(NSDecimalNumber *)rate;
 @end

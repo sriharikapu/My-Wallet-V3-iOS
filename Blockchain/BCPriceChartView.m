@@ -11,6 +11,7 @@
 #import "UIView+ChangeFrameAttribute.h"
 #import "Blockchain-Swift.h"
 #import "GraphTimeFrame.h"
+#import "NSNumberFormatter+Currencies.h"
 
 #define X_INSET_GRAPH_CONTAINER 16
 
@@ -20,7 +21,7 @@
 
 @property (nonatomic) id <IChartAxisValueFormatter, BCPriceChartViewDelegate> delegate;
 
-@property (nonatomic) AssetType assetType;
+@property (nonatomic) LegacyAssetType assetType;
 @property (nonatomic) LineChartView *chartView;
 @property (nonatomic) UIView *graphContainerView;
 @property (nonatomic) UILabel *titleLabel;
@@ -44,7 +45,7 @@
 
 @implementation BCPriceChartView
 
-- (id)initWithFrame:(CGRect)frame assetType:(AssetType)assetType dataPoints:(NSArray *)dataPoints delegate:(id<IChartAxisValueFormatter, ChartViewDelegate, BCPriceChartViewDelegate>)delegate
+- (id)initWithFrame:(CGRect)frame assetType:(LegacyAssetType)assetType dataPoints:(NSArray *)dataPoints delegate:(id<IChartAxisValueFormatter, ChartViewDelegate, BCPriceChartViewDelegate>)delegate
 {
     if (self == [super initWithFrame:frame]) {
         self.assetType = assetType;
@@ -315,7 +316,7 @@
     self.titleLabel.center = CGPointMake([self.titleLabel superview].frame.size.width/2, self.titleLabel.center.y);
     
     NSString *formattedString = [NSNumberFormatter localFormattedString:[NSString stringWithFormat:@"%.2f", dataEntry.y]];
-    self.priceLabel.text = [NSString stringWithFormat:@"%@%@", app.latestResponse.symbol_local.symbol, formattedString];
+    self.priceLabel.text = [NSString stringWithFormat:@"%@%@", WalletManager.sharedInstance.latestMultiAddressResponse.symbol_local.symbol, formattedString];
     [self.priceLabel sizeToFit];
     
     self.percentageChangeLabel.hidden = YES;
@@ -411,12 +412,12 @@
 
 - (NSString *)getChartTitleText
 {
-    AssetType assetType = self.assetType;
-    if (assetType == AssetTypeBitcoin) {
+    LegacyAssetType assetType = self.assetType;
+    if (assetType == LegacyAssetTypeBitcoin) {
         return [BC_STRING_BITCOIN_PRICE uppercaseString];
-    } else if (assetType == AssetTypeEther) {
+    } else if (assetType == LegacyAssetTypeEther) {
         return [BC_STRING_ETHER_PRICE uppercaseString];
-    } else if (assetType == AssetTypeBitcoinCash) {
+    } else if (assetType == LegacyAssetTypeBitcoinCash) {
         return [BC_STRING_BITCOIN_CASH_PRICE uppercaseString];
     }
     DLog(@"Error: unknown asset type!");
@@ -425,12 +426,12 @@
 
 - (NSString *)getPriceLabelText
 {
-    AssetType assetType = self.assetType;
-    if (assetType == AssetTypeBitcoin) {
+    LegacyAssetType assetType = self.assetType;
+    if (assetType == LegacyAssetTypeBitcoin) {
         return [NSNumberFormatter formatMoney:SATOSHI localCurrency:YES];
-    } else if (assetType == AssetTypeEther) {
+    } else if (assetType == LegacyAssetTypeEther) {
         return [NSNumberFormatter formatEthToFiatWithSymbol:@"1" exchangeRate:self.lastEthExchangeRate];
-    } else if (assetType == AssetTypeBitcoinCash) {
+    } else if (assetType == LegacyAssetTypeBitcoinCash) {
         return [NSNumberFormatter formatBchWithSymbol:SATOSHI localCurrency:YES];
     }
     DLog(@"Error: unknown asset type!");

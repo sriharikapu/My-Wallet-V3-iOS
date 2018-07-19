@@ -7,10 +7,14 @@
 //
 
 #import "WalletSetupViewController.h"
+#import "Blockchain-Swift.h"
+#import <LocalAuthentication/LocalAuthentication.h>
 
 @interface WalletSetupViewController ()
 @property (nonatomic) UIScrollView *scrollView;
 @property (nonatomic) UILabel *emailLabel;
+@property (nonatomic) UIWindow *window;
+@property (nonatomic) BiometricType *biometricType;
 @end
 
 @implementation WalletSetupViewController
@@ -19,19 +23,23 @@
 {
     if (self = [super init]) {
         self.delegate = delegate;
+        _window = [UIApplication sharedApplication].keyWindow;
+        _biometricType = UIDevice.currentDevice.supportedBiometricType;
     }
     return self;
 }
 
 - (void)loadView
 {
-    self.view = [[UIView alloc] initWithFrame:[self.delegate getFrame]];
+    CGFloat safeAreaInsetBottom = [UIView rootViewSafeAreaInsets].bottom;
+    CGRect frame = CGRectMake(0, 0, _window.frame.size.width, _window.frame.size.height - safeAreaInsetBottom);
+    self.view = [[UIView alloc] initWithFrame:frame];
     self.view.backgroundColor = [UIColor whiteColor];
     
     if (self.view == nil) {
         [super loadView];
     }
-    
+
     UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.frame];
     scrollView.pagingEnabled = YES;
     scrollView.showsHorizontalScrollIndicator = NO;
@@ -39,55 +47,65 @@
     
     NSInteger numberOfPages = 2;
     
-    [scrollView addSubview:[self setupTouchIDView]];
+    if (_biometricType) {
+        [scrollView addSubview:[self setupBiometricView]];
+    } else {
+        self.emailOnly = YES;
+    }
     [scrollView addSubview:[self setupEmailView]];
     
-    scrollView.contentSize = CGSizeMake(self.view.frame.size.width * numberOfPages, self.view.frame.size.height);
+    scrollView.contentSize = CGSizeMake(self.view.frame.size.width * numberOfPages, scrollView.frame.size.height);
     [self.view addSubview:scrollView];
     
     self.scrollView = scrollView;
     
-    if (self.emailOnly) [self goToSecondPage];
+    if (self.emailOnly) {
+        [self goToSecondPage];
+    }
 }
 
-- (UIView *)setupTouchIDView
+#pragma mark - Biometrics
+
+- (UIView *)setupBiometricView
 {
-    UIView *touchIDView = [[UIView alloc] initWithFrame:self.view.frame];
+    UIView *biometricView = [[UIView alloc] initWithFrame:self.view.frame];
+    UIView *bannerView = [self setupBannerViewWithImageName:_biometricType.asset];
+
+    [biometricView addSubview:bannerView];
     
-    UIView *bannerView = [self setupBannerViewWithImageName:@"fingerprint"];
-    [touchIDView addSubview:bannerView];
-    
-    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, bannerView.frame.size.height + 32, touchIDView.frame.size.width - 50, 50)];
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, bannerView.frame.size.height + 32, biometricView.frame.size.width - 50, 50)];
     titleLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:FONT_SIZE_EXTRA_EXTRA_LARGE];
     titleLabel.textColor = COLOR_TEXT_DARK_GRAY;
-    titleLabel.text = BC_STRING_TOUCH_ID;
-    titleLabel.center = CGPointMake(touchIDView.center.x, titleLabel.center.y);
+    titleLabel.text = _biometricType.title;
+    titleLabel.center = CGPointMake(biometricView.center.x, titleLabel.center.y);
     titleLabel.textAlignment = NSTextAlignmentCenter;
-    [touchIDView addSubview:titleLabel];
+    [biometricView addSubview:titleLabel];
     
-    UITextView *body = [[UITextView alloc] initWithFrame:CGRectMake(0, titleLabel.frame.origin.y + titleLabel.frame.size.height + 8, touchIDView.frame.size.width - 50, 100)];
+    UITextView *body = [[UITextView alloc] initWithFrame:CGRectMake(0, titleLabel.frame.origin.y + titleLabel.frame.size.height + 8, biometricView.frame.size.width - 50, 100)];
+    NSString *biometricInstructions = [NSString stringWithFormat:[LocalizationConstantsObjcBridge biometricInstructions], _biometricType.title];
     body.selectable = NO;
     body.editable = NO;
     body.scrollEnabled = NO;
     body.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:FONT_SIZE_SMALL_MEDIUM];
     body.textColor = COLOR_TEXT_DARK_GRAY;
-    body.text = BC_STRING_WELCOME_TOUCH_ID_INSTRUCTIONS;
-    body.center = CGPointMake(touchIDView.center.x, body.center.y);
+    body.text = biometricInstructions;
+    body.center = CGPointMake(biometricView.center.x, body.center.y);
     body.textAlignment = NSTextAlignmentCenter;
-    [touchIDView addSubview:body];
+    [biometricView addSubview:body];
     
-    UIButton *enableTouchIDButton = [self setupActionButton];
-    [enableTouchIDButton setTitle:[BC_STRING_ENABLE_TOUCH_ID uppercaseString] forState:UIControlStateNormal];
-    [enableTouchIDButton addTarget:self action:@selector(enableTouchID:) forControlEvents:UIControlEventTouchUpInside];
-    enableTouchIDButton.layer.cornerRadius = CORNER_RADIUS_BUTTON;
-    [touchIDView addSubview:enableTouchIDButton];
+    UIButton *enableBiometricButton = [self setupActionButton];
+    NSString *buttonTitle = [NSString stringWithFormat:[LocalizationConstantsObjcBridge enableBiometrics], _biometricType.title];
+    [enableBiometricButton setTitle:[buttonTitle uppercaseString] forState:UIControlStateNormal];
+    [enableBiometricButton addTarget:self action:@selector(enableBiometrics:) forControlEvents:UIControlEventTouchUpInside];
+    enableBiometricButton.layer.cornerRadius = CORNER_RADIUS_BUTTON;
+    [biometricView addSubview:enableBiometricButton];
     
     UIButton *doneButton = [self setupDoneButton];
     doneButton.layer.cornerRadius = CORNER_RADIUS_BUTTON;
     [doneButton addTarget:self action:@selector(goToSecondPage) forControlEvents:UIControlEventTouchUpInside];
-    [touchIDView addSubview:doneButton];
+    [biometricView addSubview:doneButton];
     
-    return touchIDView;
+    return biometricView;
 }
 
 - (UIView *)setupEmailView
@@ -107,7 +125,7 @@
     
     self.emailLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, titleLabel.frame.origin.y + titleLabel.frame.size.height + 8, emailView.frame.size.width - 50, 30)];
     self.emailLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_SEMIBOLD size:FONT_SIZE_SMALL_MEDIUM];
-    self.emailLabel.text = [self.delegate getEmail];
+    self.emailLabel.text = [WalletManager.sharedInstance.wallet getEmail];
     self.emailLabel.textColor = COLOR_TEXT_DARK_GRAY;
     self.emailLabel.center = CGPointMake(emailView.center.x - self.view.frame.size.width, self.emailLabel.center.y);
     self.emailLabel.textAlignment = NSTextAlignmentCenter;
@@ -161,12 +179,22 @@
 
 - (UIView *)setupBannerViewWithImageName:(NSString *)imageName
 {
-    UIView *bannerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, DEFAULT_HEADER_HEIGHT + 80)];
+    CGFloat safeAreaInsetTop = 20;
+    if (@available(iOS 11.0, *)) {
+        safeAreaInsetTop = _window.rootViewController.view.safeAreaInsets.top;
+    }
+
+    CGFloat headerHeight = [ConstantsObjcBridge defaultNavigationBarHeight] + safeAreaInsetTop + 80;
+
+    UIView *bannerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, headerHeight)];
     bannerView.backgroundColor = COLOR_BLOCKCHAIN_BLUE;
 
+    CGFloat imageHeight = 72;
+    CGFloat imageWidth = 72;
+    CGFloat posX = (bannerView.frame.size.width / 2) - (imageWidth / 2);
+    CGFloat posY = (bannerView.frame.size.height / 2) - (imageHeight / 2) + (safeAreaInsetTop / 2);
     UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:imageName]];
-    imageView.frame = CGRectMake(0, 0, 72, 72);
-    imageView.center = CGPointMake(bannerView.center.x, bannerView.center.y + DEFAULT_STATUS_BAR_HEIGHT/2);
+    imageView.frame = CGRectMake(posX, posY, imageWidth, imageHeight);
     
     [bannerView addSubview:imageView];
     return bannerView;
@@ -185,17 +213,19 @@
 
 - (void)openMail
 {
-    [self.delegate openMailClicked];
+    [UIApplication.sharedApplication openMailApplication];
 }
 
-- (void)enableTouchID:(UIButton *)sender
+- (void)enableBiometrics:(UIButton *)sender
 {
-    if ([self.delegate enableTouchIDClicked]) {
-        [sender setTitle:[BC_STRING_ENABLED_EXCLAMATION uppercaseString] forState:UIControlStateNormal];
-        sender.backgroundColor = COLOR_BLOCKCHAIN_GREEN;
-        
-        [self performSelector:@selector(goToSecondPage) withObject:nil afterDelay:0.3f];
-    }
+    [self.delegate enableTouchIDClicked:^(BOOL success) {
+        if (success) {
+            [sender setTitle:[BC_STRING_ENABLED_EXCLAMATION uppercaseString] forState:UIControlStateNormal];
+            sender.backgroundColor = COLOR_BLOCKCHAIN_GREEN;
+
+            [self performSelector:@selector(goToSecondPage) withObject:nil afterDelay:0.3f];
+        }
+    }];
 }
 
 @end

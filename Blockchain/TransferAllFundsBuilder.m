@@ -7,15 +7,16 @@
 //
 
 #import "TransferAllFundsBuilder.h"
-#import "RootService.h"
+#import "Blockchain-Swift.h"
+#import "NSNumberFormatter+Currencies.h"
 
 @interface TransferAllFundsBuilder()
 @property (nonatomic) NSString *temporarySecondPassword;
-@property (nonatomic) AssetType assetType;
+@property (nonatomic) LegacyAssetType assetType;
 @end
 @implementation TransferAllFundsBuilder
 
-- (id)initWithAssetType:(AssetType)assetType usingSendScreen:(BOOL)usesSendScreen
+- (id)initWithAssetType:(LegacyAssetType)assetType usingSendScreen:(BOOL)usesSendScreen
 {
     if (self = [super init]) {
         self.assetType = assetType;
@@ -27,17 +28,17 @@
 
 - (Wallet *)wallet
 {
-    return app.wallet;
+    return WalletManager.sharedInstance.wallet;
 }
 
 - (void)getTransferAllInfo
 {
-    [app.wallet getInfoForTransferAllFundsToAccount];
+    [WalletManager.sharedInstance.wallet getInfoForTransferAllFundsToAccount];
 }
 
 - (NSString *)getLabelForDestinationAccount
 {
-    return [app.wallet getLabelForAccount:self.destinationAccount assetType:self.assetType];
+    return [WalletManager.sharedInstance.wallet getLabelForAccount:self.destinationAccount assetType:self.assetType];
 }
 
 - (NSString *)formatMoney:(uint64_t)amount localCurrency:(BOOL)useLocalCurrency
@@ -58,13 +59,13 @@
     self.transferAllAddressesUnspendable = 0;
     
     // use default account, but can select new destination account by calling setupTransfersToAccount:
-    [self setupTransfersToAccount:[app.wallet getDefaultAccountIndexForAssetType:self.assetType]];
+    [self setupTransfersToAccount:[WalletManager.sharedInstance.wallet getDefaultAccountIndexForAssetType:self.assetType]];
 }
 
 - (void)setupTransfersToAccount:(int)account
 {
     _destinationAccount = account;
-    [app.wallet setupFirstTransferForAllFundsToAccount:account address:[self.transferAllAddressesToTransfer firstObject] secondPassword:nil useSendPayment:self.usesSendScreen];
+    [WalletManager.sharedInstance.wallet setupFirstTransferForAllFundsToAccount:account address:[self.transferAllAddressesToTransfer firstObject] secondPassword:nil useSendPayment:self.usesSendScreen];
 }
 
 - (void)transferAllFundsToAccountWithSecondPassword:(NSString *)_secondPassword
@@ -73,6 +74,8 @@
         [self finishedTransferFunds];
         return;
     }
+    
+    Wallet *wallet = WalletManager.sharedInstance.wallet;
     
     transactionProgressListeners *listener = [[transactionProgressListeners alloc] init];
     
@@ -90,11 +93,11 @@
         
         self.temporarySecondPassword = secondPassword;
         
-        [app.wallet changeLastUsedReceiveIndexOfDefaultAccount];
+        [wallet changeLastUsedReceiveIndexOfDefaultAccount];
         // Fields are automatically reset by reload, called by MyWallet.wallet.getHistory() after a utx websocket message is received. However, we cannot rely on the websocket 100% of the time.
-        [app.wallet performSelector:@selector(getHistoryIfNoTransactionMessage) withObject:nil afterDelay:DELAY_GET_HISTORY_BACKUP];
+        [wallet performSelector:@selector(getHistoryIfNoTransactionMessage) withObject:nil afterDelay:DELAY_GET_HISTORY_BACKUP];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(continueTransferringFunds) name:NOTIFICATION_KEY_MULTIADDRESS_RESPONSE_RELOAD object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(continueTransferringFunds) name:[ConstantsObjcBridge notificationKeyMultiAddressResponseReload] object:nil];
         
         if (self.on_success) self.on_success(secondPassword);
     };
@@ -111,32 +114,39 @@
         }
                 
         if ([error isEqualToString:ERROR_UNDEFINED]) {
-            [app standardNotify:BC_STRING_SEND_ERROR_NO_INTERNET_CONNECTION];
+            [[AlertViewPresenter sharedInstance] standardNotifyWithMessage:BC_STRING_SEND_ERROR_NO_INTERNET_CONNECTION title:BC_STRING_ERROR in:nil handler:nil];
         } else if ([error isEqualToString:ERROR_FAILED_NETWORK_REQUEST]) {
-            [app standardNotify:BC_STRING_REQUEST_FAILED_PLEASE_CHECK_INTERNET_CONNECTION];
+            [[AlertViewPresenter sharedInstance] standardNotifyWithMessage:[LocalizationConstantsObjcBridge requestFailedCheckConnection] title:BC_STRING_ERROR in:nil handler:nil];
         } else if (error && error.length != 0)  {
-            [app standardNotify:error];
+            [[AlertViewPresenter sharedInstance] standardNotifyWithMessage:error title:BC_STRING_ERROR in:nil handler:nil];
         }
         
         if (self.on_error) self.on_error(error, secondPassword);
         
-        [app.wallet getHistory];
+        [wallet getHistory];
     };
     
-    if (self.on_before_send) self.on_before_send();
-    
-    app.wallet.didReceiveMessageForLastTransaction = NO;
+    WalletManager.sharedInstance.wallet.didReceiveMessageForLastTransaction = NO;
     
     if (self.usesSendScreen) {
-        [app.wallet sendPaymentWithListener:listener secondPassword:_secondPassword];
+        if (self.on_before_send) self.on_before_send();
+        [wallet sendPaymentWithListener:listener secondPassword:_secondPassword];
     } else {
-        [app.wallet transferFundsBackupWithListener:listener secondPassword:_secondPassword];
+        if (wallet.needsSecondPassword && !_secondPassword) {
+            [AuthenticationCoordinator.shared showPasswordConfirmWithDisplayText:[LocalizationConstantsObjcBridge secondPasswordDefaultDescription] headerText:[LocalizationConstantsObjcBridge secondPasswordRequired] validateSecondPassword:YES confirmHandler:^(NSString * _Nonnull secondPasswordInput) {
+                if (self.on_before_send) self.on_before_send();
+                [wallet transferFundsBackupWithListener:listener secondPassword:secondPasswordInput];
+            }];
+        } else {
+            if (self.on_before_send) self.on_before_send();
+            [wallet transferFundsBackupWithListener:listener secondPassword:_secondPassword];
+        }
     }
 }
 
 - (void)continueTransferringFunds
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NOTIFICATION_KEY_MULTIADDRESS_RESPONSE_RELOAD object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:[ConstantsObjcBridge notificationKeyMultiAddressResponseReload] object:nil];
     
     if ([self.transferAllAddressesToTransfer count] > 0) {
         [self.transferAllAddressesTransferred addObject:self.transferAllAddressesToTransfer[0]];
@@ -145,7 +155,7 @@
     if ([self.transferAllAddressesToTransfer count] > 1 && !self.userCancelledNext) {
         [self.transferAllAddressesToTransfer removeObjectAtIndex:0];
         if (self.on_prepare_next_transfer) self.on_prepare_next_transfer(self.transferAllAddressesToTransfer);
-        [app.wallet setupFollowingTransferForAllFundsToAccount:self.destinationAccount address:self.transferAllAddressesToTransfer[0] secondPassword:self.temporarySecondPassword useSendPayment:self.usesSendScreen];
+        [WalletManager.sharedInstance.wallet setupFollowingTransferForAllFundsToAccount:self.destinationAccount address:self.transferAllAddressesToTransfer[0] secondPassword:self.temporarySecondPassword useSendPayment:self.usesSendScreen];
     } else {
         [self.transferAllAddressesToTransfer removeAllObjects];
         [self finishedTransferFunds];
@@ -173,7 +183,7 @@
 
 - (void)archiveTransferredAddresses
 {
-    [app.wallet archiveTransferredAddresses:self.transferAllAddressesTransferred];
+    [WalletManager.sharedInstance.wallet archiveTransferredAddresses:self.transferAllAddressesTransferred];
 }
 
 @end

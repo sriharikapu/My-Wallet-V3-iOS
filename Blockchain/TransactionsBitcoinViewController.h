@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright (c) 2012, Ben Reeves. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -27,16 +27,11 @@
 @interface TransactionsBitcoinViewController : TransactionsViewController <UITableViewDelegate, UITableViewDataSource, UIPopoverPresentationControllerDelegate>
 {
     IBOutlet UITableView *tableView;
-    
-    IBOutlet UIView *headerView;
-    
-    IBOutlet UIButton *balanceBigButton;
-    
     MultiAddressResponse *data;
     LatestBlock *latestBlock;
 }
 
-@property (nonatomic) AssetType assetType;
+@property (nonatomic) LegacyAssetType assetType;
 
 @property(nonatomic, strong) MultiAddressResponse *data;
 @property(nonatomic, strong) LatestBlock *latestBlock;

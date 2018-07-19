@@ -7,7 +7,7 @@
 //
 
 #import "SettingsTwoStepViewController.h"
-#import "RootService.h"
+#import "Blockchain-Swift.h"
 
 @implementation SettingsTwoStepViewController
 
@@ -36,7 +36,7 @@
 
 - (void)updateUI
 {
-    if ([app.wallet hasEnabledTwoStep]) {
+    if ([WalletManager.sharedInstance.wallet hasEnabledTwoStep]) {
         [self.twoStepButton setTitle:BC_STRING_DISABLE forState:UIControlStateNormal];
     } else {
         [self.twoStepButton setTitle:BC_STRING_ENABLE_TWO_STEP_SMS forState:UIControlStateNormal];

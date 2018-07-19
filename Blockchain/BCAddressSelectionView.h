@@ -21,19 +21,18 @@
 #import <UIKit/UIKit.h>
 #import "Assets.h"
 
-@class Wallet, Contact;
+@class Wallet;
 
 @protocol AddressSelectionDelegate <NSObject>
 @optional
-- (AssetType)getAssetType;
+- (LegacyAssetType)getAssetType;
 - (void)didSelectFromAccount:(int)account;
-- (void)didSelectFromAccount:(int)account assetType:(AssetType)asset;
+- (void)didSelectFromAccount:(int)account assetType:(LegacyAssetType)asset;
 - (void)didSelectToAccount:(int)account;
-- (void)didSelectToAccount:(int)account assetType:(AssetType)asset;
+- (void)didSelectToAccount:(int)account assetType:(LegacyAssetType)asset;
 - (void)didSelectFromAddress:(NSString*)address;
 - (void)didSelectToAddress:(NSString*)address;
 - (void)didSelectWatchOnlyAddress:(NSString*)address;
-- (void)didSelectContact:(Contact *)contact;
 - (void)didSelectFilter:(int)filter;
 @end
 
@@ -47,17 +46,13 @@ typedef enum {
     SelectModeSendFrom = 100,
     SelectModeSendTo = 200,
     SelectModeReceiveTo = 300,
-    SelectModeReceiveFromContact = 350,
     SelectModeTransferTo = 400,
-    SelectModeContact = 500,
     SelectModeExchangeAccountFrom = 600,
     SelectModeExchangeAccountTo = 700
 }SelectMode;
 
 - (id)initWithWallet:(Wallet*)_wallet selectMode:(SelectMode)selectMode delegate:(id<AddressSelectionDelegate>)delegate;
 - (void)reloadTableView;
-
-@property(nonatomic, strong) NSMutableArray *contacts;
 
 @property(nonatomic, strong) NSMutableArray *addressBookAddresses;
 @property(nonatomic, strong) NSMutableArray *addressBookAddressLabels;
@@ -78,7 +73,6 @@ typedef enum {
 @property(nonatomic, strong) NSMutableArray *bchAddressLabels;
 
 @property(nonatomic, strong) Wallet *wallet;
-@property(nonatomic, strong) Contact *previouslySelectedContact;
 @property(nonatomic, strong) id<AddressSelectionDelegate> delegate;
 
 @end

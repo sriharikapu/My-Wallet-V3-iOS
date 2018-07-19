@@ -9,6 +9,7 @@
 #import "ConfirmStateViewController.h"
 #import "StateSelectorViewController.h"
 #import "BCNavigationController.h"
+#import "Blockchain-Swift.h"
 
 @interface ConfirmStateViewController () <UITableViewDelegate, UITableViewDataSource, StateSelectorDelegate>
 @property (nonatomic) NSArray *states;
@@ -30,21 +31,28 @@
 
 - (void)viewDidLoad
 {
-    CGFloat windowWidth = WINDOW_WIDTH;
-    CGFloat tableViewYPosition = DEFAULT_HEADER_HEIGHT;
-    UITableView *oneRowTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, tableViewYPosition, windowWidth, self.view.frame.size.height - tableViewYPosition) style:UITableViewStyleGrouped];
+    UIWindow *window = UIApplication.sharedApplication.keyWindow;
+    CGFloat safeAreaInsetTop;
+    if (@available(iOS 11.0, *)) {
+        safeAreaInsetTop = window.rootViewController.view.safeAreaInsets.top;
+    } else {
+        safeAreaInsetTop = 20;
+    }
+    CGFloat topBarHeight = ConstantsObjcBridge.defaultNavigationBarHeight + safeAreaInsetTop;
+
+    UITableView *oneRowTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height - topBarHeight) style:UITableViewStyleGrouped];
     oneRowTableView.dataSource = self;
     oneRowTableView.delegate = self;
     [self.view addSubview:oneRowTableView];
     self.tableView = oneRowTableView;
     
-    UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, windowWidth - 32, BUTTON_HEIGHT)];
+    UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width - 32, BUTTON_HEIGHT)];
     button.backgroundColor = COLOR_BLOCKCHAIN_LIGHT_BLUE;
     button.layer.cornerRadius = CORNER_RADIUS_BUTTON;
     [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     button.titleLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:17.0];
     [button setTitle:BC_STRING_CONFIRM forState:UIControlStateNormal];
-    button.center = CGPointMake(self.view.center.x, self.view.frame.size.height - 24 - BUTTON_HEIGHT/2);
+    button.center = CGPointMake(self.view.center.x, self.view.frame.size.height - topBarHeight - 24 - BUTTON_HEIGHT/2);
     [self.view addSubview:button];
     [button addTarget:self action:@selector(confirmButtonClicked) forControlEvents:UIControlEventTouchUpInside];
 }
@@ -60,8 +68,8 @@
 - (void)confirmButtonClicked
 {
     NSString *stateCode = self.selectedState[STATE_KEY_CODE];
-    if ([app.wallet isStateWhitelistedForShapeshift:stateCode]) {
-        [app.wallet selectState:self.selectedState[STATE_KEY_NAME] code:stateCode];
+    if ([WalletManager.sharedInstance.wallet isStateWhitelistedForShapeshift:stateCode]) {
+        [WalletManager.sharedInstance.wallet selectState:self.selectedState[STATE_KEY_NAME] code:stateCode];
         [self.delegate didConfirmState:self.navigationController];
     } else {
         UIAlertController *alertNotAvailable = [UIAlertController alertControllerWithTitle:BC_STRING_EXCHANGE_NOT_AVAILABLE_TITLE message:BC_STRING_EXCHANGE_NOT_AVAILABLE_MESSAGE preferredStyle:UIAlertControllerStyleAlert];
@@ -93,7 +101,7 @@
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    CGFloat windowWidth = WINDOW_WIDTH;
+    CGFloat windowWidth = self.view.frame.size.width;
     
     UIView *containerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, windowWidth, 50)];
     

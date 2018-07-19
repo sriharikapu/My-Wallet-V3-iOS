@@ -10,8 +10,6 @@
 #import "BTCBigNumber.h"
 #import <JavaScriptCore/JavaScriptCore.h>
 #import "BTCData.h"
-#import "RootService.h"
-#import "NSString+NSString_EscapeQuotes.h"
 #import "NSData+Hex.h"
 #import "BTCCurvePoint.h"
 #import "BTCBase58.h"
@@ -20,6 +18,7 @@
 #import "BTCKey.h"
 #import "BTCAddress.h"
 #import "KeyPair.h"
+#import "Blockchain-Swift.h"
 
 @implementation HDNode {
     JSManagedValue *_network;
@@ -38,7 +37,7 @@
 
 - (JSValue *)chainCode
 {
-    return [app.wallet executeJSSynchronous:[NSString stringWithFormat:@"new Buffer('%@', 'hex')", [self.keychain.chainCode hexadecimalString]]];;
+    return [WalletManager.sharedInstance.wallet executeJSSynchronous:[NSString stringWithFormat:@"new Buffer('%@', 'hex')", [self.keychain.chainCode hexadecimalString]]];;
 }
 
 - (uint32_t)index
@@ -64,10 +63,10 @@
         
         if (network == nil || [network isNull] || [network isUndefined]) {
             if ([[[NSUserDefaults standardUserDefaults] objectForKey:USER_DEFAULTS_KEY_ENV] isEqual:ENV_INDEX_TESTNET]) {
-                network = [app.wallet executeJSSynchronous:@"MyWalletPhone.getNetworks().testnet"];
+                network = [WalletManager.sharedInstance.wallet executeJSSynchronous:@"MyWalletPhone.getNetworks().testnet"];
                 self.keychain.network = [BTCNetwork testnet];
             } else {
-                network = [app.wallet executeJSSynchronous:@"MyWalletPhone.getNetworks().bitcoin"];
+                network = [WalletManager.sharedInstance.wallet executeJSSynchronous:@"MyWalletPhone.getNetworks().bitcoin"];
                 self.keychain.network = [BTCNetwork mainnet];
             }
         }
@@ -87,10 +86,10 @@
     if (testnetOn) {
         DLog(@"Testnet set in debug menu: using testnet");
         btcNetwork = [BTCNetwork testnet];
-    } else if ([[network toDictionary] isEqual:[[app.wallet executeJSSynchronous:@"MyWalletPhone.getNetworks().bitcoin"] toDictionary]]) {
+    } else if ([[network toDictionary] isEqual:[[WalletManager.sharedInstance.wallet executeJSSynchronous:@"MyWalletPhone.getNetworks().bitcoin"] toDictionary]]) {
         DLog(@"Using mainnet");
         btcNetwork = [BTCNetwork mainnet];
-    } else if ([[network toDictionary] isEqual:[[app.wallet executeJSSynchronous:@"MyWalletPhone.getNetworks().testnet"] toDictionary]]) {
+    } else if ([[network toDictionary] isEqual:[[WalletManager.sharedInstance.wallet executeJSSynchronous:@"MyWalletPhone.getNetworks().testnet"] toDictionary]]) {
         DLog(@"Using testnet");
         btcNetwork = [BTCNetwork testnet];
     } else {
@@ -110,7 +109,7 @@
 
 + (HDNode *)fromSeed:(JSValue *)seed buffer:(JSValue *)network;
 {
-    JSValue *hex = [app.wallet executeJSSynchronous:@"'hex'"];
+    JSValue *hex = [WalletManager.sharedInstance.wallet executeJSSynchronous:@"'hex'"];
     NSString *seedString = [[seed invokeMethod:@"toString" withArguments:@[hex]] toString];
     return [HDNode fromSeed:seedString network:network];
 }
@@ -133,12 +132,12 @@
 
 - (JSValue *)getFingerprint
 {
-    return [JSValue valueWithInt32:self.keychain.fingerprint inContext:app.wallet.context];
+    return [JSValue valueWithInt32:self.keychain.fingerprint inContext:WalletManager.sharedInstance.wallet.context];
 }
 
 - (JSValue *)getNetwork
 {
-    return [JSValue valueWithObject:self.keychain.network inContext:app.wallet.context];
+    return [JSValue valueWithObject:self.keychain.network inContext:WalletManager.sharedInstance.wallet.context];
 }
 
 - (JSValue *)getPublicKeyBuffer

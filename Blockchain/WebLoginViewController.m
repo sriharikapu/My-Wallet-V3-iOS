@@ -6,9 +6,9 @@
 //  Copyright © 2017 Blockchain Luxembourg S.A. All rights reserved.
 //
 
-#import "RootService.h"
 #import "WebLoginViewController.h"
 #import "QRCodeGenerator.h"
+#import "Blockchain-Swift.h"
 
 @interface WebLoginViewController ()
 @property (nonatomic) QRCodeGenerator *qrCodeGenerator;
@@ -42,7 +42,7 @@ const float qrSize = 230;
 {
     [super viewDidLoad];
 
-    CGSize size = app.window.frame.size;
+    CGSize size = [UIApplication sharedApplication].keyWindow.frame.size;
     self.view.frame = CGRectMake(0, DEFAULT_HEADER_HEIGHT, size.width, size.height - DEFAULT_HEADER_HEIGHT);
     self.view.backgroundColor = [UIColor whiteColor];
     
@@ -50,8 +50,8 @@ const float qrSize = 230;
 
     [self setupQRCodeViews];
 
-    app.wallet.delegate = self;
-    [app.wallet makePairingCode];
+    WalletManager.sharedInstance.wallet.delegate = self;
+    [WalletManager.sharedInstance.wallet makePairingCode];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -235,7 +235,7 @@ const float qrSize = 230;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    app.wallet.delegate = app;
+    WalletManager.sharedInstance.wallet.delegate = WalletManager.sharedInstance;
     [super viewWillDisappear:animated];
 }
 

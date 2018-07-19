@@ -8,7 +8,7 @@
 
 #import "SettingsNavigationController.h"
 #import "SettingsTableViewController.h"
-#import "RootService.h"
+#import "Blockchain-Swift.h"
 
 @interface SettingsNavigationController ()
 @end
@@ -18,14 +18,24 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    self.view.frame = CGRectMake(0, 0, app.window.frame.size.width, app.window.frame.size.height);
-    
-    UIView *topBar = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, DEFAULT_HEADER_HEIGHT)];
+
+    UIWindow *window = UIApplication.sharedApplication.keyWindow;
+
+    CGFloat safeAreaInsetTop;
+    if (@available(iOS 11.0, *)) {
+        safeAreaInsetTop = window.rootViewController.view.safeAreaInsets.top;
+    } else {
+        safeAreaInsetTop = 20;
+    }
+
+    self.view.frame = CGRectMake(0, 0, window.frame.size.width, window.frame.size.height);
+
+    CGRect topBarFrame = CGRectMake(0, 0, self.view.frame.size.width, ConstantsObjcBridge.defaultNavigationBarHeight + safeAreaInsetTop);
+    UIView *topBar = [[UIView alloc] initWithFrame:topBarFrame];
     topBar.backgroundColor = COLOR_BLOCKCHAIN_BLUE;
     [self.view addSubview:topBar];
     
-    UILabel *headerLabel = [[UILabel alloc] initWithFrame:FRAME_HEADER_LABEL];
+    UILabel *headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(60, safeAreaInsetTop + 6, 200, 30)];
     headerLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:FONT_SIZE_TOP_BAR_TEXT];
     headerLabel.textColor = [UIColor whiteColor];
     headerLabel.textAlignment = NSTextAlignmentCenter;
@@ -37,7 +47,7 @@
     
     UIButton *backButton = [UIButton buttonWithType:UIButtonTypeCustom];
     backButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
-    backButton.imageEdgeInsets = IMAGE_EDGE_INSETS_BACK_BUTTON_CHEVRON;
+    backButton.imageEdgeInsets = UIEdgeInsetsMake(0, 8, 0, 0);
     [backButton.titleLabel setFont:[UIFont systemFontOfSize:FONT_SIZE_MEDIUM]];
     [backButton setImage:[UIImage imageNamed:@"back_chevron_icon"] forState:UIControlStateNormal];
     [backButton setTitleColor:[UIColor colorWithWhite:0.56 alpha:1.0] forState:UIControlStateHighlighted];
@@ -45,7 +55,7 @@
     [topBar addSubview:backButton];
     self.backButton = backButton;
     
-    BCFadeView *busyView = [[BCFadeView alloc] initWithFrame:app.window.rootViewController.view.frame];
+    BCFadeView *busyView = [[BCFadeView alloc] initWithFrame:[UIApplication sharedApplication].keyWindow.rootViewController.view.frame];
     busyView.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.5];
     UIView *textWithSpinnerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 250, 110)];
     textWithSpinnerView.backgroundColor = [UIColor whiteColor];
@@ -57,7 +67,7 @@
     busyLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:BUSY_VIEW_LABEL_FONT_SYSTEM_SIZE];
     busyLabel.alpha = BUSY_VIEW_LABEL_ALPHA;
     busyLabel.textAlignment = NSTextAlignmentCenter;
-    busyLabel.text = BC_STRING_LOADING_SYNCING_WALLET;
+    busyLabel.text = [LocalizationConstantsObjcBridge syncingWallet];
     busyLabel.center = CGPointMake(textWithSpinnerView.bounds.origin.x + textWithSpinnerView.bounds.size.width/2, textWithSpinnerView.bounds.origin.y + textWithSpinnerView.bounds.size.height/2 + 15);
     [textWithSpinnerView addSubview:busyLabel];
     
@@ -86,21 +96,20 @@
         self.backButton.imageEdgeInsets = IMAGE_EDGE_INSETS_CLOSE_BUTTON_X;
         self.backButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
         [self.backButton setImage:[UIImage imageNamed:@"close"] forState:UIControlStateNormal];
-        self.backButton.center = CGPointMake(self.backButton.center.x, self.headerLabel.center.y);
     } else {
-        self.backButton.frame = FRAME_BACK_BUTTON;
+        self.backButton.frame = CGRectMake(0, 15, 85, 51);
         self.backButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
         [self.backButton setTitle:@"" forState:UIControlStateNormal];
-        self.backButton.imageEdgeInsets = IMAGE_EDGE_INSETS_BACK_BUTTON_CHEVRON;
+        self.backButton.imageEdgeInsets = UIEdgeInsetsMake(0, 8, 0, 0);
         [self.backButton setImage:[UIImage imageNamed:@"back_chevron_icon"] forState:UIControlStateNormal];
     }
+    self.backButton.center = CGPointMake(self.backButton.center.x, self.headerLabel.center.y);
 }
 
 - (void)backButtonClicked:(UIButton *)sender
 {
     if ([self.visibleViewController isMemberOfClass:[SettingsTableViewController class]]) {
         [self dismissViewControllerAnimated:YES completion:nil];
-        app.topViewControllerDelegate = nil;
     } else {
         [self popViewControllerAnimated:YES];
     }
@@ -163,11 +172,6 @@
 {
     //TODO: use this delegate method instead of handling busy views manually from view controllers
     return;
-}
-
-- (void)presentAlertController:(UIAlertController *)alertController
-{
-    [self.visibleViewController presentViewController:alertController animated:YES completion:nil];
 }
 
 - (void)dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion

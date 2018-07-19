@@ -7,11 +7,11 @@
 //
 
 #import "TransactionsBitcoinCashViewController.h"
-#import "RootService.h"
 #import "NSNumberFormatter+Currencies.h"
 #import "TransactionTableCell.h"
 #import "Transaction.h"
 #import "UIView+ChangeFrameAttribute.h"
+#import "Blockchain-Swift.h"
 
 @interface TransactionsViewController () <AddressSelectionDelegate>
 @property (nonatomic) UILabel *noTransactionsTitle;
@@ -21,7 +21,7 @@
 @property (nonatomic) UILabel *filterSelectorView;
 @property (nonatomic) UILabel *filterSelectorLabel;
 @property (nonatomic) NSString *balance;
-- (void)setupNoTransactionsViewInView:(UIView *)view assetType:(AssetType)assetType;
+- (void)setupNoTransactionsViewInView:(UIView *)view assetType:(LegacyAssetType)assetType;
 - (void)setupFilter;
 - (uint64_t)getAmountForReceivedTransaction:(Transaction *)transaction;
 @end
@@ -38,10 +38,7 @@
 {
     [super viewDidLoad];
     
-    self.view.frame = CGRectMake(0,
-                                 DEFAULT_HEADER_HEIGHT_OFFSET,
-                                 [UIScreen mainScreen].bounds.size.width,
-                                 [UIScreen mainScreen].bounds.size.height - DEFAULT_HEADER_HEIGHT - DEFAULT_HEADER_HEIGHT_OFFSET - DEFAULT_FOOTER_HEIGHT);
+    self.view.frame = [UIView rootViewSafeAreaFrameWithNavigationBar:YES tabBar:YES assetSelector:YES];
     
     [self setupFilter];
 
@@ -57,7 +54,7 @@
     
     [self setupPullToRefresh];
 
-    [self setupNoTransactionsViewInView:self.tableView assetType:AssetTypeBitcoinCash];
+    [self setupNoTransactionsViewInView:self.tableView assetType:LegacyAssetTypeBitcoinCash];
 
     [self loadTransactions];
 }
@@ -100,17 +97,17 @@
 - (uint64_t)getBalance
 {
     if (self.filterIndex == FILTER_INDEX_ALL) {
-        return [app.wallet getBchBalance];
+        return [WalletManager.sharedInstance.wallet getBchBalance];
     } else if (self.filterIndex == FILTER_INDEX_IMPORTED_ADDRESSES) {
-        return [app.wallet getTotalBalanceForActiveLegacyAddresses:AssetTypeBitcoinCash];
+        return [WalletManager.sharedInstance.wallet getTotalBalanceForActiveLegacyAddresses:LegacyAssetTypeBitcoinCash];
     } else {
-        return [[app.wallet getBalanceForAccount:(int)self.filterIndex assetType:AssetTypeBitcoinCash] longLongValue];
+        return [[WalletManager.sharedInstance.wallet getBalanceForAccount:(int)self.filterIndex assetType:LegacyAssetTypeBitcoinCash] longLongValue];
     }
 }
 
 - (void)loadTransactions
 {
-    self.transactions = [app.wallet getBitcoinCashTransactions:self.filterIndex];
+    self.transactions = [WalletManager.sharedInstance.wallet getBitcoinCashTransactions:self.filterIndex];
     
     self.noTransactionsView.hidden = self.transactions.count > 0;
     
@@ -127,9 +124,9 @@
 
 - (void)getHistoryAndRates
 {
-    [app showBusyViewWithLoadingText:BC_STRING_LOADING_LOADING_TRANSACTIONS];
+    [[LoadingViewPresenter sharedInstance] showBusyViewWithLoadingText:BC_STRING_LOADING_LOADING_TRANSACTIONS];
 
-    [app.wallet performSelector:@selector(getBitcoinCashHistoryAndRates) withObject:nil afterDelay:0.1f];
+    [WalletManager.sharedInstance.wallet performSelector:@selector(getBitcoinCashHistoryAndRates) withObject:nil afterDelay:0.1f];
 }
 
 - (void)didReceiveTransactionMessage
@@ -146,8 +143,12 @@
     } else if ([transaction.txType isEqualToString:TX_TYPE_RECEIVED]) {
         
         [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationFade];
-        
-        [app paymentReceived:[self getAmountForReceivedTransaction:transaction] showBackupReminder:NO];
+
+        TabControllerManager *tabControllerManager = AppCoordinator.sharedInstance.tabControllerManager;
+        if (tabControllerManager.tabViewController.selectedIndex == TAB_RECEIVE && ![tabControllerManager isSending]) {
+            uint64_t amount = [self getAmountForReceivedTransaction:transaction];
+            [tabControllerManager paymentReceived:amount showBackupReminder:NO];
+        }
     } else {
         [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationFade];
     }
@@ -155,7 +156,8 @@
 
 - (void)getAssetButtonClicked
 {
-    [app.tabControllerManager receiveCoinClicked:nil];
+    TabControllerManager *tabControllerManager = [AppCoordinator sharedInstance].tabControllerManager;
+    [tabControllerManager receiveCoinClicked:nil];
 }
 
 #pragma mark - Table View Data Source
@@ -168,7 +170,7 @@
 
     if (cell == nil) {
         cell = [[[NSBundle mainBundle] loadNibNamed:@"TransactionCell" owner:nil options:nil] objectAtIndex:0];
-        cell.assetType = AssetTypeBitcoinCash;
+        cell.assetType = LegacyAssetTypeBitcoinCash;
     }
     
     cell.transaction = transaction;
@@ -220,15 +222,15 @@
 
 - (void)showFilterMenu
 {
-    BCAddressSelectionView *filterView = [[BCAddressSelectionView alloc] initWithWallet:app.wallet selectMode:SelectModeFilter delegate:self];
-    [app showModalWithContent:filterView closeType:ModalCloseTypeBack headerText:BC_STRING_BALANCES];
+    BCAddressSelectionView *filterView = [[BCAddressSelectionView alloc] initWithWallet:WalletManager.sharedInstance.wallet selectMode:SelectModeFilter delegate:self];
+    [[ModalPresenter sharedInstance] showModalWithContent:filterView closeType:ModalCloseTypeBack showHeader:YES headerText:BC_STRING_BALANCES onDismiss:nil onResume:nil];
 }
 
 #pragma mark - Address Selection Delegate
 
-- (AssetType)getAssetType
+- (LegacyAssetType)getAssetType
 {
-    return AssetTypeBitcoinCash;
+    return LegacyAssetTypeBitcoinCash;
 }
 
 - (void)didSelectFilter:(int)filter
@@ -239,7 +241,7 @@
     } else if (self.filterIndex == FILTER_INDEX_IMPORTED_ADDRESSES) {
         self.filterSelectorLabel.text = BC_STRING_IMPORTED_ADDRESSES;
     } else {
-        self.filterSelectorLabel.text = [app.wallet getLabelForAccount:filter assetType:AssetTypeBitcoinCash];
+        self.filterSelectorLabel.text = [WalletManager.sharedInstance.wallet getLabelForAccount:filter assetType:LegacyAssetTypeBitcoinCash];
     }
     [self reload];
 }

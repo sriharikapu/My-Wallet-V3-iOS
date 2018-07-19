@@ -34,7 +34,7 @@
         self.fiatLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.btcField.frame.origin.x + self.btcField.frame.size.width + 8, 15, labelWidth, 21)];
         self.fiatLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:FONT_SIZE_SMALL];
         self.fiatLabel.textColor = COLOR_TEXT_DARK_GRAY;
-        self.fiatLabel.text = app.latestResponse.symbol_local.code;
+        self.fiatLabel.text = WalletManager.sharedInstance.latestMultiAddressResponse.symbol_local.code;
         [self addSubview:self.fiatLabel];
         
         CGFloat receiveFiatFieldOriginX =  self.fiatLabel.frame.origin.x + self.fiatLabel.frame.size.width + 8;

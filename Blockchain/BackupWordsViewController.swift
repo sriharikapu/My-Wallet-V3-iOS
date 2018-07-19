@@ -75,9 +75,16 @@ class BackupWordsViewController: UIViewController, SecondPasswordDelegate, UIScr
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        var bottomPadding: CGFloat = 0
+        if #available(iOS 11.0, *) {
+            let window = UIApplication.shared.keyWindow
+            bottomPadding = window?.safeAreaInsets.bottom ?? 0
+        }
+
         UIView .animate(withDuration: 0.3, animations: {
             var posX: CGFloat = 0
-            let posY: CGFloat = self.view.frame.size.height - self.previousWordButton.frame.size.height
+            let posY: CGFloat = self.view.frame.size.height - bottomPadding - self.previousWordButton.frame.size.height
             let buttonWidth = (self.view.frame.size.width / 2) - 2
             var buttonHeight = self.previousWordButton.frame.size.height
             self.previousWordButton.frame = CGRect(x: 0, y: posY, width: buttonWidth, height: buttonHeight)
@@ -105,11 +112,19 @@ class BackupWordsViewController: UIViewController, SecondPasswordDelegate, UIScr
         if wordsPageControl.currentPage == 0 {
             previousWordButton.isEnabled = false
             previousWordButton.setTitleColor(UIColor.darkGray, for: UIControlState())
-            previousWordButton.backgroundColor = Constants.Colors.DisabledGray
+            if #available(iOS 11.0, *) {
+                previousWordButton.backgroundColor = UIColor(named: "ColorGray1")
+            } else {
+                previousWordButton.backgroundColor = Constants.Colors.ColorGray1
+            }
         } else {
             previousWordButton.isEnabled = true
             previousWordButton.setTitleColor(UIColor.white, for: UIControlState())
-            previousWordButton.backgroundColor = Constants.Colors.BlockchainLightBlue
+            if #available(iOS 11.0, *) {
+                previousWordButton.backgroundColor = UIColor(named: "ColorBrandSecondary")
+            } else {
+                previousWordButton.backgroundColor = Constants.Colors.ColorBrandSecondary
+            }
         }
     }
 
@@ -140,11 +155,19 @@ class BackupWordsViewController: UIViewController, SecondPasswordDelegate, UIScr
         wordsProgressLabel.text = progressLabelText
         if let count = wordLabels?.count {
             if wordsPageControl.currentPage == count-1 {
-                nextWordButton.backgroundColor = Constants.Colors.BlockchainBlue
+                if #available(iOS 11.0, *) {
+                    nextWordButton.backgroundColor = UIColor(named: "ColorBrandPrimary")
+                } else {
+                    nextWordButton.backgroundColor = Constants.Colors.ColorBrandPrimary
+                }
                 nextWordButton.setTitleColor(UIColor.white, for: UIControlState())
                 nextWordButton.setTitle(NSLocalizedString("Done", comment: ""), for: UIControlState())
             } else if wordsPageControl.currentPage == count-2 {
-                nextWordButton.backgroundColor = Constants.Colors.BlockchainLightBlue
+                if #available(iOS 11.0, *) {
+                    nextWordButton.backgroundColor = UIColor(named: "ColorBrandSecondary")
+                } else {
+                    nextWordButton.backgroundColor = Constants.Colors.ColorBrandSecondary
+                }
                 nextWordButton.setTitleColor(UIColor.white, for: UIControlState())
                 nextWordButton.setTitle(NSLocalizedString("NEXT", comment: ""), for: UIControlState())
             }
@@ -165,13 +188,18 @@ class BackupWordsViewController: UIViewController, SecondPasswordDelegate, UIScr
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "secondPasswordForBackup" {
-            let vc = segue.destination as! SecondPasswordViewController
-            vc.delegate = self
-            vc.wallet = wallet
+            let navController = segue.destination as! UINavigationController
+            let storyboard = UIStoryboard(name: "Backup", bundle: nil)
+            let secondPasswordController = storyboard.instantiateViewController(
+                withIdentifier: "secondPasswordController"
+                ) as! SecondPasswordViewController
+            secondPasswordController.delegate = self
+            secondPasswordController.wallet = wallet
+            navController.viewControllers = [secondPasswordController]
         } else if segue.identifier == "backupVerify" {
-            let vc = segue.destination as! BackupVerifyViewController
-            vc.wallet = wallet
-            vc.isVerifying = false
+            let viewController = segue.destination as! BackupVerifyViewController
+            viewController.wallet = wallet
+            viewController.isVerifying = false
         }
     }
 

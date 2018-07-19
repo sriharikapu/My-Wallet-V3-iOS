@@ -9,11 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @protocol SetupDelegate
-- (CGRect)getFrame;
-- (BOOL)enableTouchIDClicked;
-- (void)openMailClicked;
-- (NSString *)getEmail;
-- (void)getAccountInfo;
+- (void)enableTouchIDClicked:(void (^_Nonnull)(BOOL success))completion;
 @end
 
 @interface WalletSetupViewController : UIViewController

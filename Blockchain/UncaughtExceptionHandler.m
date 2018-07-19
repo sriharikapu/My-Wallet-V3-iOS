@@ -13,15 +13,14 @@
 //
 
 #import "UncaughtExceptionHandler.h"
-#import "DeviceIdentifier.h"
+//#import "DeviceIdentifier.h"
 #include <libkern/OSAtomic.h>
 #include <sys/sysctl.h>
 #import "KeychainItemWrapper+Credentials.h"
 #include <execinfo.h>
 #import "NSString+URLEncode.h"
-#import "RootService.h"
 #import "NSURLSession+SendSynchronousRequest.h"
-#import "SessionManager.h"
+#import "Blockchain-Swift.h"
 
 NSString * const UncaughtExceptionHandlerSignalExceptionName = @"UncaughtExceptionHandlerSignalExceptionName";
 NSString * const UncaughtExceptionHandlerSignalKey = @"UncaughtExceptionHandlerSignalKey";
@@ -94,15 +93,15 @@ const NSInteger UncaughtExceptionHandlerReportAddressCount = 5;
 
 + (void)logException:(NSException*)exception walletIsLoaded:(BOOL)walletIsLoaded walletIsInitialized:(BOOL)walletIsInitialized
 {
-    
+    TabControllerManager *tabControllerManager = [AppCoordinator sharedInstance].tabControllerManager;
     NSString * message = [NSString stringWithFormat:@"<pre>App Version: %@\nSystem Name: %@ -  System Version : %@\nActive View Controller: %@\nWallet State: JSLoaded = %@, isInitialized = %@\nDevice: %@ Language: %@\nGUID Hash: %@\n\nReason: %@\n\nStacktrace:%@</pre>",
                           [self appNameAndVersionNumberDisplayString],
                           [[UIDevice currentDevice] systemName],
                           [[UIDevice currentDevice] systemVersion],
-                          [app.tabControllerManager.tabViewController.activeViewController class],
+                          [tabControllerManager.tabViewController.activeViewController class],
                           walletIsLoaded ? @"TRUE" : @"FALSE",
                           walletIsInitialized? @"TRUE" : @"FALSE",
-                          [DeviceIdentifier deviceName],
+                          @"",//[DeviceIdentifier deviceName],
                           [[NSLocale preferredLanguages] firstObject],
                           [KeychainItemWrapper hashedGuid],
                           [exception reason],
@@ -118,13 +117,13 @@ const NSInteger UncaughtExceptionHandlerReportAddressCount = 5;
     NSHTTPURLResponse * repsonse = NULL;
     NSError * error = NULL;
     
-    [NSURLSession sendSynchronousRequest:[NSURLRequest requestWithURL:url] session:[SessionManager sharedSession] returningResponse:&repsonse error:&error sessionDescription:nil];
+    [NSURLSession sendSynchronousRequest:[NSURLRequest requestWithURL:url] session:[[NetworkManager sharedInstance] session] returningResponse:&repsonse error:&error sessionDescription:nil];
 }
 
 - (void)handleException:(NSException *)exception
 {
     BOOL walletIsLoaded = NO;
-    BOOL walletIsInitialized = [app.wallet isInitialized];
+    BOOL walletIsInitialized = [WalletManager.sharedInstance.wallet isInitialized];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
         [UncaughtExceptionHandler logException:exception walletIsLoaded:walletIsLoaded walletIsInitialized:walletIsInitialized];

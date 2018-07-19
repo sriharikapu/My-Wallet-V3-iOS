@@ -7,27 +7,22 @@
 //
 
 #import "QRCodeGenerator.h"
-#import "RootService.h"
+#import "Blockchain-Swift.h"
 
 @implementation QRCodeGenerator
 
 - (UIImage *)qrImageFromAddress:(NSString *)address
 {
-    NSString *addressURL = [NSString stringWithFormat:@"%@%@", PREFIX_BITCOIN_URI, address];
+    NSString *addressURL = [NSString stringWithFormat:@"%@:%@", [ConstantsObjcBridge bitcoinUriPrefix], address];
     
     return [self createQRImageFromString:addressURL];
 }
 
 - (UIImage *)qrImageFromAddress:(NSString *)address amount:(double)amount
 {
-    app.btcFormatter.usesGroupingSeparator = NO;
-    NSLocale *currentLocale = app.btcFormatter.locale;
-    app.btcFormatter.locale = [NSLocale localeWithLocaleIdentifier:LOCALE_IDENTIFIER_EN_US];
-    NSString *amountString = [app.btcFormatter stringFromNumber:[NSNumber numberWithDouble:amount]];
-    app.btcFormatter.locale = currentLocale;
-    app.btcFormatter.usesGroupingSeparator = YES;
+    NSString *amountString = [[NSNumberFormatter assetFormatterWithUSLocale] stringFromNumber:[NSNumber numberWithDouble:amount]];
     
-    NSString *addressURL = [NSString stringWithFormat:@"%@%@?amount=%@", PREFIX_BITCOIN_URI, address, amountString];
+    NSString *addressURL = [NSString stringWithFormat:@"%@:%@?amount=%@", [ConstantsObjcBridge bitcoinUriPrefix], address, amountString];
     
     return [self createQRImageFromString:addressURL];
 }

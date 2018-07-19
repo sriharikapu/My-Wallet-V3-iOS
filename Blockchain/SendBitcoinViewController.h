@@ -25,8 +25,9 @@
 #import "FeeTypes.h"
 #import "QRCodeScannerSendViewController.h"
 #import "Assets.h"
+#import "DestinationAddressSource.h"
 
-@class Wallet, ContactTransaction;
+@class Wallet;
 
 @interface SendBitcoinViewController : QRCodeScannerSendViewController <AddressSelectionDelegate> {
     IBOutlet UIView *containerView;
@@ -36,7 +37,6 @@
     IBOutlet UIButton *selectFromButton;
     IBOutlet UIButton *fundsAvailableButton;
     
-    IBOutlet UILabel *contactLabel;
     IBOutlet UILabel *toLabel;
     IBOutlet UITextField *toField;
     IBOutlet UIButton *addressBookButton;
@@ -48,7 +48,6 @@
     
     IBOutlet UIButton *continuePaymentButton;
     IBOutlet UIButton *continuePaymentAccessoryButton;
-    IBOutlet UIButton *rejectPaymentButton;
 
     IBOutlet UIView *amountKeyboardAccessoryView;
     
@@ -77,18 +76,9 @@
 }
 
 // Must be a Bitcoin fork
-@property (nonatomic) AssetType assetType;
+@property (nonatomic) LegacyAssetType assetType;
 
 @property (strong, nonatomic) BCConfirmPaymentView *confirmPaymentView;
-
-typedef enum {
-    DestinationAddressSourceNone,
-    DestinationAddressSourceQR,
-    DestinationAddressSourcePaste,
-    DestinationAddressSourceURI,
-    DestinationAddressSourceDropDown,
-    DestinationAddressSourceContact
-} DestinationAddressSource;
 
 @property (nonatomic, readonly) DestinationAddressSource addressSource;
 
@@ -96,7 +86,6 @@ typedef enum {
 
 @property(nonatomic, strong) NSString *fromAddress;
 @property(nonatomic, strong) NSString *toAddress;
-@property(nonatomic, strong) Contact *toContact;
 @property int fromAccount;
 @property int toAccount;
 @property BOOL sendFromAddress;
@@ -124,8 +113,6 @@ typedef enum {
 - (IBAction)sendPaymentClicked:(id)sender;
 - (IBAction)labelAddressClicked:(id)sender;
 - (IBAction)useAllClicked:(id)sender;
-
-- (void)setupPaymentRequest:(ContactTransaction *)transaction;
 
 - (void)setAmountStringFromUrlHandler:(NSString*)amountString withToAddress:(NSString*)string;
 

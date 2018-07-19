@@ -7,14 +7,13 @@
 //
 
 #import "BCEditAddressView.h"
-#import "RootService.h"
 #import "Blockchain-Swift.h"
 
 @implementation BCEditAddressView
 
 -(id)initWithAddress:(NSString *)address
 {
-    UIWindow *window = app.window;
+    UIWindow *window = [UIApplication sharedApplication].keyWindow;
     
     self = [super initWithFrame:CGRectMake(0, DEFAULT_HEADER_HEIGHT, window.frame.size.width, window.frame.size.height - DEFAULT_HEADER_HEIGHT)];
     
@@ -58,26 +57,26 @@
 {
     NSString *label = [self.labelTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
-    if (![app.wallet didUpgradeToHd]) {
+    if (![WalletManager.sharedInstance.wallet didUpgradeToHd]) {
         NSMutableCharacterSet *allowedCharSet = [[NSCharacterSet alphanumericCharacterSet] mutableCopy];
         [allowedCharSet formUnionWithCharacterSet:[NSCharacterSet whitespaceCharacterSet]];
         
         if ([label rangeOfCharacterFromSet:[allowedCharSet invertedSet]].location != NSNotFound) {
-            [app standardNotify:BC_STRING_LABEL_MUST_BE_ALPHANUMERIC];
+            [[AlertViewPresenter sharedInstance] standardNotifyWithMessage:BC_STRING_LABEL_MUST_BE_ALPHANUMERIC title:BC_STRING_ERROR in:nil handler:nil];
             return;
         }
     }
     
     NSString *addr = self.address;
     
-    [app.wallet setLabel:label forLegacyAddress:addr];
+    [WalletManager.sharedInstance.wallet setLabel:label forLegacyAddress:addr];
     
     [self.labelTextField resignFirstResponder];
     
-    [app closeModalWithTransition:kCATransitionFade];
+    [[ModalPresenter sharedInstance] closeModalWithTransition:kCATransitionFade];
     
-    if (app.wallet.isSyncing) {
-        [app showBusyViewWithLoadingText:BC_STRING_LOADING_SYNCING_WALLET];
+    if (WalletManager.sharedInstance.wallet.isSyncing) {
+        [[LoadingViewPresenter sharedInstance] showBusyViewWithLoadingText:[LocalizationConstantsObjcBridge syncingWallet]];
     }
 }
 

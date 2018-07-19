@@ -8,9 +8,10 @@
 
 #import "AssetSelectionTableViewCell.h"
 #import "UIView+ChangeFrameAttribute.h"
+#import "Blockchain-Swift.h"
 
 @interface AssetSelectionTableViewCell ()
-@property (nonatomic, readwrite) AssetType assetType;
+@property (nonatomic, readwrite) LegacyAssetType assetType;
 @property (nonatomic) UIView *containerView;
 @property (nonatomic) UILabel *label;
 @property (nonatomic) UIImageView *assetImageView;
@@ -18,7 +19,7 @@
 
 @implementation AssetSelectionTableViewCell
 
-- (id)initWithAsset:(AssetType)assetType
+- (id)initWithAsset:(LegacyAssetType)assetType
 {
     if (self == [super init]) {
         
@@ -31,14 +32,14 @@
         NSString *text;
         NSString *assetImage;
         
-        if (assetType == AssetTypeBitcoin) {
-            text = BC_STRING_BITCOIN;
+        if (assetType == LegacyAssetTypeBitcoin) {
+            text = [AssetTypeLegacyHelper descriptionFor:AssetTypeBitcoin];
             assetImage = @"bitcoin_white";
-        } else if (assetType == AssetTypeEther) {
-            text = BC_STRING_ETHER;
+        } else if (assetType == LegacyAssetTypeEther) {
+            text = [AssetTypeLegacyHelper descriptionFor:AssetTypeEthereum];
             assetImage = @"ether_white";
-        } else if (assetType == AssetTypeBitcoinCash) {
-            text = BC_STRING_BITCOIN_CASH;
+        } else if (assetType == LegacyAssetTypeBitcoinCash) {
+            text = [AssetTypeLegacyHelper descriptionFor:AssetTypeBitcoinCash];
             assetImage = @"bitcoin_cash_white";
         }
         

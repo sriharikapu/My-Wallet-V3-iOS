@@ -12,6 +12,7 @@
 #import "UIView+ChangeFrameAttribute.h"
 #import "NSDateFormatter+VerboseString.h"
 #import "NSNumberFormatter+Currencies.h"
+#import "Blockchain-Swift.h"
 
 #define MARGIN_HORIZONTAL 20
 #define NUMBER_OF_ROWS_FETCHED_TRADE 6
@@ -120,7 +121,7 @@
 - (UIView *)rowViewWithText:(NSString *)text accessoryText:(NSString *)accessoryText yPosition:(CGFloat)posY accessoryLabelWidthHasPriority:(BOOL)accessoryLabelWidthHasPriority
 {
     CGFloat horizontalMargin = MARGIN_HORIZONTAL;
-    CGFloat rowWidth = WINDOW_WIDTH;
+    CGFloat rowWidth = UIApplication.sharedApplication.keyWindow.rootViewController.view.frame.size.width;
     CGFloat rowHeight = [ExchangeDetailView rowHeight];
     UIView *rowView = [[UIView alloc] initWithFrame:CGRectMake(0, posY, rowWidth, rowHeight)];
 
@@ -191,11 +192,11 @@
 + (NSString *)stringFromSymbol:(NSString *)symbol
 {
     if ([symbol isEqualToString:CURRENCY_SYMBOL_BTC]) {
-        return BC_STRING_BITCOIN;
+        return [AssetTypeLegacyHelper descriptionFor:AssetTypeBitcoin];
     } else if ([symbol isEqualToString:CURRENCY_SYMBOL_ETH]) {
-        return BC_STRING_ETHER;
+        return [AssetTypeLegacyHelper descriptionFor:AssetTypeEthereum];
     } else if ([symbol isEqualToString:CURRENCY_SYMBOL_BCH]) {
-        return BC_STRING_BITCOIN_CASH;
+        return [AssetTypeLegacyHelper descriptionFor:AssetTypeBitcoinCash];
     }
     DLog(@"ExchangeDetailView: unsupported symbol!");
     return nil;

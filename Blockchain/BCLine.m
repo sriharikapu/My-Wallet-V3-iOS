@@ -7,6 +7,7 @@
 //
 
 #import "BCLine.h"
+#import "Blockchain-Swift.h"
 
 @implementation BCLine
 
@@ -29,11 +30,12 @@
 - (void)setupAtYPosition:(CGFloat)yPosition
 {
     float onePixelHeight = 1.0/[UIScreen mainScreen].scale;
-    
-    UIView *onePixelLine = [[UIView alloc] initWithFrame:CGRectMake(0, yPosition, WINDOW_WIDTH, onePixelHeight)];
+
+    CGFloat windowWidth = UIApplication.sharedApplication.keyWindow.rootViewController.view.frame.size.width;
+    UIView *onePixelLine = [[UIView alloc] initWithFrame:CGRectMake(0, yPosition, windowWidth, onePixelHeight)];
     
     onePixelLine.userInteractionEnabled = NO;
-    [onePixelLine setBackgroundColor:self.backgroundColor ? : COLOR_LINE_GRAY];
+    [onePixelLine setBackgroundColor:self.backgroundColor ? : [ConstantsObjcBridge grayLineColor]];
     [self addSubview:onePixelLine];
     
     self.backgroundColor = [UIColor clearColor];

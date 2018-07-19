@@ -7,6 +7,8 @@
 //
 
 #import "BCCardView.h"
+#import "Blockchain-Swift.h"
+
 @interface BCCardView ()
 @property (nonatomic) ActionType actionType;
 @property (nonatomic) BOOL reducedHeightForPageIndicator;
@@ -32,7 +34,7 @@
         
         self.backgroundColor = [UIColor whiteColor];
         
-        CGFloat imageViewHeight = actionType == ActionTypeBuySell || actionType == ActionTypeBitcoinCash ? self.frame.size.height - 32 : 100;
+        CGFloat imageViewHeight = actionType == ActionTypeBuySell ? self.frame.size.height - 32 : 100;
         
         UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 16, 100, imageViewHeight)];
         imageView.image = [UIImage imageNamed:imageName];
@@ -56,7 +58,7 @@
             actionName = BC_STRING_BUY_AND_SELL_BITCOIN;
             actionColor = COLOR_BLOCKCHAIN_LIGHT_BLUE;
             titleColor = actionColor;
-        } else if (actionType == ActionTypeBuySell || actionType == ActionTypeBitcoinCash) {
+        } else if (actionType == ActionTypeBuySell) {
             actionName = BC_STRING_GET_STARTED;
             actionColor = COLOR_BLOCKCHAIN_BLUE;
             titleColor = COLOR_BLOCKCHAIN_BLUE;
@@ -108,9 +110,12 @@
 
 - (void)setupCloseButton
 {
-    UIButton *closeButton = [[UIButton alloc] initWithFrame:CGRectMake(self.bounds.size.width - 25, 12.5, 12.5, 12.5)];
-    [closeButton setImage:[[UIImage imageNamed:@"close_large"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    CGRect closeFrame = CGRectMake(self.bounds.size.width - ConstantsObjcBridge.minimumTapTargetSize - 4, 4, ConstantsObjcBridge.minimumTapTargetSize, ConstantsObjcBridge.minimumTapTargetSize);
+    UIButton *closeButton = [[UIButton alloc] initWithFrame:closeFrame];
+    UIImage *buttonImage = [[UIImage imageNamed:@"close_large"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    [closeButton setImage:buttonImage forState:UIControlStateNormal];
     closeButton.tintColor = COLOR_TEXT_DARK_GRAY;
+    closeButton.imageEdgeInsets = UIEdgeInsetsMake(5, 5, 5, 5);
     [self addSubview:closeButton];
     self.closeButton = closeButton;
 }

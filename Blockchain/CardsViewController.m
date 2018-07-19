@@ -7,9 +7,10 @@
 //
 
 #import "CardsViewController.h"
-#import "RootService.h"
 #import "BCCardView.h"
 #import "UIView+ChangeFrameAttribute.h"
+#import "Blockchain-Swift.h"
+#import "NSNumberFormatter+Currencies.h"
 
 #define ANNOUNCEMENT_CARD_HEIGHT 208
 
@@ -36,13 +37,21 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    UIWindow *window = [UIApplication sharedApplication].keyWindow;
+    CGFloat safeAreaInsetTop = 20;
+    CGFloat safeAreaInsetBottom = 0;
+    if (@available(iOS 11.0, *)) {
+        safeAreaInsetTop = window.rootViewController.view.safeAreaInsets.top;
+        safeAreaInsetBottom = window.rootViewController.view.safeAreaInsets.bottom;
+    }
     
     self.automaticallyAdjustsScrollViewInsets = NO;
-    
+    // TODO: store tab bar and navigation bar height as constants
     self.view.frame = CGRectMake(0,
                                  0,
-                                 [UIScreen mainScreen].bounds.size.width,
-                                 [UIScreen mainScreen].bounds.size.height - DEFAULT_HEADER_HEIGHT - DEFAULT_HEADER_HEIGHT_OFFSET);
+                                 window.bounds.size.width,
+                                 window.bounds.size.height - safeAreaInsetTop - safeAreaInsetBottom - 49 - 44);
     self.scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     self.scrollView.showsVerticalScrollIndicator = NO;
     [self.view addSubview:self.scrollView];
@@ -50,15 +59,12 @@
 
 - (void)reloadCards
 {
-    self.showCards = ![[NSUserDefaults standardUserDefaults] boolForKey:USER_DEFAULTS_KEY_SHOULD_HIDE_ALL_CARDS];
+    self.showCards = !BlockchainSettings.sharedOnboardingInstance.hasSeenAllCards;
     
     self.announcementCards = [NSMutableArray new];
     if (!self.showCards) {
-        if (![[NSUserDefaults standardUserDefaults] boolForKey:USER_DEFAULTS_KEY_SHOULD_HIDE_BUY_SELL_CARD] && [app.wallet canUseSfox]) {
+        if (!BlockchainSettings.sharedOnboardingInstance.shouldHideBuySellCard && [WalletManager.sharedInstance.wallet canUseSfox]) {
             [self.announcementCards addObject:[NSNumber numberWithInteger:CardConfigurationBuySell]];
-        }
-        if (![[NSUserDefaults standardUserDefaults] boolForKey:USER_DEFAULTS_KEY_SHOULD_HIDE_BITCOIN_CASH_CARD]) {
-            [self.announcementCards addObject:[NSNumber numberWithInteger:CardConfigurationBitcoinCash]];
         }
     }
     
@@ -68,11 +74,11 @@
         self.cardsViewHeight = IS_USING_SCREEN_SIZE_4S ? 208 : 240;
     }
     
-    if (self.showCards && app.latestResponse.symbol_local) {
+    if (self.showCards && WalletManager.sharedInstance.latestMultiAddressResponse.symbol_local) {
         [self setupWelcomeCardsView];
     } else if (self.announcementCards.count > 0) {
         [self setupCardsViewWithConfigurations:self.announcementCards];
-    } else if (app.latestResponse.symbol_local) {
+    } else if (WalletManager.sharedInstance.latestMultiAddressResponse.symbol_local) {
         [self removeCardsView];
     }
     
@@ -116,12 +122,6 @@
             [buySellCard.closeButton addTarget:self action:@selector(closeBuySellCard) forControlEvents:UIControlEventTouchUpInside];
             [buySellCard changeYPosition:ANNOUNCEMENT_CARD_HEIGHT * index + verticalPadding];
             [cardsView addSubview:buySellCard];
-        } else if ([configuration integerValue] == CardConfigurationBitcoinCash) {
-            BCCardView *bitcoinCashCard = [[BCCardView alloc] initWithContainerFrame:cardFrame title:[BC_STRING_BITCOIN_CASH_CARD_TITLE uppercaseString] description:BC_STRING_BITCOIN_CASH_CARD_DESCRIPTION actionType:ActionTypeBitcoinCash imageName:@"bitcoin_cash_partial" reducedHeightForPageIndicator:NO delegate:self];
-            [bitcoinCashCard setupCloseButton];
-            [bitcoinCashCard.closeButton addTarget:self action:@selector(closeBitcoinCashCard) forControlEvents:UIControlEventTouchUpInside];
-            [bitcoinCashCard changeYPosition:ANNOUNCEMENT_CARD_HEIGHT * index + verticalPadding];
-            [cardsView addSubview:bitcoinCashCard];
         }
     }
     
@@ -146,7 +146,7 @@
     NSInteger numberOfCards = 0;
     
     // Cards setup
-    if ([app.wallet isBuyEnabled]) {
+    if ([WalletManager.sharedInstance.wallet isBuyEnabled]) {
         
         NSString *tickerText = [NSString stringWithFormat:@"%@ = %@", [NSNumberFormatter formatBTC:[CURRENCY_CONVERSION_BTC longLongValue]], [NSNumberFormatter formatMoney:SATOSHI localCurrency:YES]];
         
@@ -275,14 +275,8 @@
 
 - (void)closeBuySellCard
 {
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:USER_DEFAULTS_KEY_SHOULD_HIDE_BUY_SELL_CARD];
+    BlockchainSettings.sharedOnboardingInstance.shouldHideBuySellCard = YES;
     [self closeAnnouncementCard:CardConfigurationBuySell];
-}
-
-- (void)closeBitcoinCashCard
-{
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:USER_DEFAULTS_KEY_SHOULD_HIDE_BITCOIN_CASH_CARD];
-    [self closeAnnouncementCard:CardConfigurationBitcoinCash];
 }
 
 - (void)closeAnnouncementCard:(CardConfiguration)cardConfiguration
@@ -308,16 +302,15 @@
 
 - (void)cardActionClicked:(ActionType)actionType
 {
+    TabControllerManager *tabControllerManager = [AppCoordinator sharedInstance].tabControllerManager;
     if (actionType == ActionTypeBuyBitcoin) {
-        [app buyBitcoinClicked:nil];
+        [BuySellCoordinator.sharedInstance showBuyBitcoinView];
     } else if (actionType == ActionTypeShowReceive) {
-        [app.tabControllerManager receiveCoinClicked:nil];
+        [tabControllerManager receiveCoinClicked:nil];
     } else if (actionType == ActionTypeScanQR) {
-        [app.tabControllerManager qrCodeButtonClicked];
+        [tabControllerManager qrCodeButtonClicked];
     } else if (actionType == ActionTypeBuySell) {
-        [app buyBitcoinClicked:nil];
-    } else if (actionType == ActionTypeBitcoinCash) {
-        [app.tabControllerManager showReceiveBitcoinCash];
+        [BuySellCoordinator.sharedInstance showBuyBitcoinView];
     }
 }
 
@@ -327,7 +320,7 @@
         
         BOOL didSeeAllCards = scrollView.contentOffset.x > scrollView.contentSize.width - scrollView.frame.size.width * 1.5;
         if (didSeeAllCards) {
-            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:USER_DEFAULTS_KEY_HAS_SEEN_ALL_CARDS];
+            BlockchainSettings.sharedOnboardingInstance.hasSeenAllCards = YES;
         }
         
         if (!self.isUsingPageControl) {
@@ -408,8 +401,8 @@
     } completion:^(BOOL finished) {
         [self removeCardsView];
     }];
-    
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:USER_DEFAULTS_KEY_SHOULD_HIDE_ALL_CARDS];
+
+    BlockchainSettings.sharedOnboardingInstance.hasSeenAllCards = YES;
 }
 
 - (void)removeCardsView

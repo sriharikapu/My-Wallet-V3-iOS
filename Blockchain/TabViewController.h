@@ -9,43 +9,39 @@
 #import "AssetSelectorView.h"
 
 @protocol AssetDelegate
-- (void)didSetAssetType:(AssetType)assetType;
+- (void)didSetAssetType:(LegacyAssetType)assetType;
 - (void)selectorButtonClicked;
 - (void)qrCodeButtonClicked;
 @end
 
-@interface TabViewcontroller : UIViewController <UITabBarDelegate> {
+@interface TabViewController : UIViewController <UITabBarDelegate> {
     IBOutlet UITabBarItem *sendButton;
     IBOutlet UITabBarItem *dashBoardButton;
-    IBOutlet UITabBarItem *homeButton;
-    IBOutlet UITabBarItem *receiveButton;
+    IBOutlet UITabBarItem *overviewButton;
+    IBOutlet UITabBarItem *requestButton;
     IBOutlet UITabBar *tabBar;
-    IBOutlet UIView *topBar;
-	
     IBOutlet UIView *bannerView;
-    IBOutlet UILabel *titleLabel;
-    IBOutlet UILabel *balanceLabel;
     UIViewController *activeViewController;
 	UIViewController *oldViewController;
-    
+
 	int selectedIndex;
 }
 
-@property(nonatomic, retain) UIViewController *activeViewController;
-@property(nonatomic, retain) UIViewController *oldViewController;
-@property(nonatomic, retain) IBOutlet UIView *contentView;
-@property (nonatomic) IBOutlet AssetSelectorView *assetSelectorView;
-@property (strong, nonatomic) IBOutlet UIView *assetControlContainer;
-@property(nonatomic, retain) UIView *menuSwipeRecognizerView;
-@property(nonatomic) UIView *tabBarGestureView;
-
+@property (nonatomic, retain) UINavigationBar *navigationBar;
+@property (nonatomic, retain) UIViewController *activeViewController;
+@property (nonatomic, retain) UIViewController *oldViewController;
+@property (nonatomic, retain) IBOutlet UIView *contentView;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *tabBarBottomConstraint;
+@property (nonatomic, retain) AssetSelectorView *assetSelectorView;
+@property (strong, nonatomic) UIView *assetControlContainer;
+@property (nonatomic, retain) UIView *menuSwipeRecognizerView;
+@property (nonatomic) UIView *tabBarGestureView;
 @property (nonatomic) UIView *bannerPricesView;
 @property (nonatomic) UILabel *ethPriceLabel;
 @property (nonatomic) UILabel *btcPriceLabel;
 
-@property (nonatomic) UIView *bannerSelectorView;
 @property(weak, nonatomic) id <AssetDelegate> assetDelegate;
-- (void)selectAsset:(AssetType)assetType;
+- (void)selectAsset:(LegacyAssetType)assetType;
 - (void)setActiveViewController:(UIViewController *)nviewcontroller animated:(BOOL)animated index:(int)index;
 - (void)addTapGestureRecognizerToTabBar:(UITapGestureRecognizer *)tapGestureRecognizer;
 - (void)removeTapGestureRecognizerFromTabBar:(UITapGestureRecognizer *)tapGestureRecognizer;
@@ -54,7 +50,5 @@
 - (void)setTitleLabelText:(NSString *)text;
 - (void)updateBalanceLabelText:(NSString *)text;
 - (void)didFetchEthExchangeRate;
-- (void)didSendEther;
-- (void)didErrorDuringEtherSend:(NSString *)error;
 - (void)reloadSymbols;
 @end

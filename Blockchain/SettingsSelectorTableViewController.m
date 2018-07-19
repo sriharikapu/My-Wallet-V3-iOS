@@ -7,6 +7,7 @@
 //
 
 #import "SettingsSelectorTableViewController.h"
+#import "Blockchain-Swift.h"
 
 @interface SettingsSelectorTableViewController()
 @property (nonatomic, copy) NSArray *keysArray;
@@ -26,7 +27,7 @@
 
 - (CurrencySymbol *)getLocalSymbolFromLatestResponse
 {
-    return app.latestResponse.symbol_local;
+    return WalletManager.sharedInstance.latestMultiAddressResponse.symbol_local;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -44,7 +45,7 @@
 
 - (void)changeCurrencySymbol:(NSString *)code
 {
-    [app.wallet changeLocalCurrency:code];
+    [WalletManager.sharedInstance.wallet changeLocalCurrency:code];
 }
 
 - (void)setItemsDictionary:(NSDictionary *)itemsDictionary

@@ -7,9 +7,8 @@
 //
 
 #import "BCConfirmPaymentViewModel.h"
-#import "ContactTransaction.h"
 #import "NSNumberFormatter+Currencies.h"
-#import "RootService.h"
+#import "Blockchain-Swift.h"
 
 @interface BCConfirmPaymentViewModel ()
 @end
@@ -20,7 +19,6 @@
             amount:(uint64_t)amount
                fee:(uint64_t)fee
              total:(uint64_t)total
-contactTransaction:(ContactTransaction *)contactTransaction
              surge:(BOOL)surgePresent
 {
     self = [super init];
@@ -29,18 +27,11 @@ contactTransaction:(ContactTransaction *)contactTransaction
         self.from = from;
         self.to = to;
         self.surgeIsOccurring = surgePresent;
-        
-        if (contactTransaction) {
-            self.buttonTitle = [contactTransaction.role isEqualToString:TRANSACTION_ROLE_RPR_INITIATOR] ? BC_STRING_SEND : BC_STRING_PAY;
-            self.noteText = contactTransaction.reason;
-        } else {
-            self.buttonTitle = BC_STRING_SEND;
-        }
-        
+        self.buttonTitle = BC_STRING_SEND;
         self.fiatTotalAmountText = [NSNumberFormatter formatMoney:total localCurrency:YES];
-        self.btcTotalAmountText = [NSNumberFormatter formatBTC:total];
-        self.btcWithFiatAmountText = [self formatAmountInBTCAndFiat:amount];
-        self.btcWithFiatFeeText = [self formatAmountInBTCAndFiat:fee];
+        self.totalAmountText = [NSNumberFormatter formatBTC:total];
+        self.cryptoWithFiatAmountText = [self formatAmountInBTCAndFiat:amount];
+        self.amountWithFiatFeeText = [self formatAmountInBTCAndFiat:fee];
         self.showDescription = YES;
     }
     return self;
@@ -55,10 +46,12 @@ contactTransaction:(ContactTransaction *)contactTransaction
        fiatTotal:(NSString *)fiatTotal
 {
     if (self == [super init]) {
+        self.from = [LocalizationConstantsObjcBridge myEtherWallet];
         self.to = to;
         self.fiatTotalAmountText = fiatTotal;
-        self.btcTotalAmountText = ethTotal;
-        self.btcWithFiatFeeText = [NSString stringWithFormat:@"%@ (%@)", ethFee, fiatFee];
+        self.totalAmountText = ethTotal;
+        self.cryptoWithFiatAmountText = [NSString stringWithFormat:@"%@ (%@)", ethAmount, fiatAmount];
+        self.amountWithFiatFeeText = [NSString stringWithFormat:@"%@ (%@)", ethFee, fiatFee];
         self.showDescription = YES;
     }
     return self;
@@ -79,12 +72,12 @@ contactTransaction:(ContactTransaction *)contactTransaction
         self.surgeIsOccurring = surgePresent;
         
         self.fiatTotalAmountText = [NSNumberFormatter formatBchWithSymbol:total localCurrency:YES];
-        self.btcTotalAmountText = [NSNumberFormatter formatBCH:total];
-        self.btcWithFiatAmountText = [self formatAmountInBCHAndFiat:amount];
-        self.btcWithFiatFeeText = [self formatAmountInBCHAndFiat:fee];
-        self.showDescription = NO;
+        self.totalAmountText = [NSNumberFormatter formatBCH:total];
+        self.cryptoWithFiatAmountText = [self formatAmountInBCHAndFiat:amount];
+        self.amountWithFiatFeeText = [self formatAmountInBCHAndFiat:fee];
+        self.showDescription = YES;
         
-        if ([app.wallet isValidAddress:self.to assetType:AssetTypeBitcoin]) {
+        if ([WalletManager.sharedInstance.wallet isValidAddress:self.to assetType:LegacyAssetTypeBitcoin]) {
             CGFloat fontSize = FONT_SIZE_EXTRA_SMALL;
             NSMutableAttributedString *warning = [[NSMutableAttributedString alloc] initWithString:BC_STRING_BITCOIN_CASH_WARNING_CONFIRM_VALID_ADDRESS_ONE];
             [warning addAttribute:NSFontAttributeName value:[UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:fontSize] range:NSMakeRange(0, [warning length])];

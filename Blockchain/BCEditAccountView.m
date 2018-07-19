@@ -7,27 +7,26 @@
 //
 
 #import "BCEditAccountView.h"
-#import "RootService.h"
 #import "Blockchain-Swift.h"
 
 @implementation BCEditAccountView
 
--(id)initWithAssetType:(AssetType)assetType
+-(id)initWithAssetType:(LegacyAssetType)assetType
 {
-    UIWindow *window = app.window;
-    
+    UIWindow *window = [UIApplication sharedApplication].keyWindow;
+
     self = [super initWithFrame:CGRectMake(0, DEFAULT_HEADER_HEIGHT, window.frame.size.width, window.frame.size.height - DEFAULT_HEADER_HEIGHT)];
-    
+
     if (self) {
         self.assetType = assetType;
         self.backgroundColor = [UIColor whiteColor];
-        
+
         UILabel *labelLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 55, window.frame.size.width - 40, 25)];
         labelLabel.text = BC_STRING_NAME;
         labelLabel.textColor = [UIColor darkGrayColor];
         labelLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:FONT_SIZE_LARGE];
         [self addSubview:labelLabel];
-        
+
         _labelTextField = [[BCSecureTextField alloc] initWithFrame:CGRectMake(20, 95, window.frame.size.width - 40, 30)];
         _labelTextField.borderStyle = UITextBorderStyleRoundedRect;
         _labelTextField.autocapitalizationType = UITextAutocapitalizationTypeSentences;
@@ -36,22 +35,22 @@
         _labelTextField.autocorrectionType = UITextAutocorrectionTypeNo;
         _labelTextField.spellCheckingType = UITextSpellCheckingTypeNo;
         [self addSubview:_labelTextField];
-        
+
         [_labelTextField setReturnKeyType:UIReturnKeyDone];
         _labelTextField.delegate = self;
-        
+
         UIButton *editAccountButton = [UIButton buttonWithType:UIButtonTypeCustom];
         editAccountButton.frame = CGRectMake(0, 0, window.frame.size.width, 46);
         editAccountButton.backgroundColor = COLOR_BLOCKCHAIN_LIGHT_BLUE;
         [editAccountButton setTitle:BC_STRING_SAVE forState:UIControlStateNormal];
         [editAccountButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         editAccountButton.titleLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:FONT_SIZE_LARGE];
-        
+
         [editAccountButton addTarget:self action:@selector(editAccountClicked:) forControlEvents:UIControlEventTouchUpInside];
-        
+
         _labelTextField.inputAccessoryView = editAccountButton;
     }
-    
+
     return self;
 }
 
@@ -61,36 +60,38 @@
 {
     // Remove whitespace
     NSString *label = [self.labelTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    
+
     if (label.length == 0) {
-        [app standardNotify:BC_STRING_YOU_MUST_ENTER_A_LABEL];
+        [[AlertViewPresenter sharedInstance] standardNotifyWithMessage:BC_STRING_YOU_MUST_ENTER_A_LABEL title:BC_STRING_ERROR in:nil handler:nil];
         return;
     }
-    
+
     if (label.length > 17) {
         // TODO i18n
-        [app standardNotify:BC_STRING_LABEL_MUST_HAVE_LESS_THAN_18_CHAR];
+        [[AlertViewPresenter sharedInstance] standardNotifyWithMessage:BC_STRING_LABEL_MUST_HAVE_LESS_THAN_18_CHAR title:BC_STRING_ERROR in:nil handler:nil];
         return;
     }
-    
-    if (![app.wallet isAccountNameValid:label]) {
+
+    if (![WalletManager.sharedInstance.wallet isAccountNameValid:label]) {
+        [[AlertViewPresenter sharedInstance] standardErrorWithMessage:[LocalizationConstantsObjcBridge nameAlreadyInUse] title:[LocalizationConstantsObjcBridge error] in:nil handler:nil];
+        [LoadingViewPresenter.sharedInstance hideBusyView];
         return;
     }
-    
+
     [self.labelTextField resignFirstResponder];
-    
-    if (self.assetType == AssetTypeBitcoin) {
-        [app showBusyViewWithLoadingText:BC_STRING_LOADING_SYNCING_WALLET];
+
+    if (self.assetType == LegacyAssetTypeBitcoin) {
+        [[LoadingViewPresenter sharedInstance] showBusyViewWithLoadingText:[LocalizationConstantsObjcBridge syncingWallet]];
     }
-    
-    [app closeModalWithTransition:kCATransitionFade];
-    
+
+    [[ModalPresenter sharedInstance] closeModalWithTransition:kCATransitionFade];
+
     [self performSelector:@selector(changeAccountName:) withObject:label afterDelay:ANIMATION_DURATION];
 }
 
 - (void)changeAccountName:(NSString *)name
 {
-    [app.wallet setLabelForAccount:self.accountIdx label:name assetType:self.assetType];
+    [WalletManager.sharedInstance.wallet setLabelForAccount:self.accountIdx label:name assetType:self.assetType];
 }
 
 #pragma mark - Textfield Delegates

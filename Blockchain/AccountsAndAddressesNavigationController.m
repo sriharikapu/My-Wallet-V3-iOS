@@ -9,14 +9,12 @@
 #import "AccountsAndAddressesNavigationController.h"
 #import "AccountsAndAddressesViewController.h"
 #import "AccountsAndAddressesDetailViewController.h"
-#import "RootService.h"
-#import "PrivateKeyReader.h"
 #import "SendBitcoinViewController.h"
 #import "UIView+ChangeFrameAttribute.h"
+#import "Blockchain-Swift.h"
 
-@interface AccountsAndAddressesNavigationController () <AssetSelectorViewDelegate>
+@interface AccountsAndAddressesNavigationController () <AssetSelectorViewDelegate, WalletAddressesDelegate>
 @property (nonatomic, readwrite) AssetSelectorView *assetSelectorView;
-@property (nonatomic) UIView *topBar;
 @property (nonatomic) BOOL isOpeningSelector;
 @end
 
@@ -27,47 +25,24 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    self.view.frame = CGRectMake(0, 0, app.window.frame.size.width, app.window.frame.size.height);
-    
-    UIView *topBar = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, DEFAULT_HEADER_HEIGHT + 8 + ASSET_SELECTOR_ROW_HEIGHT)];
-    topBar.backgroundColor = COLOR_BLOCKCHAIN_BLUE;
-    [self.view addSubview:topBar];
-    self.topBar = topBar;
-    
-    UILabel *headerLabel = [[UILabel alloc] initWithFrame:FRAME_HEADER_LABEL];
-    headerLabel.font = [UIFont fontWithName:FONT_MONTSERRAT_REGULAR size:FONT_SIZE_TOP_BAR_TEXT];
-    headerLabel.textColor = [UIColor whiteColor];
-    headerLabel.textAlignment = NSTextAlignmentCenter;
-    headerLabel.adjustsFontSizeToFitWidth = YES;
-    headerLabel.center = CGPointMake(topBar.center.x, headerLabel.center.y);
-    [topBar addSubview:headerLabel];
-    self.headerLabel = headerLabel;
-    
-    UIButton *backButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    backButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
-    backButton.imageEdgeInsets = IMAGE_EDGE_INSETS_BACK_BUTTON_CHEVRON;
-    [backButton.titleLabel setFont:[UIFont systemFontOfSize:FONT_SIZE_MEDIUM]];
-    [backButton setImage:[UIImage imageNamed:@"back_chevron_icon"] forState:UIControlStateNormal];
-    [backButton setTitleColor:[UIColor colorWithWhite:0.56 alpha:1.0] forState:UIControlStateHighlighted];
-    [backButton addTarget:self action:@selector(backButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [topBar addSubview:backButton];
-    self.backButton = backButton;
-#ifdef ENABLE_TRANSFER_FUNDS
-    UIButton *warningButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    warningButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
-    warningButton.imageEdgeInsets = UIEdgeInsetsMake(0, 4, 0, 0);
-    [warningButton.titleLabel setFont:[UIFont systemFontOfSize:FONT_SIZE_MEDIUM]];
-    [warningButton setImage:[UIImage imageNamed:@"warning"] forState:UIControlStateNormal];
-    [warningButton addTarget:self action:@selector(transferAllFundsWarningClicked) forControlEvents:UIControlEventTouchUpInside];
-    [topBar addSubview:warningButton];
-    warningButton.hidden = YES;
-    self.warningButton = warningButton;
-#endif
+
+    CGFloat safeAreaInsetTop = UIView.rootViewSafeAreaInsets.top;
+    CGFloat navBarHeight = [ConstantsObjcBridge defaultNavigationBarHeight];
+    CGFloat assetSelectorHeight = [ConstantsObjcBridge assetSelectorHeight];
+
+    self.view.frame = [UIView rootViewSafeAreaFrameWithNavigationBar:YES tabBar:NO assetSelector:YES];
+
+    [self.navigationBar setTitleTextAttributes:[UINavigationBar largeTitleTextAttributes]];
+    self.warningButton = [[UIBarButtonItem alloc]
+                          initWithImage:[UIImage imageNamed:@"warning"]
+                          style:UIBarButtonItemStylePlain
+                          target:self action:@selector(transferAllFundsWarningClicked)];
+
+    WalletManager.sharedInstance.addressesDelegate = self;
 
     CGFloat assetSelectorViewHorizontalPadding = 8;
-    self.assetSelectorView = [[AssetSelectorView alloc] initWithFrame:CGRectMake(assetSelectorViewHorizontalPadding, headerLabel.frame.origin.y + headerLabel.frame.size.height + 8, self.view.frame.size.width - assetSelectorViewHorizontalPadding*2, ASSET_SELECTOR_ROW_HEIGHT) assets:@[[NSNumber numberWithInteger:AssetTypeBitcoin], [NSNumber numberWithInteger:AssetTypeBitcoinCash]] delegate:self];
-    [topBar addSubview:self.assetSelectorView];
+    self.assetSelectorView = [[AssetSelectorView alloc] initWithFrame:CGRectMake(0, safeAreaInsetTop + navBarHeight, self.view.frame.size.width, ASSET_SELECTOR_ROW_HEIGHT) assets:@[[NSNumber numberWithInteger:LegacyAssetTypeBitcoin], [NSNumber numberWithInteger:LegacyAssetTypeBitcoinCash]] delegate:self];
+    [self.view addSubview:self.assetSelectorView];
     
     [self setupBusyView];
 }
@@ -76,32 +51,7 @@
 {
     [super viewDidLayoutSubviews];
     
-    if (self.isOpeningSelector) return;
-    
-    self.warningButton.frame = CGRectMake(6, 16, 85, 51);
-    
-    if (self.viewControllers.count == 1 || [self.visibleViewController isMemberOfClass:[AccountsAndAddressesViewController class]]) {
-        self.backButton.frame = CGRectMake(self.view.frame.size.width - 80, 15, 80, 51);
-        self.backButton.imageEdgeInsets = IMAGE_EDGE_INSETS_CLOSE_BUTTON_X;
-        self.backButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
-        self.backButton.center = CGPointMake(self.backButton.center.x, self.headerLabel.center.y);
-        [self.backButton setImage:[UIImage imageNamed:@"close"] forState:UIControlStateNormal];
-        [UIView animateWithDuration:ANIMATION_DURATION animations:^{
-            [self.topBar changeHeight:DEFAULT_HEADER_HEIGHT + 8 + ASSET_SELECTOR_ROW_HEIGHT];
-            [self.assetSelectorView show];
-            [self resetAddressesViewControllerContainerFrame];
-        }];
-    } else {
-        self.backButton.frame = FRAME_BACK_BUTTON;
-        self.backButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
-        [self.backButton setTitle:@"" forState:UIControlStateNormal];
-        self.backButton.imageEdgeInsets = IMAGE_EDGE_INSETS_BACK_BUTTON_CHEVRON;
-        [self.backButton setImage:[UIImage imageNamed:@"back_chevron_icon"] forState:UIControlStateNormal];
-        [UIView animateWithDuration:ANIMATION_DURATION animations:^{
-            [self.assetSelectorView hide];
-            [self.topBar changeHeight:DEFAULT_HEADER_HEIGHT];
-        }];
-    }
+    if (self.isOpeningSelector) { return; }
 }
 
 - (void)reload
@@ -149,7 +99,7 @@
 
 - (void)setupBusyView
 {
-    BCFadeView *busyView = [[BCFadeView alloc] initWithFrame:app.window.rootViewController.view.frame];
+    BCFadeView *busyView = [[BCFadeView alloc] initWithFrame:[UIApplication sharedApplication].keyWindow.rootViewController.view.frame];
     busyView.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.5];
     UIView *textWithSpinnerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 250, 110)];
     textWithSpinnerView.backgroundColor = [UIColor whiteColor];
@@ -161,7 +111,7 @@
     self.busyLabel.alpha = 0.75;
     self.busyLabel.textAlignment = NSTextAlignmentCenter;
     self.busyLabel.adjustsFontSizeToFitWidth = YES;
-    self.busyLabel.text = BC_STRING_LOADING_SYNCING_WALLET;
+    self.busyLabel.text = [LocalizationConstantsObjcBridge syncingWallet];
     self.busyLabel.center = CGPointMake(textWithSpinnerView.bounds.origin.x + textWithSpinnerView.bounds.size.width/2, textWithSpinnerView.bounds.origin.y + textWithSpinnerView.bounds.size.height/2 + 15);
     [textWithSpinnerView addSubview:self.busyLabel];
     
@@ -181,20 +131,13 @@
     self.busyView = busyView;
 }
 
-- (void)presentAlertController:(UIAlertController *)alertController
-{
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ANIMATION_DURATION_LONG * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (self.presentedViewController) {
-            [self.presentedViewController presentViewController:alertController animated:YES completion:nil];
-        } else {
-            [self presentViewController:alertController animated:YES completion:nil];
-        }
-    });
-}
-
 - (void)alertUserToTransferAllFunds:(BOOL)userClicked
 {
-#ifdef ENABLE_TRANSFER_FUNDS
+    AppFeatureConfiguration *transferFundsConfig = [AppFeatureConfigurator.sharedInstance configurationFor:AppFeatureTransferFundsFromImportedAddress];
+    if (!transferFundsConfig.isEnabled) {
+        return;
+    }
+
     UIAlertController *alertToTransfer = [UIAlertController alertControllerWithTitle:BC_STRING_TRANSFER_FUNDS message:[NSString stringWithFormat:@"%@\n\n%@", BC_STRING_TRANSFER_FUNDS_DESCRIPTION_ONE, BC_STRING_TRANSFER_FUNDS_DESCRIPTION_TWO] preferredStyle:UIAlertControllerStyleAlert];
     [alertToTransfer addAction:[UIAlertAction actionWithTitle:BC_STRING_NOT_NOW style:UIAlertActionStyleCancel handler:nil]];
     [alertToTransfer addAction:[UIAlertAction actionWithTitle:BC_STRING_TRANSFER_FUNDS style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
@@ -202,13 +145,12 @@
     }]];
     
     if (!userClicked) {
-        [alertToTransfer addAction:[UIAlertAction actionWithTitle:BC_STRING_DONT_SHOW_AGAIN style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:USER_DEFAULTS_KEY_HIDE_TRANSFER_ALL_FUNDS_ALERT];
+        [alertToTransfer addAction:[UIAlertAction actionWithTitle:[LocalizationConstantsObjcBridge dontShowAgain] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            BlockchainSettings.sharedAppInstance.hideTransferAllFundsAlert = YES;
         }]];
     }
     
     [self presentViewController:alertToTransfer animated:YES completion:nil];
-#endif
 }
 
 #pragma mark - Transfer Funds
@@ -221,46 +163,27 @@
 - (void)transferAllFundsClicked
 {
     [self dismissViewControllerAnimated:YES completion:^{
-        [app closeSideMenu];
+        [[AppCoordinator sharedInstance] closeSideMenu];
     }];
     
-    [app setupTransferAllFunds];
+    [[TransferAllCoordinator sharedInstance] startWithSendScreen];
 }
 
 #pragma mark - Navigation
-
-- (IBAction)backButtonClicked:(UIButton *)sender
-{
-    if ([self.visibleViewController isMemberOfClass:[AccountsAndAddressesViewController class]]) {
-        [self dismissViewControllerAnimated:YES completion:nil];
-        app.topViewControllerDelegate = nil;
-    } else {
-        [self popViewControllerAnimated:YES];
-    }
-}
-
-- (void)didGenerateNewAddress
-{
-    if ([self.visibleViewController isMemberOfClass:[AccountsAndAddressesViewController class]]) {
-        AccountsAndAddressesViewController *accountsAndAddressesViewController = (AccountsAndAddressesViewController *)self.visibleViewController;
-        [accountsAndAddressesViewController didGenerateNewAddress];
-    }
-}
 
 - (void)resetAddressesViewControllerContainerFrame
 {
     if ([self.visibleViewController isMemberOfClass:[AccountsAndAddressesViewController class]]) {
         AccountsAndAddressesViewController *accountsAndAddressesViewController = (AccountsAndAddressesViewController *)self.visibleViewController;
-        [accountsAndAddressesViewController.containerView changeYPosition:DEFAULT_HEADER_HEIGHT + 8 + ASSET_SELECTOR_ROW_HEIGHT];
+        [accountsAndAddressesViewController.containerView changeYPosition:8 + ASSET_SELECTOR_ROW_HEIGHT];
     }
 }
 
 #pragma mark - Asset Selector View Delegate
 
-- (void)didSelectAsset:(AssetType)assetType
+- (void)didSelectAsset:(LegacyAssetType)assetType
 {
     [UIView animateWithDuration:ANIMATION_DURATION animations:^{
-        [self.topBar changeHeight:DEFAULT_HEADER_HEIGHT + 8 + ASSET_SELECTOR_ROW_HEIGHT];
         [self resetAddressesViewControllerContainerFrame];
     }];
     
@@ -275,14 +198,35 @@
     self.isOpeningSelector = YES;
 
     [UIView animateWithDuration:ANIMATION_DURATION animations:^{
-        [self.topBar changeHeight:DEFAULT_HEADER_HEIGHT + 8 + ASSET_SELECTOR_ROW_HEIGHT*self.assetSelectorView.assets.count];
         if ([self.visibleViewController isMemberOfClass:[AccountsAndAddressesViewController class]]) {
             AccountsAndAddressesViewController *accountsAndAddressesViewController = (AccountsAndAddressesViewController *)self.visibleViewController;
-            [accountsAndAddressesViewController.containerView changeYPosition:DEFAULT_HEADER_HEIGHT + 8 + ASSET_SELECTOR_ROW_HEIGHT*self.assetSelectorView.assets.count];
+            [accountsAndAddressesViewController.containerView changeYPosition:8 + ASSET_SELECTOR_ROW_HEIGHT*self.assetSelectorView.assets.count];
         }
     } completion:^(BOOL finished) {
         self.isOpeningSelector = NO;
     }];
+}
+
+#pragma mark WalletAddressesDelegate
+
+- (void)didSetDefaultAccount
+{
+    [AssetAddressRepository.sharedInstance removeAllSwipeAddressesFor:AssetTypeBitcoin];
+    [AssetAddressRepository.sharedInstance removeAllSwipeAddressesFor:AssetTypeBitcoinCash];
+    [AppCoordinator.sharedInstance.tabControllerManager didSetDefaultAccount];
+}
+
+- (void)didGenerateNewAddress
+{
+    if ([self.visibleViewController isMemberOfClass:[AccountsAndAddressesViewController class]]) {
+        AccountsAndAddressesViewController *accountsAndAddressesViewController = (AccountsAndAddressesViewController *)self.visibleViewController;
+        [accountsAndAddressesViewController didGenerateNewAddress];
+    }
+}
+
+- (void)returnToAddressesScreen
+{
+    [self popToRootViewControllerAnimated:YES];
 }
 
 @end

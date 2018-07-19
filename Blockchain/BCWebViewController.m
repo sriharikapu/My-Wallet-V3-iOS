@@ -7,7 +7,7 @@
 //
 
 #import "BCWebViewController.h"
-#import "RootService.h"
+#import "Blockchain-Swift.h"
 
 @interface BCWebViewController ()
 
@@ -42,7 +42,7 @@ NSMutableArray *visitedPages;
 {
     [super viewDidLoad];
     
-    self.view.frame = CGRectMake(0, 0, app.window.frame.size.width, app.window.frame.size.height);
+    self.view.frame = CGRectMake(0, 0, [UIApplication sharedApplication].keyWindow.frame.size.width, [UIApplication sharedApplication].keyWindow.frame.size.height);
     
     UIView *topBar = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, DEFAULT_HEADER_HEIGHT)];
     topBar.backgroundColor = COLOR_BLOCKCHAIN_BLUE;
@@ -126,7 +126,7 @@ NSMutableArray *visitedPages;
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
 {
     if ([error code] != NSURLErrorCancelled) {
-        [app standardNotify:[error localizedDescription]];
+        [[AlertViewPresenter sharedInstance] standardNotifyWithMessage:[error localizedDescription] title:BC_STRING_ERROR in:self handler:nil];
     }
     
     [activityIndicatorView stopAnimating];
@@ -136,9 +136,8 @@ NSMutableArray *visitedPages;
 {
     // External sites open in the system browser
     NSString *hostname = [[request URL] host];
-    if ([hostname rangeOfString:HOST_NAME_WALLET_SERVER].location == NSNotFound) {
+    if ([hostname rangeOfString:[[BlockchainAPI sharedInstance] blockchainWallet]].location == NSNotFound) {
         [[UIApplication sharedApplication] openURL:[request URL]];
-
         return NO;
     }
     

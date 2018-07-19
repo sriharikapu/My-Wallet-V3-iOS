@@ -14,8 +14,7 @@
 #import "BCNavigationController.h"
 #import "BCLine.h"
 #import "ExchangeTableViewCell.h"
-#import "RootService.h"
-
+#import "Blockchain-Swift.h"
 #import "ExchangeDetailView.h"
 
 #define EXCHANGE_VIEW_HEIGHT 70
@@ -24,7 +23,7 @@
 
 #define CELL_IDENTIFIER_EXCHANGE_CELL @"exchangeCell"
 
-@interface ExchangeOverviewViewController () <UITableViewDelegate, UITableViewDataSource, CloseButtonDelegate, ConfirmStateDelegate>
+@interface ExchangeOverviewViewController () <UITableViewDelegate, UITableViewDataSource, CloseButtonDelegate, ConfirmStateDelegate, WalletExchangeDelegate>
 @property (nonatomic) UITableView *tableView;
 @property (nonatomic) NSArray *trades;
 @property (nonatomic) ExchangeCreateViewController *createViewController;
@@ -38,15 +37,17 @@
 {
     [super viewDidLoad];
     
+    [WalletManager sharedInstance].exchangeDelegate = self;
+    
     self.view.backgroundColor = COLOR_TABLE_VIEW_BACKGROUND_LIGHT_GRAY;
     
-    NSArray *availableStates = [app.wallet availableUSStates];
+    NSArray *availableStates = [WalletManager.sharedInstance.wallet availableUSStates];
     
     if (availableStates.count > 0) {
         [self showStates:availableStates];
     } else {
-        [app showBusyViewWithLoadingText:BC_STRING_LOADING_EXCHANGE];
-        [app.wallet performSelector:@selector(getExchangeTrades) withObject:nil afterDelay:ANIMATION_DURATION];
+        [[LoadingViewPresenter sharedInstance] showBusyViewWithLoadingText:BC_STRING_LOADING_EXCHANGE];
+        [WalletManager.sharedInstance.wallet performSelector:@selector(getExchangeTrades) withObject:nil afterDelay:ANIMATION_DURATION];
     }
 }
 
@@ -63,9 +64,8 @@
     [super viewDidAppear:animated];
     
     if (self.didFinishShift) {
-        BCNavigationController *navigationController = (BCNavigationController *)self.navigationController;
-        [navigationController showBusyViewWithLoadingText:BC_STRING_LOADING_LOADING_TRANSACTIONS];
-        [app.wallet performSelector:@selector(getExchangeTrades) withObject:nil afterDelay:ANIMATION_DURATION];
+        [[LoadingViewPresenter sharedInstance] showBusyViewWithLoadingText:[LocalizationConstantsObjcBridge loadingTransactions]];
+        [WalletManager.sharedInstance.wallet performSelector:@selector(getExchangeTrades) withObject:nil afterDelay:ANIMATION_DURATION];
     }
 }
 
@@ -74,6 +74,11 @@
     [super viewWillDisappear:animated];
     
     self.didFinishShift = NO;
+}
+
+- (void)reloadSymbols
+{
+    [self.tableView reloadData];
 }
 
 - (void)setupSubviewsIfNeeded
@@ -87,8 +92,8 @@
 
 - (void)setupExchangeButtonView
 {
-    CGFloat windowWidth = WINDOW_WIDTH;
-    UIView *newExchangeView = [[UIView alloc] initWithFrame:CGRectMake(0, DEFAULT_HEADER_HEIGHT + EXCHANGE_VIEW_OFFSET, windowWidth, EXCHANGE_VIEW_HEIGHT)];
+    CGFloat windowWidth = self.view.frame.size.width;
+    UIView *newExchangeView = [[UIView alloc] initWithFrame:CGRectMake(0, EXCHANGE_VIEW_OFFSET, windowWidth, EXCHANGE_VIEW_HEIGHT)];
     newExchangeView.backgroundColor = [UIColor whiteColor];
     
     BCLine *topLine = [[BCLine alloc] initWithYPosition:newExchangeView.frame.origin.y - 1];
@@ -125,8 +130,8 @@
 
 - (void)setupTableView
 {
-    CGFloat windowWidth = WINDOW_WIDTH;
-    CGFloat yOrigin = DEFAULT_HEADER_HEIGHT + EXCHANGE_VIEW_OFFSET + EXCHANGE_VIEW_HEIGHT + 16;
+    CGFloat windowWidth = self.view.frame.size.width;
+    CGFloat yOrigin = EXCHANGE_VIEW_OFFSET + EXCHANGE_VIEW_HEIGHT + 16;
     UITableView *tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, yOrigin, windowWidth, self.view.frame.size.height - 16 - yOrigin) style:UITableViewStylePlain];
     tableView.delegate = self;
     tableView.dataSource = self;
@@ -153,9 +158,8 @@
 
 - (void)getHistory
 {
-    BCNavigationController *navigationController = (BCNavigationController *)self.navigationController;
-    [navigationController showBusyViewWithLoadingText:BC_STRING_LOADING_LOADING_TRANSACTIONS];
-    [app.wallet performSelector:@selector(getExchangeTrades) withObject:nil afterDelay:ANIMATION_DURATION];
+    [[LoadingViewPresenter sharedInstance] showBusyViewWithLoadingText:[LocalizationConstantsObjcBridge loadingTransactions]];
+    [WalletManager.sharedInstance.wallet performSelector:@selector(getExchangeTrades) withObject:nil afterDelay:ANIMATION_DURATION];
 }
 
 - (void)showStates:(NSArray *)states
@@ -178,9 +182,11 @@
     self.createViewController = createViewController;
 }
 
-- (void)didGetExchangeTrades:(NSArray *)trades
+#pragma mark - Wallet Exchange Delegate
+
+- (void)didGetExchangeTradesWithTrades:(NSArray * _Nonnull)trades
 {
-    [app hideBusyView];
+    [[LoadingViewPresenter sharedInstance] hideBusyView];
     
     BCNavigationController *navigationController = (BCNavigationController *)self.navigationController;
     [navigationController hideBusyView];
@@ -202,30 +208,29 @@
     }
 }
 
-- (void)didGetExchangeRate:(NSDictionary *)result
+- (void)didGetExchangeRateWithRate:(NSDictionary * _Nonnull)rate
 {
-    [self.createViewController didGetExchangeRate:result];
+    [self.createViewController didGetExchangeRate:rate];
 }
 
-- (void)didGetAvailableEthBalance:(NSDictionary *)result
+- (void)didGetAvailableEthBalanceWithResult:(NSDictionary * _Nonnull)result
 {
     [self.createViewController didGetAvailableEthBalance:result];
 }
 
-- (void)didGetAvailableBtcBalance:(NSDictionary *)result
+- (void)didGetAvailableBtcBalanceWithResult:(NSDictionary * _Nullable)result
 {
     [self.createViewController didGetAvailableBtcBalance:result];
 }
 
-- (void)didBuildExchangeTrade:(NSDictionary *)tradeInfo
+- (void)didBuildExchangeTradeWithTradeInfo:(NSDictionary * _Nonnull)tradeInfo
 {
     [self.createViewController didBuildExchangeTrade:tradeInfo];
 }
 
-- (void)didShiftPayment:(NSDictionary *)info
+- (void)didShiftPayment
 {
-    BCNavigationController *navigationController = (BCNavigationController *)self.navigationController;
-    [navigationController hideBusyView];
+    [[LoadingViewPresenter sharedInstance] hideBusyView];
     
     ExchangeModalView *exchangeModalView = [[ExchangeModalView alloc] initWithFrame:self.view.frame description:BC_STRING_EXCHANGE_DESCRIPTION_SENDING_FUNDS imageName:@"exchange_sending" bottomText:[NSString stringWithFormat:BC_STRING_STEP_ARGUMENT_OF_ARGUMENT, 1, 3] closeButtonText:BC_STRING_CLOSE];
     exchangeModalView.delegate = self;
@@ -235,11 +240,6 @@
         self.createViewController.navigationController.viewControllers = @[self, self.createViewController];
     }
     [self.navigationController presentViewController:modalViewController animated:YES completion:nil];
-}
-
-- (void)reloadSymbols
-{
-    [self.tableView reloadData];
 }
 
 #pragma mark - Confirm State delegate

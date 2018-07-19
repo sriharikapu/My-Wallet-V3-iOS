@@ -6,7 +6,6 @@
 //  Copyright © 2015 Blockchain Luxembourg S.A. All rights reserved.
 //
 
-#import "RootService.h"
 #import "BCFadeView.h"
 #import "SettingsChangePasswordViewController.h"
 #import "Blockchain-Swift.h"
@@ -29,7 +28,7 @@
     [super viewDidLoad];
     
     UIButton *createButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    createButton.frame = CGRectMake(0, 0, app.window.frame.size.width, 46);
+    createButton.frame = CGRectMake(0, 0, [UIApplication sharedApplication].keyWindow.frame.size.width, 46);
     createButton.backgroundColor = COLOR_BLOCKCHAIN_LIGHT_BLUE;
     [createButton setTitle:BC_STRING_CONTINUE forState:UIControlStateNormal];
     [createButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -117,7 +116,7 @@
         
         SettingsNavigationController *navigationController = (SettingsNavigationController *)self.navigationController;
         [navigationController.busyView fadeIn];
-        [app.wallet changePassword:self.newerPasswordTextField.text];
+        [WalletManager.sharedInstance.wallet changePassword:self.newerPasswordTextField.text];
     }
 }
 
@@ -125,14 +124,13 @@
 {
     [self removeObserversForChangingPassword];
     
-    UIAlertController *alertForChangePasswordSuccess = [UIAlertController alertControllerWithTitle:BC_STRING_SUCCESS message:BC_STRING_SETTINGS_SECURITY_PASSWORD_CHANGED preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alertForChangePasswordSuccess = [UIAlertController alertControllerWithTitle:[LocalizationConstantsObjcBridge success] message:BC_STRING_SETTINGS_SECURITY_PASSWORD_CHANGED preferredStyle:UIAlertControllerStyleAlert];
     [alertForChangePasswordSuccess addAction:[UIAlertAction actionWithTitle:BC_STRING_OK style:UIAlertActionStyleCancel handler:nil]];
     [self.navigationController dismissViewControllerAnimated:YES completion:^{
-        app.settingsNavigationController = nil;
-        [app closeSideMenu];
-        [app showPasswordModal];
-        app.changedPassword = YES;
-        [app.window.rootViewController presentViewController:alertForChangePasswordSuccess animated:YES completion:nil];
+        [AppCoordinator.sharedInstance closeSideMenu];
+        [AuthenticationCoordinator.sharedInstance showPasswordModal];
+        WalletManager.sharedInstance.didChangePassword = YES;
+        [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alertForChangePasswordSuccess animated:YES completion:nil];
     }];
 
     [self clearTextFields];
@@ -169,7 +167,7 @@
     UIColor *color;
     NSString *description;
     
-    float passwordStrength = [app.wallet getStrengthForPassword:password];
+    float passwordStrength = [WalletManager.sharedInstance.wallet getStrengthForPassword:password];
 
     if (passwordStrength < 25) {
         color = COLOR_PASSWORD_STRENGTH_WEAK;
@@ -201,18 +199,18 @@
 
 - (BOOL)isReadyToSubmitForm
 {
-    if (![app.wallet isCorrectPassword:self.mainPasswordTextField.text]) {
+    if (![WalletManager.sharedInstance.wallet isCorrectPassword:self.mainPasswordTextField.text]) {
         [self alertUserOfError:BC_STRING_INCORRECT_PASSWORD];
         return NO;
     }
     
     if ([self.newerPasswordTextField.text length] == 0) {
         [self.newerPasswordTextField becomeFirstResponder];
-        [self alertUserOfError:BC_STRING_NO_PASSWORD_ENTERED];
+        [self alertUserOfError:LocalizationConstantsObjcBridge.noPasswordEntered];
         return NO;
     }
     
-    NSString *email = [app.wallet getEmail];
+    NSString *email = [WalletManager.sharedInstance.wallet getEmail];
     if (email && [self.newerPasswordTextField.text isEqualToString:email]) {
         [self.newerPasswordTextField becomeFirstResponder];
         [self alertUserOfError:BC_STRING_PASSWORD_MUST_BE_DIFFERENT_FROM_YOUR_EMAIL];
@@ -239,12 +237,13 @@
         return NO;
     }
     
-    if ([app.wallet isCorrectPassword:self.newerPasswordTextField.text]) {
+    if ([WalletManager.sharedInstance.wallet isCorrectPassword:self.newerPasswordTextField.text]) {
         [self alertUserOfError:BC_STRING_NEW_PASSWORD_MUST_BE_DIFFERENT];
         return NO;
     }
     
-    if (![app checkInternetConnection]) {
+    if (!Reachability.hasInternetConnection) {
+        [AlertViewPresenter.sharedInstance showNoInternetConnectionAlert];
         return NO;
     }
     

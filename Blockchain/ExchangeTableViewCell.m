@@ -8,8 +8,8 @@
 
 #import "ExchangeTableViewCell.h"
 #import "NSDateFormatter+TimeAgoString.h"
-#import "RootService.h"
 #import "NSNumberFormatter+Currencies.h"
+#import "Blockchain-Swift.h"
 
 @implementation ExchangeTableViewCell
 
@@ -45,12 +45,13 @@
     self.actionLabel.frame = CGRectMake(self.actionLabel.frame.origin.x, 29, self.actionLabel.frame.size.width, self.actionLabel.frame.size.height);
     self.dateLabel.frame = CGRectMake(self.dateLabel.frame.origin.x, 11, self.dateLabel.frame.size.width, self.dateLabel.frame.size.height);
     
-    if (app->symbolLocal) {
+    if (BlockchainSettings.sharedAppInstance.symbolLocal) {
         NSString *lowercaseWithdrawalCurrencySymbol = [[trade withdrawalCurrency] lowercaseString];
         if ([lowercaseWithdrawalCurrencySymbol isEqualToString:[CURRENCY_SYMBOL_BTC lowercaseString]]) {
             amountString = [NSNumberFormatter formatMoney:ABS([NSNumberFormatter parseBtcValueFromString:[trade.withdrawalAmount stringValue]])];
         } else if ([lowercaseWithdrawalCurrencySymbol isEqualToString:[CURRENCY_SYMBOL_ETH lowercaseString]]) {
-            amountString = [NSNumberFormatter formatEthWithLocalSymbol:[trade.withdrawalAmount stringValue] exchangeRate:app.tabControllerManager.latestEthExchangeRate];
+            TabControllerManager *tabControllerManager = [AppCoordinator sharedInstance].tabControllerManager;
+            amountString = [NSNumberFormatter formatEthWithLocalSymbol:[trade.withdrawalAmount stringValue] exchangeRate:tabControllerManager.latestEthExchangeRate];
         } else if ([lowercaseWithdrawalCurrencySymbol isEqualToString:[CURRENCY_SYMBOL_BCH lowercaseString]]) {
             amountString = [NSNumberFormatter formatBchWithSymbol:ABS([NSNumberFormatter parseBtcValueFromString:[trade.withdrawalAmount stringValue]])];
         } else {
@@ -66,7 +67,7 @@
 
 - (IBAction)amountButtonClicked:(id)sender
 {
-    [app toggleSymbol];
+    BlockchainSettings.sharedAppInstance.symbolLocal = !BlockchainSettings.sharedAppInstance.symbolLocal;
 }
 
 @end

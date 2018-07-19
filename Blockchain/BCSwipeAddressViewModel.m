@@ -7,23 +7,24 @@
 //
 
 #import "BCSwipeAddressViewModel.h"
+#import "Blockchain-Swift.h"
 
 @implementation BCSwipeAddressViewModel
 
-- (id)initWithAssetType:(AssetType)assetType
+- (id)initWithAssetType:(LegacyAssetType)assetType
 {
     if (self == [super init]) {
         self.assetType = assetType;
         NSString *suffix;
         NSString *assetImageViewName;
-        if (assetType == AssetTypeBitcoin) {
-            suffix = BC_STRING_BITCOIN;
+        if (assetType == LegacyAssetTypeBitcoin) {
+            suffix = [AssetTypeLegacyHelper descriptionFor:AssetTypeBitcoin];
             assetImageViewName = @"bitcoin_large";
-        } else if (assetType == AssetTypeEther) {
-            suffix = BC_STRING_ETHER;
+        } else if (assetType == LegacyAssetTypeEther) {
+            suffix = [AssetTypeLegacyHelper descriptionFor:AssetTypeEthereum];
             assetImageViewName = @"ether_large";
-        } else if (assetType == AssetTypeBitcoinCash) {
-            suffix = BC_STRING_BITCOIN_CASH;
+        } else if (assetType == LegacyAssetTypeBitcoinCash) {
+            suffix = [AssetTypeLegacyHelper descriptionFor:AssetTypeBitcoinCash];
             assetImageViewName = @"bitcoin_cash_large";
         }
         self.assetImageViewName = assetImageViewName;
@@ -35,8 +36,8 @@
 - (void)setAddress:(NSString *)address
 {
     _address = address;
-    
-    self.textAddress = self.assetType == AssetTypeBitcoinCash ? [address substringFromIndex:[PREFIX_BITCOIN_CASH length]] : address;
+
+    self.textAddress = self.assetType == LegacyAssetTypeBitcoinCash ? [address substringFromIndex:[[[ConstantsObjcBridge bitcoinCashUriPrefix] stringByAppendingString:@":"] length]] : address;
 }
 
 @end

@@ -11,7 +11,8 @@
 #import "NSDateFormatter+TimeAgoString.h"
 #import "TransactionDetailViewController.h"
 #import "TransactionDetailNavigationController.h"
-#import "RootService.h"
+#import "Blockchain-Swift.h"
+#import "NSNumberFormatter+Currencies.h"
 
 @implementation TransactionEtherTableViewCell
 
@@ -35,10 +36,11 @@
         self.ethButton.alpha = 0.5;
         self.actionLabel.alpha = 0.5;
     }
-    
+
+    TabControllerManager *tabControllerManager = [AppCoordinator sharedInstance].tabControllerManager;
     self.ethButton.titleLabel.minimumScaleFactor = 0.75f;
     self.ethButton.titleLabel.adjustsFontSizeToFitWidth = YES;
-    [self.ethButton setTitle:app->symbolLocal ? [NSNumberFormatter formatEthToFiatWithSymbol:self.transaction.amount exchangeRate:app.tabControllerManager.latestEthExchangeRate] : [NSNumberFormatter formatEth: self.transaction.amountTruncated] forState:UIControlStateNormal];
+    [self.ethButton setTitle:BlockchainSettings.sharedAppInstance.symbolLocal ? [NSNumberFormatter formatEthToFiatWithSymbol:self.transaction.amount exchangeRate:tabControllerManager.latestEthExchangeRate] : [NSNumberFormatter formatEth: self.transaction.amountTruncated] forState:UIControlStateNormal];
     [self.ethButton addTarget:self action:@selector(ethButtonClicked) forControlEvents:UIControlEventTouchUpInside];
     
     if ([self.transaction.txType isEqualToString:TX_TYPE_TRANSFER]) {
@@ -58,16 +60,16 @@
     self.infoLabel.adjustsFontSizeToFitWidth = YES;
     self.infoLabel.layer.cornerRadius = 5;
     self.infoLabel.clipsToBounds = YES;
-    self.infoLabel.customEdgeInsets = UIEdgeInsetsMake(0, 4, 0, 4);
+    self.infoLabel.customEdgeInsets = [ConstantsObjcBridge infoLabelEdgeInsets];
     self.infoLabel.hidden = NO;
     
     self.actionLabel.frame = CGRectMake(self.actionLabel.frame.origin.x, 20, self.actionLabel.frame.size.width, self.actionLabel.frame.size.height);
     self.dateLabel.frame = CGRectMake(self.dateLabel.frame.origin.x, 3, self.dateLabel.frame.size.width, self.dateLabel.frame.size.height);
     
-    if ([app.wallet isDepositTransaction:self.transaction.myHash]) {
+    if ([WalletManager.sharedInstance.wallet isDepositTransaction:self.transaction.myHash]) {
         self.infoLabel.text = BC_STRING_DEPOSITED_TO_SHAPESHIFT;
         self.infoLabel.backgroundColor = COLOR_BLOCKCHAIN_BLUE;
-    } else if ([app.wallet isWithdrawalTransaction:self.transaction.myHash]) {
+    } else if ([WalletManager.sharedInstance.wallet isWithdrawalTransaction:self.transaction.myHash]) {
         self.infoLabel.text = BC_STRING_RECEIVED_FROM_SHAPESHIFT;
         self.infoLabel.backgroundColor = COLOR_BLOCKCHAIN_BLUE;
     } else {
@@ -81,8 +83,9 @@
 
 - (void)transactionClicked
 {
+    TabControllerManager *tabControllerManager = [AppCoordinator sharedInstance].tabControllerManager;
     TransactionDetailViewController *detailViewController = [TransactionDetailViewController new];
-    TransactionDetailViewModel *model = [[TransactionDetailViewModel alloc] initWithEtherTransaction:self.transaction exchangeRate:app.tabControllerManager.latestEthExchangeRate defaultAddress:[app.wallet getEtherAddress]];
+    TransactionDetailViewModel *model = [[TransactionDetailViewModel alloc] initWithEtherTransaction:self.transaction exchangeRate:tabControllerManager.latestEthExchangeRate defaultAddress:[WalletManager.sharedInstance.wallet getEtherAddress]];
     detailViewController.transactionModel = model;
 
     TransactionDetailNavigationController *navigationController = [[TransactionDetailNavigationController alloc] initWithRootViewController:detailViewController];
@@ -90,16 +93,13 @@
     
     detailViewController.busyViewDelegate = navigationController;
     navigationController.onDismiss = ^() {
-        app.tabControllerManager.transactionsEtherViewController.detailViewController = nil;
+        tabControllerManager.transactionsEtherViewController.detailViewController = nil;
     };
     navigationController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-    app.tabControllerManager.transactionsEtherViewController.detailViewController = detailViewController;
-    
-    if (app.topViewControllerDelegate) {
-        [app.topViewControllerDelegate presentViewController:navigationController animated:YES completion:nil];
-    } else {
-        [app.window.rootViewController presentViewController:navigationController animated:YES completion:nil];
-    }
+    tabControllerManager.transactionsEtherViewController.detailViewController = detailViewController;
+
+    UIViewController *topViewController = UIApplication.sharedApplication.keyWindow.rootViewController.topMostViewController;
+    [topViewController presentViewController:navigationController animated:YES completion:nil];
 }
 
 - (void)ethButtonClicked
