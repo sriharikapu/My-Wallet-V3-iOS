@@ -39,6 +39,21 @@ import RxSwift
         }
     }
 
+    func isCountryInHomebrewRegion(countryCode: String) -> Single<Bool> {
+        return networkManager.requestJsonOrString(
+            BlockchainAPI.Kyc.countries,
+            method: .get
+        ).map {
+            guard $0.statusCode == 200 else {
+                throw WalletServiceError.generic(message: nil)
+            }
+            guard let json = $1 as? JSON else {
+                throw WalletServiceError.jsonParseError
+            }
+            return json.keys.contains(countryCode)
+        }
+    }
+
     /// Validates if the provided pin payload (i.e. pin code and pin key combination) is correct.
     ///
     /// - Parameter pinPayload: the PinPayload
