@@ -41,7 +41,6 @@ class WalletManager: NSObject {
     @objc weak var sendBitcoinDelegate: WalletSendBitcoinDelegate?
     @objc weak var sendEtherDelegate: WalletSendEtherDelegate?
     @objc weak var exchangeDelegate: WalletExchangeDelegate?
-    @objc weak var exchangeIntermediateDelegate: WalletExchangeIntermediateDelegate?
     @objc weak var fiatAtTimeDelegate: WalletFiatAtTimeDelegate?
     @objc weak var transactionDelegate: WalletTransactionDelegate?
     @objc weak var transferAllDelegate: WalletTransferAllDelegate?
@@ -489,8 +488,8 @@ extension WalletManager: WalletDelegate {
     }
 
     func didCreateEthAccountForExchange() {
-        DispatchQueue.main.async { [unowned self] in
-            self.exchangeIntermediateDelegate?.didCreateEthAccountForExchange()
+        DispatchQueue.main.async {
+            ExchangeCoordinator.shared.start()
         }
     }
 

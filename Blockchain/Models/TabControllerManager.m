@@ -11,7 +11,7 @@
 #import "Transaction.h"
 #import "Blockchain-Swift.h"
 
-@interface TabControllerManager () <WalletSettingsDelegate, WalletSendBitcoinDelegate, WalletSendEtherDelegate, WalletExchangeIntermediateDelegate, WalletTransactionDelegate, WalletWatchOnlyDelegate, WalletFiatAtTimeDelegate>
+@interface TabControllerManager () <WalletSettingsDelegate, WalletSendBitcoinDelegate, WalletSendEtherDelegate, WalletTransactionDelegate, WalletWatchOnlyDelegate, WalletFiatAtTimeDelegate>
 @end
 @implementation TabControllerManager
 
@@ -32,7 +32,6 @@
     walletManager.settingsDelegate = self;
     walletManager.sendBitcoinDelegate = self;
     walletManager.sendEtherDelegate = self;
-    walletManager.exchangeIntermediateDelegate = self;
     walletManager.transactionDelegate = self;
     walletManager.watchOnlyDelegate = self;
     walletManager.fiatAtTimeDelegate = self;
@@ -801,26 +800,16 @@
     [viewControllerToPresent QRCodebuttonClicked:nil];
 }
 
-- (void)exchangeClicked
+- (void)showShapeshift
 {
-    if ([WalletManager.sharedInstance.wallet hasEthAccount]) {
-        self.exchangeOverviewViewController = [ExchangeOverviewViewController new];
-        BCNavigationController *navigationController = [[BCNavigationController alloc] initWithRootViewController:self.exchangeOverviewViewController title:BC_STRING_EXCHANGE];
-        [self.tabViewController presentViewController:navigationController animated:YES completion:nil];
-    } else {
-        if ([WalletManager.sharedInstance.wallet needsSecondPassword]) {
-            [AuthenticationCoordinator.shared showPasswordConfirmWithDisplayText:BC_STRING_ETHER_ACCOUNT_SECOND_PASSWORD_PROMPT headerText:LocalizationConstantsObjcBridge.secondPasswordRequired validateSecondPassword:YES confirmHandler:^(NSString * _Nonnull secondPassword) {
-                [WalletManager.sharedInstance.wallet createEthAccountForExchange:secondPassword];
-            }];
-        } else {
-            [WalletManager.sharedInstance.wallet createEthAccountForExchange:nil];
-        }
-    }
+    self.exchangeOverviewViewController = [ExchangeOverviewViewController new];
+    BCNavigationController *navigationController = [[BCNavigationController alloc] initWithRootViewController:self.exchangeOverviewViewController title:BC_STRING_EXCHANGE];
+    [self.tabViewController presentViewController:navigationController animated:YES completion:nil];
 }
 
-- (void)didCreateEthAccountForExchange
+- (void)showHomebrew
 {
-    [self exchangeClicked];
+    // TODO
 }
 
 - (void)showGetAssetsAlert

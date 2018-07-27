@@ -1376,6 +1376,15 @@
     [self.context evaluateScript:@"MyWalletPhone.getAccountInfoAndExchangeRates()"];
 }
 
+- (NSString *)countryCodeGuess
+{
+    if (![self isInitialized]) {
+        return nil;
+    }
+
+    return [[self.context evaluateScript:@"MyWalletPhone.countryCodeGuess()"] toString];
+}
+
 - (NSString *)getEmail
 {
     if (![self isInitialized]) {
@@ -2602,7 +2611,7 @@
 - (void)createEthAccountForExchange:(NSString *)secondPassword
 {
     if ([self isInitialized]) {
-        NSString *setupHelperText = BC_STRING_ETHER_ACCOUNT_SECOND_PASSWORD_PROMPT;
+        NSString *setupHelperText = [LocalizationConstantsObjcBridge etherSecondPasswordPrompt];
         [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.createEthAccountForExchange(\"%@\", \"%@\")", [secondPassword escapedForJS], [setupHelperText escapedForJS]]];
     }
 }
@@ -2664,7 +2673,7 @@
 - (NSString *)getEtherAddress
 {
     if ([self isInitialized]) {
-        NSString *setupHelperText = BC_STRING_ETHER_ACCOUNT_SECOND_PASSWORD_PROMPT;
+        NSString *setupHelperText = [LocalizationConstantsObjcBridge etherSecondPasswordPrompt];
         JSValue *result = [self.context evaluateScript:[NSString stringWithFormat:@"MyWalletPhone.getEtherAddress(\"%@\")", [setupHelperText escapedForJS]]];
         if ([result isUndefined]) return nil;
         NSString *etherAddress = [result toString];

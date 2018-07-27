@@ -352,6 +352,7 @@
 - (BOOL)getEmailVerifiedStatus;
 
 - (void)getAccountInfoAndExchangeRates;
+- (NSString *_Nullable)countryCodeGuess;
 
 - (void)changeEmail:(NSString *)newEmail;
 - (void)resendVerificationEmail:(NSString *)email;
